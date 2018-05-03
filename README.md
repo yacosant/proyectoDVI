@@ -1,18 +1,18 @@
-#PROYECTO FINAL DVI
+# PROYECTO FINAL DVI
 
-##EL JUEGO: Ghosts 'n Goblins
+## EL JUEGO: Ghosts 'n Goblins
 ![Logo](/md/ghost-and-goblins.jpg)
 
-##Descripcion
+## Descripcion
 Fue creado por Capcom.
 El jugador controla a un caballero, llamado **Sir Arthur**, que tiene la habilidad de arrojar lanzas, dagas, antorchas, hachas y otras armas con las que debe derrotar a zombis, demonios y otras criaturas fantasmagóricas para poder rescatar a una princesa.
 
-##Objetivo del juego
+## Objetivo del juego
 El objetivo del juego consiste en superar los 7 niveles y rescatar a la princesa en el ultimo.
 
-##Principales mecánicas
+## Principales mecánicas
 
-##Personajes
+## Personajes
 ![arthur](/md/arthur.png)
 **Sir Arthur**: Personaje principal, es el caballero que se enfrenta a las legiones de los muertos vivientes y varias otras criaturas sobrenaturales. Arturo ha enfrentado valientemente a poderosos señores demonios, como Astaroth, Lucifer y Sardius, y vivió para contarlo.
 
@@ -39,19 +39,19 @@ El objetivo del juego consiste en superar los 7 niveles y rescatar a la princesa
 
 
 
-###NIVELES 
+### NIVELES 
 ![niveles](/md/niveles.gif)
 **El cementerio y el bosque**
 En el cementerio lucharás contra zombies que salen del suelo, contra plantas que te lanzan ojos y contra gárgolas voladoras que te harán las cosas difíciles. Una vez en el bosque, lucharás contra caballeros oscuros, espectros armados con arpones y contra el Cíclope, el malo final que tendrás que vencer para pasar al siguiente nivel.
 
-##IMPLEMENTACION
+## IMPLEMENTACION
 
 
-##DESARROLLADORES
+## DESARROLLADORES
 *Andrea Martin
 *Jose Luis Sánchez Gárcia 
 *Yaco Alejandro Santiago Pérez
 
 
-##RECURSOS Y FUENTES
+## RECURSOS Y FUENTES
 Sprites obtenidos de la web www.spriters-resources.com

@@ -1,6 +1,6 @@
-#PROYECTO FINAL DVI: ALCANCE
+# PROYECTO FINAL DVI: ALCANCE
 
-##EL JUEGO: Ghosts 'n Goblins
+## EL JUEGO: Ghosts 'n Goblins
 ![Logo](/md/ghost-and-goblins.jpg)
 
 **Descripcion**
