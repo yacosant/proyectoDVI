@@ -48,12 +48,12 @@ El objetivo del juego consiste en superar los 7 niveles y rescatar a la princesa
 En el cementerio lucharás contra zombies que salen del suelo, contra plantas que te lanzan ojos y contra gárgolas voladoras que te harán las cosas difíciles. Una vez en el bosque, lucharás contra caballeros oscuros, espectros armados con arpones y contra el Cíclope, el malo final que tendrás que vencer para pasar al siguiente nivel.
 
 ## IMPLEMENTACION
-
+La implementación se ha hecho mediante el motor de videojuegos *Quintus*.
 
 ## DESARROLLADORES
-*Andrea Martin
-*Jose Luis Sánchez Gárcia 
-*Yaco Alejandro Santiago Pérez
+* Andrea Martin
+* Jose Luis Sánchez Gárcia 
+* Yaco Alejandro Santiago Pérez
 
 
 ## RECURSOS Y FUENTES
