@@ -1,0 +1,16 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 05-abr-2018, 15:04:21
+    Author     : usuario_local
+*/
+body{
+    background-color: darkgrey;
+}
+canvas { 
+    background-color:#55aaff;
+    border: outset 3px black;
+}
