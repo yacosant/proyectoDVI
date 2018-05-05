@@ -204,36 +204,46 @@ Q.animations('Mario', {
   jump_left: { frames: [18,19,20,21], rate: 1/2,loop: false},
   die:{ frames: [12], rate: 1/8}
 });
-//Animacion del Bloopa
-Q.animations('Bloopa', {
-    bloopa: { frames: [0,1], rate: 1/2 },
-    bloopaDie: { frames: [2,3], rate: 1/3},
-    bloopaDieStop: { frames: [2], rate: 1}
+//Animacion del Crow
+Q.animations('Crow', {
+    crow: { frames: [0,1,2,3], rate: 1/2 },
+    crowFly: { frames: [4,5,6,7], rate: 1/3}
 });
-//Animacion del goomba  
-Q.animations('Goomba', {
-    goomba: { frames: [0,1], rate: 1/3},
-    goombaDie: { frames: [1,2,3], rate: 1/3},
-    goombaDieStop: { frames: [3], rate: 1}
+
+//Animacion del zombie  
+Q.animations('Zombie', {
+    zombie: { frames: [7,8,9], rate: 1/3},
+    zombieBorn: { frames: [0,1,2,3,4,5,6], rate: 1/3}
 });
-//Animacion de la moneda
-Q.animations('Coin', {
-    coin: { frames: [0,1,2], rate: 1/2}
+
+//Animacion de la bullet
+Q.animations('Bullet', {
+    bullet: { frames: [0,1,2,3], rate: 1/2}
 });
-//Animacion de Bowser
-Q.animations('Bowser', {
-  run_right: { frames: [0,1,2,3], rate: 1/5}, 
-  run_left: { frames: [4,5,6,7], rate:1/5 },
-  die:{ frames: [0], rate:1/5 }
+
+//Animacion de Devil
+Q.animations('Devil', {
+  devil: { frames: [0,1,2], rate: 1/5}, 
+  devilHide: { frames: [4,5], rate:1/2 },
+  devilFly: { frames: [4], rate:1/2 },
+  devilPrincess:{ frames: [6], rate:1/2 }
 });
-//Animacion del disparo de Bowser
-Q.animations('Bowser_fireball', {
-  shoot: { frames: [0,1], rate: 1/5} 
+
+//Animacion de la planta
+Q.animations('Plant', {
+    plant: { frames: [0,1,2,3,4], rate: 1/2}
+})
+
+//Animacion del disparo
+Q.animations('Burst', {
+  burst: { frames: [0,1,2,3], rate: 1/5} 
 });
-//Animacion del hacha
-Q.animations('Axe', {
-  shine: { frames: [0,1,2,3], rate: 1/5} 
+
+//Animacion de a princesa
+Q.animations('Princess', {
+    princess: { frames: [0,1,2,3], rate: 1/5} 
 });
+
 /*-------------------------------JUGADOR--------------------------------------*/
 Q.Sprite.extend("Mario",{
     init:function(p) {
@@ -470,22 +480,21 @@ Q.Sprite.extend("Princess",{
     }
 });
 /*-------------------------------ENEMIGOS-------------------------------------*/
-//Bloopa
-Q.Sprite.extend("Bloopa",{ 
+//Crow
+Q.Sprite.extend("Crow",{ 
     init: function(p) { 
         this._super(p, { 
-            sheet: "bloopa",
-            sprite:"Bloopa",
+            sheet: "crow",
+            sprite:"Crow",
             frame: 0,
             vy:100,
+            x:25,
             gravity:0,
-            die: false,
-            muerteCont: 0,
             type: SPRITE_ENEMY,
-            collisionMask: SPRITE_PLAYER | SPRITE_DEFAULT
+            collisionMask: SPRITE_PLAYER
         }); 
-        this.add("2d,aiBounce2,animation");
-        this.play("bloopa");
+        this.add("2d,aiBounce,animation");
+        this.play("crow");
     },
     muerte:function() {
       Q.audio.play('kill_enemy.ogg');
