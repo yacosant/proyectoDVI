@@ -10,17 +10,13 @@ var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .include("Sprites, Scenes, Input, 2D, Anim,UI,TMX,Audio")//Librerias del quintus cargadas
                 .setup({
                          width:   800,// Set the default width to 800 pixels
-                         height:  600,// Set the default height to 600 pixels
-                         upsampleWidth:  420,// Double the pixel density of the
-                         upsampleHeight: 320,// game if the w or h is 420x320
-                         downsampleWidth: 1024,// Halve the pixel density if resolution
-                         downsampleHeight: 768// is larger than or equal to 1024x768
+                         height:  600// Set the default height to 600 pixels
                 })
                 .controls()//Controles para PC
                 .enableSound();//Habilita el uso de audio
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload([]);
+Q.preload(["main_title.png"]);
 //JSON'S 
 Q.preload([]);
 //Musica
@@ -30,13 +26,15 @@ Q.preload(function(){
     //Compilacion del las sheets
 
     //Estado global de juego
-    Q.state.set({ score: 0, lives: 4 //Puntuaciones
+    Q.state.set({ score: 0, lives: 4, //Puntuaciones
+                  level:1,world:1,
+                  pause:false,enJuego:false
                 });
     //Controlador de la musica de fondo
-    backMusic= new Q.backMusic();
+    //backMusic= new Q.backMusic();
     //Carga del menu principal
     Q.loadTMX("mainMenu.tmx", function() {
-    Q.stageScene("initScreen");
+        Q.stageScene("initScreen");
     });
 });
 /*-----------------------------COMPONENTES------------------------------------*/
@@ -205,8 +203,7 @@ Q.scene("initScreen",function(stage){
     Q.stageTMX("mainMenu.tmx",stage);
     stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:32,color: "#ffffff",label: "Pulsa enter para empezar" }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
-    stage.insert(new Q.Mario({x:(3*34),y:13*34,limInfMapa:17*34,auto:true,vx:80}));
-    Q.state.set({ score:0, lives:4,coins:0,level:1,world:1,pause:false,enJuego:false });
+    Q.state.set({ score:0, lives:4,level:1,world:1,pause:false,enJuego:false });
     //Musica principal del juego
     Q.input.on("confirm",this,function(){
             Q.loadTMX("world1level1.tmx", function() {
@@ -270,17 +267,5 @@ Q.scene('pauseMessage',function(stage) {
 */
 //World 1 level 1
 Q.scene("W1L1",function(stage) {
-    
-});
-//World 1 level 2
-Q.scene("W1L2",function(stage) {
-  
-});
-//World 1 level 3
-Q.scene("W1L3",function(stage) {
-   
-});
-//World 1 level 4
-Q.scene("W1L4",function(stage) {
     
 });
