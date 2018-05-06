@@ -206,11 +206,17 @@ Q.scene("initScreen",function(stage){
     Q.state.set({ score:0, lives:4,level:1,world:1,pause:false,enJuego:false });
     //Musica principal del juego
     Q.input.on("confirm",this,function(){
-            Q.loadTMX("world1level1.tmx", function() {
-                Q.stageScene("HUD",2);
-                Q.stageScene("W1L1");
+        //Testing
+        Q.loadTMX("testing.tmx", function() {
+                Q.stageScene("testing");
                 Q.input.off("confirm");
             });
+        //Bueno
+        /*Q.loadTMX("level1.tmx", function() {
+            Q.stageScene("HUD",2);
+            Q.stageScene("L1");
+            Q.input.off("confirm");
+        });*/
     });
 });
 //Pantalla de perdido
@@ -265,7 +271,11 @@ Q.scene('pauseMessage',function(stage) {
     * y= (numTileY*TamTile) + [tamTile/2]
     * x= (numTileX*TamTile) + [tamTile/2]
 */
-//World 1 level 1
-Q.scene("W1L1",function(stage) {
+//level 1
+Q.scene("L1",function(stage) {
     
+});
+/*----------------------------------TESTING-----------------------------------*/
+Q.scene("testing",function(stage) {
+    Q.stageTMX("testing.tmx",stage);
 });
