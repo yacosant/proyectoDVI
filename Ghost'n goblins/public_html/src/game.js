@@ -127,6 +127,45 @@ Q.component("Timer",{
     }
 });
 /*-----------------------------ANIMACIONES------------------------------------*/
+//Animacion del Crow
+Q.animations('Crow', {
+    crow: { frames: [0,1,2,3], rate: 1/2 },
+    crowFly: { frames: [4,5,6,7], rate: 1/3}
+});
+
+//Animacion del zombie  
+Q.animations('Zombie', {
+    zombie: { frames: [7,8,9], rate: 1/3},
+    zombieBorn: { frames: [0,1,2,3,4,5,6], rate: 1/3}
+});
+
+//Animacion de la bullet
+Q.animations('Bullet', {
+    bullet: { frames: [0,1,2,3], rate: 1/2}
+});
+
+//Animacion de Devil
+Q.animations('Devil', {
+  devil: { frames: [0,1,2], rate: 1/5}, 
+  devilHide: { frames: [4,5], rate:1/2 },
+  devilFly: { frames: [4], rate:1/2 },
+  devilPrincess:{ frames: [6], rate:1/2 }
+});
+
+//Animacion de la planta
+Q.animations('Plant', {
+    plant: { frames: [0,1,2,3,4], rate: 1/2}
+})
+
+//Animacion del disparo
+Q.animations('Burst', {
+  burst: { frames: [0,1,2,3], rate: 1/5} 
+});
+
+//Animacion de a princesa
+Q.animations('Princess', {
+    princess: { frames: [0,1,2,3], rate: 1/5} 
+});
 
 /*-------------------------------JUGADOR--------------------------------------*/
 
