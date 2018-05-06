@@ -8,7 +8,7 @@
  </tileset>
  <layer name="Collision" width="50" height="20">
   <properties>
-   <property name="Collision" value="true"/>
+   <property name="collision" value="true"/>
   </properties>
   <data>
    <tile/>

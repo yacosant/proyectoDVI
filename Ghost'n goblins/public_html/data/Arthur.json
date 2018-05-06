@@ -1,0 +1,36 @@
+{
+    "arthurArmoR":{"sx":0,"sy":0,"tileW":64,"tileH":64,"frames":4},
+    "arthurArmoL":{"sx":256,"sy":0,"tileW":64,"tileH":64,"frames":4},
+    
+    "arthurArmoJumpL":{"sx":0,"sy":64,"tileW":64,"tileH":64,"frames":2},
+    "arthurArmoJumpR":{"sx":384,"sy":64,"tileW":64,"tileH":64,"frames":2},
+    "arthurArmoJumpStaticR":{"sx":192,"sy":64,"tileW":64,"tileH":64,"frames":1},
+    "arthurArmoJumpStaticL":{"sx":256,"sy":64,"tileW":64,"tileH":64,"frames":1},
+    "arthurArmoDownR":{"sx":128,"sy":64,"tileW":64,"tileH":64,"frames":1},
+    "arthurArmoDownL":{"sx":320,"sy":64,"tileW":64,"tileH":64,"frames":1},
+    
+    "arthurArmoShootR":{"sx":0,"sy":128,"tileW":64,"tileH":64,"frames":2},
+    "arthurArmoShootL":{"sx":384,"sy":128,"tileW":64,"tileH":64,"frames":2},
+    "arthurArmoDownShootR":{"sx":128,"sy":128,"tileW":64,"tileH":64,"frames":2},
+    "arthurArmoDownShootL":{"sx":256,"sy":128,"tileW":64,"tileH":64,"frames":2},
+    
+    "arthurNudeR":{"sx":0,"sy":256,"tileW":64,"tileH":64,"frames":4},
+    "arthurNudeL":{"sx":256,"sy":256,"tileW":64,"tileH":64,"frames":4},
+    
+    "arthurNudeJumpL":{"sx":0,"sy":320,"tileW":64,"tileH":64,"frames":2},
+    "arthurNudeJumpR":{"sx":384,"sy":320,"tileW":64,"tileH":64,"frames":2},
+    "arthurNudeJumpStaticR":{"sx":192,"sy":320,"tileW":64,"tileH":64,"frames":1},
+    "arthurNudeJumpStaticL":{"sx":256,"sy":320,"tileW":64,"tileH":64,"frames":1},
+    "arthurNudeDownR":{"sx":128,"sy":320,"tileW":64,"tileH":64,"frames":1},
+    "arthurNudeDownL":{"sx":320,"sy":320,"tileW":64,"tileH":64,"frames":1},
+    
+    "arthurNudeShootR":{"sx":0,"sy":384,"tileW":64,"tileH":64,"frames":2},
+    "arthurNudeShootL":{"sx":384,"sy":384,"tileW":64,"tileH":64,"frames":2},
+    "arthurNudeDownShootR":{"sx":128,"sy":384,"tileW":64,"tileH":64,"frames":2},
+    "arthurNudeDownShootL":{"sx":256,"sy":384,"tileW":64,"tileH":64,"frames":2},
+    
+    "arthurDieR":{"sx":64,"sy":448,"tileW":64,"tileH":64,"frames":3},
+    "arthurDieL":{"sx":256,"sy":448,"tileW":64,"tileH":64,"frames":3},
+    "ArhurBones":{"sx":0,"sy":512,"tileW":64,"tileH":64,"frames":3},
+    "ArhurWin":{"sx":0,"sy":578,"tileW":64,"tileH":64,"frames":1}
+}

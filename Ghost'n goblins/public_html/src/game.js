@@ -16,15 +16,15 @@ var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .enableSound();//Habilita el uso de audio
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png"]);
+Q.preload(["main_title.png","ArthurV2.png"]);
 //JSON'S 
-Q.preload([]);
+Q.preload(["ArthurV2.json"]);
 //Musica
 Q.preload([]);
 //Funcion de inicio
 Q.preload(function(){
     //Compilacion del las sheets
-
+    Q.compileSheets("ArthurV2.png","ArthurV2.json");
     //Estado global de juego
     Q.state.set({ score: 0, lives: 4, //Puntuaciones
                   level:1,world:1,
@@ -127,23 +127,27 @@ Q.component("Timer",{
     }
 });
 /*-----------------------------ANIMACIONES------------------------------------*/
+//Animacion de Arthur
+Q.animations('Arthur', {
+    run_right: { frames: [0,1,2,3], rate: 1/5}, 
+    run_left: { frames: [4,5,6,7], rate:1/5 },
+    stand_right:{ frames: [2], rate:1 },
+    stand_left:{ frames: [6], rate:1 }
+});
 //Animacion del Crow
 Q.animations('Crow', {
     crow: { frames: [0,1,2,3], rate: 1/2 },
     crowFly: { frames: [4,5,6,7], rate: 1/3}
 });
-
 //Animacion del zombie  
 Q.animations('Zombie', {
     zombie: { frames: [7,8,9], rate: 1/3},
     zombieBorn: { frames: [0,1,2,3,4,5,6], rate: 1/3}
 });
-
 //Animacion de la bullet
 Q.animations('Bullet', {
     bullet: { frames: [0,1,2,3], rate: 1/2}
 });
-
 //Animacion de Devil
 Q.animations('Devil', {
   devil: { frames: [0,1,2], rate: 1/5}, 
@@ -151,24 +155,57 @@ Q.animations('Devil', {
   devilFly: { frames: [4], rate:1/2 },
   devilPrincess:{ frames: [6], rate:1/2 }
 });
-
 //Animacion de la planta
 Q.animations('Plant', {
     plant: { frames: [0,1,2,3,4], rate: 1/2}
-})
-
+});
 //Animacion del disparo
 Q.animations('Burst', {
   burst: { frames: [0,1,2,3], rate: 1/5} 
 });
-
 //Animacion de a princesa
 Q.animations('Princess', {
     princess: { frames: [0,1,2,3], rate: 1/5} 
 });
 
 /*-------------------------------JUGADOR--------------------------------------*/
-
+Q.Sprite.extend("Arthur",{
+    init:function(p) {
+        this._super(p, {
+            sheet:"arthurArmo",
+            sprite:"Arthur",
+            frame:0,
+            suelo:true,
+            agachado:false,
+            auto:false,
+            muerto:false,
+            type:SPRITE_PLAYER,
+            collisionMask: SPRITE_DEFAULT | SPRITE_TILES
+        });
+        this.add("2d,animation,tween");
+        //this.add("levelManager");
+        //this.add("Timer");
+        if(this.p.auto!==null){
+            if(this.p.auto)
+                this.add("aiBounce");
+            else
+                this.add("platformerControls");
+        }
+    },
+    step:function(dt){
+        var prop=this.p;
+        if(prop.vx>0)
+            this.play("run_right");
+        else if(prop.vx<0)
+            this.play("run_left");
+        else{
+            if(this.p.direction ==="right")
+                this.play("stand_right");
+            else 
+                this.play("stand_left");
+        }
+    }
+});
 /*---------------------------------PNJ----------------------------------------*/
 
 /*-------------------------------ENEMIGOS-------------------------------------*/
@@ -316,5 +353,10 @@ Q.scene("L1",function(stage) {
 });
 /*----------------------------------TESTING-----------------------------------*/
 Q.scene("testing",function(stage) {
+    var arthur= new Q.Arthur({x:(14*32)-17,y:8*32,limInfMapa:17*34});
     Q.stageTMX("testing.tmx",stage);
+    //Insertamos a Sir Arthur
+    stage.insert(arthur);
+    stage.add("viewport").follow(arthur,{x:true,y:false});
+    //stage.viewport.offsetY=-100;
 });
