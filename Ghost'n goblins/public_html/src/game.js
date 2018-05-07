@@ -185,12 +185,11 @@ Q.Sprite.extend("Arthur",{
             sheet:"arthurArmo",
             sprite:"Arthur",
             frame:0,
-            suelo:true,
-            agachado:false,
             auto:false,
-            muerto:false,
+            shootDelay:1,//En segundos
+            shoot:0,
             type:SPRITE_PLAYER,
-            collisionMask: SPRITE_DEFAULT | SPRITE_TILES
+            collisionMask: SPRITE_DEFAULT
         });
         this.add("2d,animation,tween");
         //this.add("levelManager");
@@ -205,6 +204,13 @@ Q.Sprite.extend("Arthur",{
     },
     step:function(dt){
         var prop=this.p;
+        prop.shoot+=dt;
+        //Aumentamos el tiempo sin disparar
+        this.animacion(prop);
+        if(Q.inputs["fire"] && prop.shoot>prop.shootDelay)
+            this.fire(prop);
+    },
+    animacion:function(prop){
         if(Q.inputs["down"]){
             if(Q.inputs["left"] || Q.inputs["right"])
                 prop.speed=0;
@@ -255,6 +261,22 @@ Q.Sprite.extend("Arthur",{
                 }
             }
         }
+    },
+    fire:function(prop){
+        prop.shoot=0;
+        if(prop.sheet==="arthurNude")
+            prop.sheet="arthurArmo";
+        else
+            prop.sheet="arthurNude";
+    },
+    hit:function(prop){
+        if(prop.sheet==="arthurArmo")
+            prop.sheet="arthurNude";
+        else
+            this.muerte();
+    },
+    muerte:function(){
+        
     }
 });
 /*---------------------------------PNJ----------------------------------------*/
