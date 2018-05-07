@@ -3930,14 +3930,14 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
+   <tile gid="84"/>
+   <tile gid="84"/>
+   <tile gid="84"/>
+   <tile gid="84"/>
+   <tile gid="84"/>
+   <tile gid="84"/>
+   <tile gid="84"/>
+   <tile gid="84"/>
    <tile gid="85"/>
    <tile/>
    <tile/>
