@@ -42,7 +42,7 @@ Q.preload(function(){
 Q.input.keyboardControls({
     P: "pausa",
     X:"",
-    SPACE:"up"
+    SPACE:"fire"
 });
 //Modo de pausa del juego
 Q.input.on("pausa",function() {
@@ -132,7 +132,17 @@ Q.animations('Arthur', {
     run_right: { frames: [0,1,2,3], rate: 1/5}, 
     run_left: { frames: [4,5,6,7], rate:1/5 },
     stand_right:{ frames: [2], rate:1 },
-    stand_left:{ frames: [6], rate:1 }
+    stand_left:{ frames: [6], rate:1 },
+    jump_right:{ frames: [8,9], rate:1/2,loop:false},
+    jump_left:{ frames: [15,14], rate:1/2,loop:false},
+    jump_site_right:{ frames: [11], rate:1 },
+    jump_site_left:{ frames: [12], rate:1 },
+    duck_right:{frames: [10], rate:1},
+    duck_left:{frames: [13], rate:1},
+    shoot_right:{frames: [16,17], rate:1/5,loop:false},
+    shoot_left:{frames: [23,22], rate:1/5,loop:false},
+    shoot_duck_right:{frames: [18,19], rate:1/5,loop:false},
+    shoot_duck_left:{frames: [21,20], rate:1/5,loop:false}  
 });
 //Animacion del Crow
 Q.animations('Crow', {
@@ -185,6 +195,7 @@ Q.Sprite.extend("Arthur",{
         this.add("2d,animation,tween");
         //this.add("levelManager");
         //this.add("Timer");
+        this.p.jumpSpeed=-500;
         if(this.p.auto!==null){
             if(this.p.auto)
                 this.add("aiBounce");
@@ -194,15 +205,55 @@ Q.Sprite.extend("Arthur",{
     },
     step:function(dt){
         var prop=this.p;
-        if(prop.vx>0)
-            this.play("run_right");
-        else if(prop.vx<0)
-            this.play("run_left");
-        else{
-            if(this.p.direction ==="right")
-                this.play("stand_right");
-            else 
-                this.play("stand_left");
+        if(Q.inputs["down"]){
+            if(Q.inputs["left"] || Q.inputs["right"])
+                prop.speed=0;
+            else
+                prop.speed=200;
+            if(this.p.direction ==="right"){
+                if(Q.inputs["fire"])
+                    this.play("shoot_duck_right");
+                else
+                    this.play("duck_right");
+            }else{
+                if(Q.inputs["fire"])
+                    this.play("shoot_duck_left");
+                else
+                    this.play("duck_left");
+           }
+        }else if(!Q.inputs["down"]){
+            if(Q.inputs["fire"]){
+                prop.speed=0;
+                if(this.p.direction ==="right")
+                    this.play("shoot_right");
+                else
+                    this.play("shoot_left");
+            }else{
+                prop.speed=200;
+                if(prop.vx>0){
+                    if(prop.vy<0)
+                        this.play("jump_right");
+                    else
+                        this.play("run_right");
+                } else if(prop.vx<0) {
+                    if(prop.vy<0)
+                        this.play("jump_left");
+                    else
+                        this.play("run_left");
+                }else{
+                    if(this.p.direction ==="right"){
+                        if(prop.vy<0)
+                            this.play("jump_site_right");
+                        else
+                            this.play("stand_right");
+                    }else{
+                        if(prop.vy<0)
+                            this.play("jump_site_left");
+                        else
+                            this.play("stand_left");
+                    }
+                }
+            }
         }
     }
 });
