@@ -16,15 +16,17 @@ var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .enableSound();//Habilita el uso de audio
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png"]);
+Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json"]);
+Q.preload(["ArthurV2.json", "zombie.json","crow.json"]);
 //Musica
 Q.preload([]);
 //Funcion de inicio
 Q.preload(function(){
     //Compilacion del las sheets
     Q.compileSheets("ArthurV2.png","ArthurV2.json");
+    Q.compileSheets("zombie.png", "zombie.json");
+    Q.compileSheets("crow.png", "crow.json");
     //Estado global de juego
     Q.state.set({ score: 0, lives: 4, //Puntuaciones
                   level:1,world:1,
@@ -146,13 +148,14 @@ Q.animations('Arthur', {
 });
 //Animacion del Crow
 Q.animations('Crow', {
-    crow: { frames: [0,1,2,3], rate: 1/2 },
-    crowFly: { frames: [4,5,6,7], rate: 1/3}
+    crow: { frames: [0,1,2,3], next: 'crowFly', rate: 1/8},
+    crowFly: { frames: [4,5,6,7], rate: 1/4}
 });
 //Animacion del zombie  
 Q.animations('Zombie', {
     zombie: { frames: [7,8,9], rate: 1/3},
-    zombieBorn: { frames: [0,1,2,3,4,5,6], rate: 1/3}
+    zombieBorn: { frames: [0,1,2,3,4,5,6,7,8,9], next: 'zombie', rate: 1/2},
+    zombieBye: { frames: [6,5,4,3,2,1,0], rate: 1/3}
 });
 //Animacion de la bullet
 Q.animations('Bullet', {
@@ -282,9 +285,99 @@ Q.Sprite.extend("Arthur",{
 /*---------------------------------PNJ----------------------------------------*/
 
 /*-------------------------------ENEMIGOS-------------------------------------*/
+//Zombie
+Q.Sprite.extend("Zombie",{ 
+    init: function(p) { 
+        this._super(p, { 
+            vx:80,
+            sheet: "zombie",
+            sprite: "Zombie",
+            frame: 0,
+            flip: "x",
+            reload:0,
+            timeReload:3,
+            type: SPRITE_ENEMY,
+            collisionMask: SPRITE_PLAYER | SPRITE_DEFAULT
+        }); 
+        this.add("2d,aiBounce,animation");  
+        this.on("bump.top,bump.down,bump.left,bump.right","matar");
+        this.play("zombieBorn");
+    },
+    matar:function(collision){
+        if(collision.obj.p.type===SPRITE_PLAYER) 
+            collision.obj.muerte();
+    },
+    muerte:function() {
+        this.destroy();
+    },
+    step:function(dt){}
+}); 
 
+//Crow
+Q.Sprite.extend("Crow",{ 
+    init: function(p) { 
+        this._super(p, { 
+            vx:50,
+            vy:15,
+            gravity: 0,
+            reload:0,
+            timeReload:5,
+            sheet: "crow",
+            sprite: "Crow",
+            frame: 0,
+            flip: "x",
+            reload:0,
+            timeReload:3,
+            type: SPRITE_ENEMY,
+            collisionMask: SPRITE_PLAYER | SPRITE_DEFAULT
+        }); 
+        this.add("2d,aiBounce,aiBounce2,animation");  
+        this.on("bump.top,bump.down,bump.left,bump.right","matar");
+        this.play("crow");
+    },
+    matar:function(collision){
+        if(collision.obj.p.type===SPRITE_PLAYER) 
+            collision.obj.muerte();
+    },
+    muerte:function() {
+        this.destroy();
+    },
+    step:function(dt){
+        this.p.reload+=dt;
+
+        if(this.p.reload>this.p.timeReload){
+            this.p.reload=0;
+            if(this.p.flip==='x'){
+                this.p.flip=false;
+                this.p.vx=-50;
+            }
+            else{
+                this.p.flip='x';
+                this.p.vx=50;
+            } 
+        }
+        
+        
+    }
+}); 
 /*------------------------------ELEMENTOS--------------------------------------*/
 
+//rebote en eje Y
+Q.component('aiBounce2', {
+    added: function() {
+      this.entity.on("bump.top",this,"goDown");
+      this.entity.on("bump.bottom",this,"goUp");
+    },
+
+    goDown: function(col) {
+      this.entity.p.vy = 20;
+    },
+
+    goUp: function(col) {
+      this.entity.p.vy =-20;
+    }
+  });
+  
 /*----------------------------------HUD---------------------------------------*/
 //Puntuacion
 Q.UI.Text.extend("Score",{
@@ -430,6 +523,8 @@ Q.scene("testing",function(stage) {
     Q.stageTMX("testing.tmx",stage);
     //Insertamos a Sir Arthur
     stage.insert(arthur);
+    stage.insert(new Q.Zombie({x:(16*32)-17,y:12*32}));
+    stage.insert(new Q.Crow({x:(16*32)-17,y:8*32}));
     stage.add("viewport").follow(arthur,{x:true,y:false});
     //stage.viewport.offsetY=-100;
 });
