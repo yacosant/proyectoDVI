@@ -29,7 +29,7 @@ Q.preload(function(){
     Q.compileSheets("crow.png", "crow.json");
     //Estado global de juego
     Q.state.set({ score: 0, lives: 4, //Puntuaciones
-                  level:1,world:1,
+                  level:1,respX:0,respY:0, //Nivel y punto del respawn
                   pause:false,enJuego:false
                 });
     //Controlador de la musica de fondo
@@ -63,6 +63,21 @@ Q.input.on("pausa",function() {
         }
     }
   });
+ //rebote en eje Y
+Q.component('aiBounce2', {
+    added: function() {
+      this.entity.on("bump.top",this,"goDown");
+      this.entity.on("bump.bottom",this,"goUp");
+    },
+
+    goDown: function(col) {
+      this.entity.p.vy = 20;
+    },
+
+    goUp: function(col) {
+      this.entity.p.vy =-20;
+    }
+  });
 //Control musica principal
 Q.Class.extend("backMusic", {
     playMusic:function(){
@@ -71,10 +86,6 @@ Q.Class.extend("backMusic", {
 //Gestor de niveles
 Q.component("levelManager",{
     changeLevel:function(){
-        if(Q.state.get("level")===4){
-                Q.state.inc("world",1);
-                Q.state.set("level",1);
-        }else
             Q.state.inc("level",1);
     },
     winScreen:function(){ 
@@ -88,18 +99,18 @@ Q.component("levelManager",{
         });
     },
     nextLevel:function(){
-        if(Q.state.get("world")>Q.state.get("maxWorld")){
+        if(Q.state.get("level")>1){
             this.winScreen();
         }else{
             Q.loadTMX("nextLevel.tmx", function() {
-               Q.stageScene("nextLevelScreen",{label:"World "+Q.state.get("world")+" Level "+Q.state.get("level")});
+               Q.stageScene("nextLevelScreen",{label:"Level "+Q.state.get("level")});
            });
         }
     },
     loadLevel:function(){
-        Q.loadTMX("world"+Q.state.get("world")+"level"+Q.state.get("level")+".tmx", function() {
+        Q.loadTMX("level"+Q.state.get("level")+".tmx", function() {
            Q.stage(2).show();    
-           Q.stageScene("W"+Q.state.get("world")+"L"+Q.state.get("level"));
+           Q.stageScene("L"+Q.state.get("level"));
        });
     }
 });
@@ -195,7 +206,7 @@ Q.Sprite.extend("Arthur",{
             collisionMask: SPRITE_DEFAULT
         });
         this.add("2d,animation,tween");
-        //this.add("levelManager");
+        this.add("levelManager");
         //this.add("Timer");
         this.p.jumpSpeed=-500;
         if(this.p.auto!==null){
@@ -273,13 +284,16 @@ Q.Sprite.extend("Arthur",{
             prop.sheet="arthurNude";
     },
     hit:function(prop){
-        if(prop.sheet==="arthurArmo")
+        if(prop.sheet==="arthurArmo"){
+            this.animate({x: this.p.x-50},0.5); 
             prop.sheet="arthurNude";
-        else
+        }else
             this.muerte();
     },
     muerte:function(){
-        
+        Q.state.dec("lives",1);
+        if(Q.state.get("lives")>0)
+            this.levelManager.loadLevel();
     }
 });
 /*---------------------------------PNJ----------------------------------------*/
@@ -305,7 +319,7 @@ Q.Sprite.extend("Zombie",{
     },
     matar:function(collision){
         if(collision.obj.p.type===SPRITE_PLAYER) 
-            collision.obj.muerte();
+            collision.obj.hit(collision.obj.p);
     },
     muerte:function() {
         this.destroy();
@@ -337,7 +351,7 @@ Q.Sprite.extend("Crow",{
     },
     matar:function(collision){
         if(collision.obj.p.type===SPRITE_PLAYER) 
-            collision.obj.muerte();
+            collision.obj.hit(collision.obj.p);
     },
     muerte:function() {
         this.destroy();
@@ -362,36 +376,21 @@ Q.Sprite.extend("Crow",{
 }); 
 /*------------------------------ELEMENTOS--------------------------------------*/
 
-//rebote en eje Y
-Q.component('aiBounce2', {
-    added: function() {
-      this.entity.on("bump.top",this,"goDown");
-      this.entity.on("bump.bottom",this,"goUp");
-    },
-
-    goDown: function(col) {
-      this.entity.p.vy = 20;
-    },
-
-    goUp: function(col) {
-      this.entity.p.vy =-20;
-    }
-  });
   
 /*----------------------------------HUD---------------------------------------*/
 //Puntuacion
 Q.UI.Text.extend("Score",{
     init:function(p) {
         this._super({
-            label: "Mario\n 0",    
-            x: 100,
+            label: "Puntos\n 0",    
+            x: 200,
             y: 0,
             color:"#ffffff"
             });
         Q.state.on("change.score",this,"score");
     },
     score:function(score) {
-        this.p.label = "Mario\n " + score;
+        this.p.label = "Puntos\n " + score;
     }
 });
 //vidas
@@ -399,7 +398,7 @@ Q.UI.Text.extend("Lives",{
     init:function(p) {
         this._super({
             label: "vidas\n 4",    
-            x: 500,
+            x: 400,
             y: 0,
             color:"#ffffff"
             });
@@ -414,7 +413,7 @@ Q.UI.Text.extend("Timer",{
     init:function(p) {
         this._super({
             label: "Tiempo\n 300",    
-            x: 700,
+            x: 600,
             y: 0,
             color:"#ffffff"
             });
@@ -448,17 +447,11 @@ Q.scene("initScreen",function(stage){
     Q.state.set({ score:0, lives:4,level:1,world:1,pause:false,enJuego:false });
     //Musica principal del juego
     Q.input.on("confirm",this,function(){
-        //Testing
-        Q.loadTMX("testing.tmx", function() {
-                Q.stageScene("testing");
-                Q.input.off("confirm");
-            });
-        //Bueno
-        /*Q.loadTMX("level1.tmx", function() {
+        Q.loadTMX("level1.tmx", function() {
             Q.stageScene("HUD",2);
             Q.stageScene("L1");
             Q.input.off("confirm");
-        });*/
+        });
     });
 });
 //Pantalla de perdido
@@ -515,7 +508,18 @@ Q.scene('pauseMessage',function(stage) {
 */
 //level 1
 Q.scene("L1",function(stage) {
-    
+    Q.state.set("enJuego",true);
+    if(Q.state.get("respX")===0 && Q.state.get("respY")===0){
+        Q.state.set("respX",(14*32)-16);
+        Q.state.set("respY",15*32);
+    }
+    var arthur= new Q.Arthur({x:Q.state.get("respX"),y:Q.state.get("respY"),limInfMapa:17*32});
+    Q.stageTMX("level1.tmx",stage);
+    //Insertamos a Sir Arthur
+    stage.insert(arthur);
+    stage.insert(new Q.Zombie({x:(16*32)-17,y:12*32}));
+    stage.insert(new Q.Crow({x:(16*32)-17,y:8*32}));
+    stage.add("viewport").follow(arthur,{x:true,y:false});
 });
 /*----------------------------------TESTING-----------------------------------*/
 Q.scene("testing",function(stage) {
