@@ -165,8 +165,8 @@ Q.animations('Crow', {
 //Animacion del zombie  
 Q.animations('Zombie', {
     zombie: { frames: [7,8,9], rate: 1/3},
-    zombieBorn: { frames: [0,1,2,3,4,5,6,7,8,9], next: 'zombie', rate: 1/2},
-    zombieBye: { frames: [6,5,4,3,2,1,0], rate: 1/3}
+    zombieBorn: { frames: [0,1,2,3,4,5,6,7,8,9], next: 'zombie', trigger:"camina", rate: 1/2},
+    zombieBye: { frames: [6,5,4,3,2,1,0],   next: 'zombie', trigger:"muerte", rate: 1/3}
 });
 //Animacion de la bullet
 Q.animations('Bullet', {
@@ -303,7 +303,7 @@ Q.Sprite.extend("Arthur",{
 Q.Sprite.extend("Zombie",{ 
     init: function(p) { 
         this._super(p, { 
-            vx:80,
+            vx:0,
             sheet: "zombie",
             sprite: "Zombie",
             frame: 0,
@@ -315,16 +315,30 @@ Q.Sprite.extend("Zombie",{
         }); 
         this.add("2d,aiBounce,animation");  
         this.on("bump.top,bump.down,bump.left,bump.right","matar");
+        this.on("camina","camina");
+        this.on("muerte","muerte");
         this.play("zombieBorn");
     },
     matar:function(collision){
         if(collision.obj.p.type===SPRITE_PLAYER) 
             collision.obj.hit(collision.obj.p);
+        else if(collision.tile === 40){
+            this.play("zombieBye");
+            this.p.vx=0;
+        }
+            
     },
     muerte:function() {
         this.destroy();
     },
-    step:function(dt){}
+    step:function(dt){
+        if(this.p.vx<0)this.p.flip=false;
+        else this.p.flip='x';
+    },
+
+    camina:function(){
+        this.p. vx=80;
+    }
 }); 
 
 //Crow
