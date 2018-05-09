@@ -16,9 +16,9 @@ var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .enableSound();//Habilita el uso de audio
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png"]);
+Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json", "zombie.json","crow.json"]);
+Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json"]);
 //Musica
 Q.preload([]);
 //Funcion de inicio
@@ -27,6 +27,7 @@ Q.preload(function(){
     Q.compileSheets("ArthurV2.png","ArthurV2.json");
     Q.compileSheets("zombie.png", "zombie.json");
     Q.compileSheets("crow.png", "crow.json");
+    Q.compileSheets("princess.png", "princess.json");
     //Estado global de juego
     Q.state.set({ score: 0, lives: 4, //Puntuaciones
                   level:1,respX:0,respY:0, //Nivel y punto del respawn
@@ -297,6 +298,19 @@ Q.Sprite.extend("Arthur",{
     }
 });
 /*---------------------------------PNJ----------------------------------------*/
+//Princess
+Q.Sprite.extend("Princess",{ 
+    init: function(p) { 
+        this._super(p, { 
+            vx:0,
+            sheet: "princess",
+            sprite: "Princess",
+            frame: 0,
+            type: SPRITE_DEFAULT
+        }); 
+        this.play("princess");
+    }
+}); 
 
 /*-------------------------------ENEMIGOS-------------------------------------*/
 //Zombie
