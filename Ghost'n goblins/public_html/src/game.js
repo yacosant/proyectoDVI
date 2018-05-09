@@ -53,10 +53,10 @@ Q.input.on("pausa",function() {
         if(Q.state.get("pause")) {
             Q.state.set("pause",false);
             Q.stage().unpause();
-            Q.stage(2).show();
+            Q.stage(2).show(false);
             Q.clearStage(3);
         }else{
-            Q.stage(2).show();
+            Q.stage(2).show(true);
             Q.state.set("pause",true);
             Q.audio.stop();
             Q.stage().pause();
@@ -89,17 +89,20 @@ Q.component("levelManager",{
     changeLevel:function(){
             Q.state.inc("level",1);
     },
-    winScreen:function(){ 
+    winScreen:function(){
+        Q.stage(2).show(true);
         Q.loadTMX("finalscreen.tmx", function() {
             Q.stageScene("winScreen",{label:"Has ganado!"});
         });
     },
     loseScreen:function(){
+        Q.stage(2).show(true);
         Q.loadTMX("endGame.tmx", function() {
             Q.stageScene("loseScreen",{label:"Game Over \n Pulsa enter para volver al menu principal"});
         });
     },
     nextLevel:function(){
+        Q.stage(2).show(true);
         if(Q.state.get("level")>1){
             this.winScreen();
         }else{
@@ -208,7 +211,8 @@ Q.Sprite.extend("Arthur",{
         });
         this.add("2d,animation,tween");
         this.add("levelManager");
-        //this.add("Timer");
+        this.on("bump.bottom",this,"colMapa");
+        this.add("Timer");
         this.p.jumpSpeed=-500;
         if(this.p.auto!==null){
             if(this.p.auto)
@@ -219,9 +223,15 @@ Q.Sprite.extend("Arthur",{
     },
     step:function(dt){
         var prop=this.p;
-        prop.shoot+=dt;
-        //Aumentamos el tiempo sin disparar
-        this.animacion(prop);
+        prop.shoot+=dt; //Aumentamos el tiempo sin disparar
+        this.Timer.step(dt);
+            //Comprobamos el tiempo
+            if(this.Timer.tiempoRest()<100 && !this.p.prisa)
+                this.prisas();
+            else if(this.Timer.tiempoRest()===0)
+                this.muerte();
+        this.animacion(prop);//Animacion
+        this.colMapa(prop);
         if(Q.inputs["fire"] && prop.shoot>prop.shootDelay)
             this.fire(prop);
     },
@@ -277,6 +287,10 @@ Q.Sprite.extend("Arthur",{
             }
         }
     },
+    colMapa:function(collision){
+        if(collision.tile === 91)
+            this.muerte();
+    },
     fire:function(prop){
         prop.shoot=0;
         if(prop.sheet==="arthurNude")
@@ -295,6 +309,9 @@ Q.Sprite.extend("Arthur",{
         Q.state.dec("lives",1);
         if(Q.state.get("lives")>0)
             this.levelManager.loadLevel();
+    },
+    prisas:function(){
+        
     }
 });
 /*---------------------------------PNJ----------------------------------------*/
@@ -458,11 +475,8 @@ Q.scene('HUD',function(stage) {
   container.insert(new Q.Lives());
   container.insert(new Q.Timer());
   container.fit(5,200);
-  stage.show= function(){
-      if(this.hidden)
-          this.hidden=false;
-      else
-          this.hidden=true;
+  stage.show= function(state){
+          this.hidden=state;
   };
 });
 /*------------------------------ESCENAS BASE----------------------------------*/
@@ -498,7 +512,6 @@ Q.scene("loseScreen",function(stage){
 });
 //Pantalla de ganado
 Q.scene("winScreen",function(stage){
-    Q.stage(2).show();
     Q.state.set("enJuego",false);
     Q.stageTMX("finalscreen.tmx",stage);
     Q.audio.stop();
@@ -536,17 +549,18 @@ Q.scene('pauseMessage',function(stage) {
 */
 //level 1
 Q.scene("L1",function(stage) {
+    Q.stage(2).show(false);
     Q.state.set("enJuego",true);
     if(Q.state.get("respX")===0 && Q.state.get("respY")===0){
-        Q.state.set("respX",(14*32)-16);
+        Q.state.set("respX",(17*32)-16);
         Q.state.set("respY",15*32);
     }
     var arthur= new Q.Arthur({x:Q.state.get("respX"),y:Q.state.get("respY"),limInfMapa:17*32});
     Q.stageTMX("level1.tmx",stage);
     //Insertamos a Sir Arthur
     stage.insert(arthur);
-    stage.insert(new Q.Zombie({x:(16*32)-17,y:12*32}));
-    stage.insert(new Q.Crow({x:(16*32)-17,y:8*32}));
+    //stage.insert(new Q.Zombie({x:(20*32)+16,y:(15*32)+16}));
+   // stage.insert(new Q.Crow({x:(25*32)+16,y:(8*32)+16}));
     stage.add("viewport").follow(arthur,{x:true,y:false});
 });
 /*----------------------------------TESTING-----------------------------------*/
