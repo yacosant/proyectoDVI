@@ -4,6 +4,9 @@ var SPRITE_DEFAULT=1;
 var SPRITE_TILES = 2;
 var SPRITE_ENEMY = 4;
 var SPRITE_PLAYER = 8;
+var SPRITE_LANZA = 16;
+var SPRITE_TUMBA = 32;
+var SPRITE_PREMIO = 64;
 var backMusic;
 /* global Quintus */
 var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
@@ -376,6 +379,51 @@ Q.Sprite.extend("Crow",{
 }); 
 /*------------------------------ELEMENTOS--------------------------------------*/
 
+Q.Sprite.extend("Lanza",{
+    init: function(p) {
+        this._super(p, {
+            sheet: "lanza",
+            sprite: "Lanza",
+            frame: 0,           
+            type: SPRITE_LANZA,
+            collisionMask: SPRITE_TILES | SPRITE_ENEMY
+        }); 
+        this.add('2d, platformerControls');
+        this.on("bump.top,bump.down,bump.left,bump.right","kill"); 
+        if(this.p.vx < 0){
+            this.p.flip = "x";
+        }                    
+    },
+
+    kill: function(){
+        if(collision.obj.p.type===SPRITE_ENEMY) 
+          collision.obj.hit(collision.obj.p);
+    }
+ });
+  
+Q.Sprite.extend("Tumba",{
+    init: function(p) {
+        this._super(p, {
+            asset: "grave0.png",
+            frame: 0,           
+            type: SPRITE_TUMBA,
+            collisionMask: SPRITE_PLAYER | SPRITE_TILES | SPRITE_LANZA
+        }); 
+        this.add('2d');                   
+    }
+ });
+
+Q.Sprite.extend("Premio",{
+    init: function(p) {
+        this._super(p, {
+            asset: "monedas.png",
+            frame: 0,           
+            type: SPRITE_PREMIO,
+            collisionMask: SPRITE_PLAYER | SPRITE_TILES
+        }); 
+        this.add('2d');                   
+    }
+ });
   
 /*----------------------------------HUD---------------------------------------*/
 //Puntuacion
