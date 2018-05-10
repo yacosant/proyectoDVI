@@ -19,7 +19,7 @@ var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .enableSound();//Habilita el uso de audio
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png"]);
+Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png", "grave0.png", "grave1.png", "grave2.png", "jar.png"]);
 //JSON'S 
 Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json"]);
 //Musica
@@ -452,26 +452,39 @@ Q.Sprite.extend("Lanza",{
           collision.obj.hit(collision.obj.p);
     }
  });
+
+Q.component("GeneradorPremios", {
+
+        generar: function(x,y){
+            var listaPremios = [{asset: "sacoMonedas", puntos: 200}, {asset: "escudo", puntos: 400}];
+            var maxPremios = listaPremios.length - 1;
+            var randomPremio = Math.floor(Math.random() * (5 - 0) + 0);
+            if(randomPremio <= maxPremios){
+                Q.Stage().insert(new Q.Premio({x: x, y: y, asset: listaPremios[randomPremio].asset, puntos: listaPremios[randomPremio].puntos}))
+            }
+        }
+    });
   
 Q.Sprite.extend("Tumba",{
     init: function(p) {
         this._super(p, {
-            asset: "grave0.png",
-            frame: 0,           
+            asset: "grave0.png", 
+            gravity: 0,     
             type: SPRITE_TUMBA,
-            collisionMask: SPRITE_PLAYER | SPRITE_TILES | SPRITE_LANZA
+            collisionMask: SPRITE_PLAYER | SPRITE_TILES
         }); 
-        this.add('2d');                   
+        this.add('2d');
+        this.p.static = true;                   
     }
  });
 
 Q.Sprite.extend("Premio",{
     init: function(p) {
         this._super(p, {
-            asset: "monedas.png",
-            frame: 0,           
+            asset: "jar.png", 
+            puntos: 0,       
             type: SPRITE_PREMIO,
-            collisionMask: SPRITE_PLAYER | SPRITE_TILES
+            collisionMask: SPRITE_PLAYER | SPRITE_TILES,
         }); 
         this.add('2d');                   
     }
@@ -599,8 +612,8 @@ Q.scene('pauseMessage',function(stage) {
 });
 /*----------------------------------NIVELES-----------------------------------*/ 
 /*Posicion de un objeto en el mapa
-    * y= (numTileY*TamTile) + [tamTile/2]
-    * x= (numTileX*TamTile) + [tamTile/2]
+    * y= (numTileY*TamTile) + [tamTile/2]  16*32 + 16
+    * x= (numTileX*TamTile) + [tamTile/2]  94*32 + 16
 */
 //level 1
 Q.scene("L1",function(stage) {
@@ -615,6 +628,8 @@ Q.scene("L1",function(stage) {
     //Insertamos a Sir Arthur
     stage.insert(arthur);
     //stage.insert(new Q.Zombie({x:(20*32)+16,y:(15*32)+16}));
+    stage.insert(new Q.Tumba({x:(20*32)+16,y:(16*32)}));
+    //stage.insert(new Q.Premio({x:(20*32)+16,y:(16*32)}));
    // stage.insert(new Q.Crow({x:(25*32)+16,y:(8*32)+16}));
     stage.add("viewport").follow(arthur,{x:true,y:false});
 });
