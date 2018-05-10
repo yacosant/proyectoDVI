@@ -437,6 +437,7 @@ Quintus["2D"] = function(Q) {
         ax: 0,
         ay: 0,
         gravity: 1,
+        static: false,
         collisionMask: Q.SPRITE_DEFAULT
       });
       entity.on('step',this,"step");
@@ -457,9 +458,11 @@ Quintus["2D"] = function(Q) {
       var impactX = Math.abs(p.vx);
       var impactY = Math.abs(p.vy);
 
-      p.x -= col.separate[0];
-      p.y -= col.separate[1];
-
+      if(!p.static){
+        p.x -= col.separate[0];
+        p.y -= col.separate[1];
+      }
+      
       // Top collision
       if(col.normalY < -0.3) {
         if(!p.skipCollide && p.vy > 0) { p.vy = 0; }
