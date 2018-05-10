@@ -164,6 +164,13 @@ Q.animations('Arthur', {
     shoot_duck_right:{frames: [18,19], rate:1/5,loop:false},
     shoot_duck_left:{frames: [21,20], rate:1/5,loop:false}  
 });
+//Animacion mortal de Arthur
+Q.animations("ArthurAux",{
+    dieArthurDieRight:{frames:[1,2,3,8,9,10],rate:1,loop:false},
+    dieArthurDieLeft:{frames:[6,5,4,8,9,10],rate:1,loop:false},
+    arthurVago:{frames:[12],rate:1},
+    arthurWinner:{frames:[11],rate:1}
+});
 //Animacion del Crow
 Q.animations('Crow', {
     crow: { frames: [0,1,2,3], next: 'crowFly', rate: 1/8},
