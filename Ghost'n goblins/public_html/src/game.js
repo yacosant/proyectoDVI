@@ -19,9 +19,9 @@ var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .enableSound();//Habilita el uso de audio
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png", "grave0.png", "grave1.png", "grave2.png", "jar.png"]);
+Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json"]);
+Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json"]);
 //Musica
 Q.preload([]);
 //Funcion de inicio
@@ -31,6 +31,9 @@ Q.preload(function(){
     Q.compileSheets("zombie.png", "zombie.json");
     Q.compileSheets("crow.png", "crow.json");
     Q.compileSheets("princess.png", "princess.json");
+    Q.compileSheets("burst.png", "burst.json");
+    Q.compileSheets("spark.png", "spark.json");
+    Q.compileSheets("plant.png", "plant.json");
     //Estado global de juego
     Q.state.set({ score: 0, lives: 4, //Puntuaciones
                   level:1,respX:0,respY:0, //Nivel y punto del respawn
@@ -195,12 +198,19 @@ Q.animations('Devil', {
 });
 //Animacion de la planta
 Q.animations('Plant', {
-    plant: { frames: [0,1,2,3,4], rate: 1/2}
+    plant: { frames: [0,1,2], rate: 1/5},
+    plantL: { frames: [3,4], rate: 1/5}
 });
-//Animacion del disparo
+//Animacion dela sangre
 Q.animations('Burst', {
-  burst: { frames: [0,1,2,3], rate: 1/5} 
+  burst: { frames: [0,1,2,3], next: 'burst', trigger:"muerte", rate: 1/5} 
 });
+
+//Animacion de las chispas
+Q.animations('Spark', {
+    spark: { frames: [0,1,2], next: 'spark', trigger:"muerte", rate: 1/5} 
+  });
+
 //Animacion de a princesa
 Q.animations('Princess', {
     princess: { frames: [0,1,2,3], rate: 1/5} 
@@ -351,6 +361,7 @@ Q.Sprite.extend("Zombie",{
             flip: "x",
             reload:0,
             timeReload:3,
+            life:1,
             type: SPRITE_ENEMY,
             collisionMask: SPRITE_PLAYER | SPRITE_DEFAULT
         }); 
@@ -366,9 +377,14 @@ Q.Sprite.extend("Zombie",{
         else if(collision.tile === 40){
             this.play("zombieBye");
             this.p.vx=0;
-        }
-            
+        }   
     },
+    
+    hit: function(){
+        this.p.life--;
+        if(this.p.life===0) this.muerte();
+    },
+
     muerte:function() {
         this.destroy();
     },
@@ -397,6 +413,7 @@ Q.Sprite.extend("Crow",{
             flip: "x",
             reload:0,
             timeReload:3,
+            life:2,
             type: SPRITE_ENEMY,
             collisionMask: SPRITE_PLAYER | SPRITE_DEFAULT
         }); 
@@ -408,6 +425,12 @@ Q.Sprite.extend("Crow",{
         if(collision.obj.p.type===SPRITE_PLAYER) 
             collision.obj.hit(collision.obj.p);
     },
+
+    hit: function(){
+        this.p.life--;
+        if(this.p.life===0) muerte();
+    },
+
     muerte:function() {
         this.destroy();
     },
@@ -429,27 +452,87 @@ Q.Sprite.extend("Crow",{
         
     }
 }); 
+
+//Planta
+Q.Sprite.extend("Plant",{ 
+    init: function(p) { 
+        this._super(p, { 
+            vx:0,
+            sheet: "plant",
+            sprite: "Plant",
+            lengua: false,
+            frame: 0,
+            reload:0,
+            timeReload:3,
+            life:1,
+            type: SPRITE_ENEMY,
+            collisionMask: SPRITE_PLAYER | SPRITE_DEFAULT
+        }); 
+        this.add("2d,animation");  
+        this.on("bump.top,bump.down,bump.left,bump.right","matar");
+        this.play("plant");
+    },
+    matar:function(collision){
+        if(collision.obj.p.type===SPRITE_PLAYER) 
+            collision.obj.hit(collision.obj.p);
+    },
+    
+    hit: function(){
+        this.p.life--;
+        this.play("plantL");
+        this.p.lengua=true;
+        this.p.reload=0;
+        if(this.p.life===0) this.muerte();
+    },
+
+    muerte:function() {
+        this.destroy();
+    },
+    step:function(dt){
+        this.p.reload+=dt;
+
+        if(this.p.reload>this.p.timeReload){
+            this.p.reload=0;
+            if(this.p.lengua){
+                this.p.timeReload+=2,75;
+                this.play("plant");
+                this.p.lengua=false;
+            }
+            else{
+                this.p.timeReload-=2,75;
+                this.play("plantL");
+                this.p.lengua=true;
+            } 
+        }
+    }
+}); 
 /*------------------------------ELEMENTOS--------------------------------------*/
 
 Q.Sprite.extend("Lanza",{
     init: function(p) {
         this._super(p, {
-            sheet: "lanza",
-            sprite: "Lanza",
-            frame: 0,           
+            asset: "lance.png",
+            frame: 0, 
+            gravity:0, 
+            vx:201,         
             type: SPRITE_LANZA,
-            collisionMask: SPRITE_TILES | SPRITE_ENEMY
+            collisionMask: SPRITE_TUMBA | SPRITE_ENEMY 
         }); 
-        this.add('2d, platformerControls');
+        this.add('2d');
         this.on("bump.top,bump.down,bump.left,bump.right","kill"); 
         if(this.p.vx < 0){
             this.p.flip = "x";
         }                    
     },
 
-    kill: function(){
-        if(collision.obj.p.type===SPRITE_ENEMY) 
-          collision.obj.hit(collision.obj.p);
+    kill: function(collision){
+        if(collision.obj.p.type===SPRITE_ENEMY){
+            Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+            collision.obj.hit(collision.obj.p);
+        } else if(collision.obj.p.type===SPRITE_TUMBA) 
+            Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+
+        this.destroy();
     }
  });
 
@@ -489,7 +572,48 @@ Q.Sprite.extend("Premio",{
         this.add('2d');                   
     }
  });
-  
+
+//Burst
+Q.Sprite.extend("Burst",{ 
+    init: function(p) { 
+        this._super(p, { 
+            vx:0,
+            vy:0,
+            sheet: "burst",
+            sprite: "Burst",
+            frame: 0,
+            type: SPRITE_DEFAULT
+        }); 
+        this.add("2d,animation");  
+        this.play("burst");
+        this.on("muerte", "muerte");
+    },
+    
+    muerte:function() {
+        this.destroy();
+    }
+}); 
+
+//Spark
+Q.Sprite.extend("Spark",{ 
+    init: function(p) { 
+        this._super(p, { 
+            vx:0,
+            vy:0,
+            sheet: "spark",
+            sprite: "Spark",
+            frame: 0,
+            type: SPRITE_DEFAULT
+        }); 
+        this.add("2d,animation");  
+        this.play("spark");
+        this.on("muerte", "muerte");
+    },
+    
+    muerte:function() {
+        this.destroy();
+    }
+}); 
 /*----------------------------------HUD---------------------------------------*/
 //Puntuacion
 Q.UI.Text.extend("Score",{
@@ -627,7 +751,9 @@ Q.scene("L1",function(stage) {
     Q.stageTMX("level1.tmx",stage);
     //Insertamos a Sir Arthur
     stage.insert(arthur);
-    //stage.insert(new Q.Zombie({x:(20*32)+16,y:(15*32)+16}));
+   // stage.insert(new Q.Zombie({x:(24*32)+16,y:(15*32)+16}));
+    stage.insert(new Q.Lanza({x:(24*32)+16,y:(15*32)+16}));
+    stage.insert(new Q.Plant({x:(20*32)+16,y:(15*32)+16}));
     stage.insert(new Q.Tumba({x:(20*32)+16,y:(16*32)}));
     //stage.insert(new Q.Premio({x:(20*32)+16,y:(16*32)}));
    // stage.insert(new Q.Crow({x:(25*32)+16,y:(8*32)+16}));
