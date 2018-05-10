@@ -179,10 +179,9 @@ Q.animations('Arthur', {
     shoot_duck_right:{frames: [18,19], rate:1/5,loop:false},
     shoot_duck_left:{frames: [21,20], rate:1/5,loop:false}  
 });
-//Animacion mortal de Arthur
 Q.animations("ArthurAux",{
-    dieArthurDieRight:{frames:[1,2,3,8,9,10],rate:1,loop:false},
-    dieArthurDieLeft:{frames:[6,5,4,8,9,10],rate:1,loop:false},
+    dieArthurRight:{frames:[1,2,3,8,9,10],rate:1/3,loop:false,trigger:"dead"},
+    dieArthurLeft:{frames:[6,5,4,8,9,10],rate:1/3,loop:false,trigger:"dead"},
     arthurVago:{frames:[12],rate:1},
     arthurWinner:{frames:[11],rate:1}
 });
@@ -245,7 +244,8 @@ Q.Sprite.extend("Arthur",{
         this.add("levelManager");
         this.on("bump.bottom",this,"colMapa");
         this.add("Timer");
-        this.p.jumpSpeed=-500;
+        this.p.jumpSpeed=-400;
+        this.on("dead","respawn");
         if(this.p.auto!==null){
             if(this.p.auto)
                 this.add("aiBounce");
@@ -294,12 +294,12 @@ Q.Sprite.extend("Arthur",{
             }else{
                 prop.speed=200;
                 if(prop.vx>0){
-                    if(prop.vy<0)
+                    if(prop.vy!==0)
                         this.play("jump_right");
                     else
                         this.play("run_right");
                 } else if(prop.vx<0) {
-                    if(prop.vy<0)
+                    if(prop.vy!==0)
                         this.play("jump_left");
                     else
                         this.play("run_left");
@@ -325,10 +325,10 @@ Q.Sprite.extend("Arthur",{
     },
     fire:function(prop){
         prop.shoot=0;
-        if(prop.sheet==="arthurNude")
-            prop.sheet="arthurArmo";
+        if(prop.direction ==="right")
+            Q.Stage().insert(new Q.Lanza({x:prop.x,y:prop.y,vx:200}));
         else
-            prop.sheet="arthurNude";
+            Q.Stage().insert(new Q.Lanza({x:prop.x,y:prop.y,vx:-200}));
     },
     hit:function(prop){
         if(prop.sheet==="arthurArmo"){
@@ -338,13 +338,29 @@ Q.Sprite.extend("Arthur",{
             this.muerte();
     },
     muerte:function(){
-        Q.state.dec("lives",1);
-        if(Q.state.get("lives")>0)
-            this.levelManager.loadLevel();
+        var prop=this.p;
+        prop.sheet="arthurDie";
+        prop.sprite="ArthurAux";
+        prop.frame=1;
+        this.del("platformerControls,2d");
+        this.animate({x: this.p.x-50},0.5,{
+                callback:function(){
+                    Q.state.dec("lives",1);
+                    
+                    if(prop.direction ==="right")
+                        this.play("dieArthurRight");
+                    else
+                        this.play("dieArthurLeft");
+                    }
+                });
+    },
+    fin:function(){
+        
     },
     prisas:function(){
         
-    }
+    },
+    respawn:function(){}
 });
 /*---------------------------------PNJ----------------------------------------*/
 //Princess
@@ -754,7 +770,7 @@ Q.scene("L1",function(stage) {
     stage.insert(arthur);
    // stage.insert(new Q.Zombie({x:(24*32)+16,y:(15*32)+16}));
     //stage.insert(new Q.Lanza({x:(24*32)+16,y:(15*32)+16}));
-    //stage.insert(new Q.Plant({x:(20*32)+16,y:(15*32)+16}));
+    stage.insert(new Q.Plant({x:(20*32)+16,y:(15*32)+16}));
     stage.insert(new Q.Tumba({x:(25*32)+16,y:(16*32)+12}));
     //stage.insert(new Q.Premio({x:(20*32)+16,y:(16*32)}));
    // stage.insert(new Q.Crow({x:(25*32)+16,y:(8*32)+16}));
