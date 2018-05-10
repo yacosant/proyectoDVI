@@ -149,6 +149,18 @@ Q.component("Timer",{
             return Q.state.get("timer");
     }
 });
+//Generador de recompensas
+Q.component("GeneradorPremios", {
+        generar: function(x,y){
+            var listaPremios = [{asset: "sacoMonedas", puntos: 200}, {asset: "escudo", puntos: 400}];
+            var maxPremios = listaPremios.length - 1;
+            var randomPremio = Math.floor(Math.random() * (5 - 0) + 0);
+            if(randomPremio <= maxPremios){
+                Q.Stage().insert(new Q.Premio({x: x, y: y, asset: listaPremios[randomPremio].asset, puntos: listaPremios[randomPremio].puntos}))
+            }
+        }
+    });
+  
 /*-----------------------------ANIMACIONES------------------------------------*/
 //Animacion de Arthur
 Q.animations('Arthur', {
@@ -411,8 +423,6 @@ Q.Sprite.extend("Crow",{
             sprite: "Crow",
             frame: 0,
             flip: "x",
-            reload:0,
-            timeReload:3,
             life:2,
             type: SPRITE_ENEMY,
             collisionMask: SPRITE_PLAYER | SPRITE_DEFAULT
@@ -507,7 +517,7 @@ Q.Sprite.extend("Plant",{
     }
 }); 
 /*------------------------------ELEMENTOS--------------------------------------*/
-
+//Lanza de Arthur
 Q.Sprite.extend("Lanza",{
     init: function(p) {
         this._super(p, {
@@ -535,24 +545,17 @@ Q.Sprite.extend("Lanza",{
         this.destroy();
     }
  });
-
-Q.component("GeneradorPremios", {
-
-        generar: function(x,y){
-            var listaPremios = [{asset: "sacoMonedas", puntos: 200}, {asset: "escudo", puntos: 400}];
-            var maxPremios = listaPremios.length - 1;
-            var randomPremio = Math.floor(Math.random() * (5 - 0) + 0);
-            if(randomPremio <= maxPremios){
-                Q.Stage().insert(new Q.Premio({x: x, y: y, asset: listaPremios[randomPremio].asset, puntos: listaPremios[randomPremio].puntos}))
-            }
-        }
-    });
-  
+//Tumbas saltables
+/*Tamaños de las tuambas para calcular su centro y colocar la base en el suelo
+ * grave0:44x40
+ * grave1:36x40
+ * grave2:38x42
+ */
 Q.Sprite.extend("Tumba",{
     init: function(p) {
         this._super(p, {
             asset: "grave0.png", 
-            gravity: 0,     
+            gravity: 0,
             type: SPRITE_TUMBA,
             collisionMask: SPRITE_PLAYER | SPRITE_TILES
         }); 
@@ -560,7 +563,7 @@ Q.Sprite.extend("Tumba",{
         this.p.static = true;                   
     }
  });
-
+//Default de recompensa
 Q.Sprite.extend("Premio",{
     init: function(p) {
         this._super(p, {
@@ -572,7 +575,6 @@ Q.Sprite.extend("Premio",{
         this.add('2d');                   
     }
  });
-
 //Burst
 Q.Sprite.extend("Burst",{ 
     init: function(p) { 
@@ -593,7 +595,6 @@ Q.Sprite.extend("Burst",{
         this.destroy();
     }
 }); 
-
 //Spark
 Q.Sprite.extend("Spark",{ 
     init: function(p) { 
@@ -752,9 +753,9 @@ Q.scene("L1",function(stage) {
     //Insertamos a Sir Arthur
     stage.insert(arthur);
    // stage.insert(new Q.Zombie({x:(24*32)+16,y:(15*32)+16}));
-    stage.insert(new Q.Lanza({x:(24*32)+16,y:(15*32)+16}));
-    stage.insert(new Q.Plant({x:(20*32)+16,y:(15*32)+16}));
-    stage.insert(new Q.Tumba({x:(20*32)+16,y:(16*32)}));
+    //stage.insert(new Q.Lanza({x:(24*32)+16,y:(15*32)+16}));
+    //stage.insert(new Q.Plant({x:(20*32)+16,y:(15*32)+16}));
+    stage.insert(new Q.Tumba({x:(25*32)+16,y:(16*32)+12}));
     //stage.insert(new Q.Premio({x:(20*32)+16,y:(16*32)}));
    // stage.insert(new Q.Crow({x:(25*32)+16,y:(8*32)+16}));
     stage.add("viewport").follow(arthur,{x:true,y:false});

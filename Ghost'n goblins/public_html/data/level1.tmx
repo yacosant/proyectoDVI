@@ -3036,8 +3036,8 @@
    <tile gid="1"/>
    <tile gid="36"/>
    <tile gid="1"/>
-   <tile gid="7"/>
-   <tile gid="8"/>
+   <tile/>
+   <tile/>
    <tile gid="36"/>
    <tile gid="37"/>
    <tile gid="27"/>
@@ -3236,8 +3236,8 @@
    <tile gid="6"/>
    <tile gid="47"/>
    <tile gid="4"/>
-   <tile gid="18"/>
-   <tile gid="19"/>
+   <tile gid="4"/>
+   <tile gid="4"/>
    <tile gid="47"/>
    <tile gid="5"/>
    <tile gid="48"/>

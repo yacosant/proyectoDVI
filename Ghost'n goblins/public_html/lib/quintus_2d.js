@@ -448,45 +448,46 @@ Quintus["2D"] = function(Q) {
       var entity = this.entity,
           p = entity.p,
           magnitude = 0;
-
-      if(col.obj.p && col.obj.p.sensor) {
-        col.obj.trigger("sensor",entity);
-        return;
-      }
-
-      col.impact = 0;
-      var impactX = Math.abs(p.vx);
-      var impactY = Math.abs(p.vy);
-
-      if(!p.static){
-        p.x -= col.separate[0];
-        p.y -= col.separate[1];
-      }
       
-      // Top collision
-      if(col.normalY < -0.3) {
-        if(!p.skipCollide && p.vy > 0) { p.vy = 0; }
-        col.impact = impactY;
-        entity.trigger("bump.bottom",col);
-      }
-      if(col.normalY > 0.3) {
-        if(!p.skipCollide && p.vy < 0) { p.vy = 0; }
-        col.impact = impactY;
+        if(col.obj.p && col.obj.p.sensor) {
+          col.obj.trigger("sensor",entity);
+          return;
+        }
+        
+        col.impact = 0;
+        var impactX = Math.abs(p.vx);
+        var impactY = Math.abs(p.vy);
+        //Modificcion propia del engine
+        if(!p.static){
+          p.x -= col.separate[0];
+          p.y -= col.separate[1];
+        }else{
+            if(col.obj.p.vy!==0)
+              col.obj.p.y=p.y-(p.h+10);
+        }
+        // Top collision
+        if(col.normalY < -0.3) {
+          if(!p.skipCollide && p.vy > 0) { p.vy = 0; }
+          col.impact = impactY;
+            entity.trigger("bump.bottom",col);
+        }
+        if(col.normalY > 0.3) {
+          if(!p.skipCollide && p.vy < 0) { p.vy = 0; }
+          col.impact = impactY;
+            entity.trigger("bump.top",col);
+        }
 
-        entity.trigger("bump.top",col);
-      }
+        if(col.normalX < -0.3) {
+          if(!p.skipCollide && p.vx > 0) { p.vx = 0;  }
+          col.impact = impactX;
+          entity.trigger("bump.right",col);
+        }
+        if(col.normalX > 0.3) {
+          if(!p.skipCollide && p.vx < 0) { p.vx = 0; }
+          col.impact = impactX;
 
-      if(col.normalX < -0.3) {
-        if(!p.skipCollide && p.vx > 0) { p.vx = 0;  }
-        col.impact = impactX;
-        entity.trigger("bump.right",col);
-      }
-      if(col.normalX > 0.3) {
-        if(!p.skipCollide && p.vx < 0) { p.vx = 0; }
-        col.impact = impactX;
-
-        entity.trigger("bump.left",col);
-      }
+          entity.trigger("bump.left",col);
+        }
     },
 
     step: function(dt) {
