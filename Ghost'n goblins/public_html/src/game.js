@@ -246,7 +246,7 @@ Q.Sprite.extend("Arthur",{
         this.on("bump.bottom",this,"colMapa");
         this.add("Timer");
         this.p.jumpSpeed=-400;
-        this.on("dead",this,"muerte");
+        this.on("dead",this,"respawn");
         if(this.p.auto!==null){
             if(this.p.auto)
                 this.add("aiBounce");
@@ -255,26 +255,25 @@ Q.Sprite.extend("Arthur",{
         }
     },
     step:function(dt){
-        var prop=this.p;
-        prop.shoot+=dt; //Aumentamos el tiempo sin disparar
+        this.p.shoot+=dt; //Aumentamos el tiempo sin disparar
         this.Timer.step(dt);
             //Comprobamos el tiempo
             if(this.Timer.tiempoRest()<100 && !this.p.prisa)
                 this.prisas();
             else if(this.Timer.tiempoRest()===0)
-                this.muerte();
-        if(!prop.muerto)
-            this.animacion(prop);//Animacion
-        this.colMapa(prop);
-        if(Q.inputs["fire"] && prop.shoot>prop.shootDelay)
-            this.fire(prop);
+                this.muerto();
+        if(!this.p.muerto)
+            this.animacion(this.p);//Animacion
+        this.colMapa(this.p);
+        if(Q.inputs["fire"] && this.p.shoot>this.p.shootDelay)
+            this.fire();
     },
-    animacion:function(prop){
+    animacion:function(){
         if(Q.inputs["down"]){
             if(Q.inputs["left"] || Q.inputs["right"])
-                prop.speed=0;
+                this.p.speed=0;
             else
-                prop.speed=200;
+                this.p.speed=200;
             if(this.p.direction ==="right"){
                 if(Q.inputs["fire"])
                     this.play("shoot_duck_right");
@@ -288,31 +287,31 @@ Q.Sprite.extend("Arthur",{
            }
         }else if(!Q.inputs["down"]){
             if(Q.inputs["fire"]){
-                prop.speed=0;
+                this.p.speed=0;
                 if(this.p.direction ==="right")
                     this.play("shoot_right");
                 else
                     this.play("shoot_left");
             }else{
-                prop.speed=200;
-                if(prop.vx>0){
-                    if(prop.vy!==0)
+                this.p.speed=200;
+                if(this.p.vx>0){
+                    if(this.p.vy!==0)
                         this.play("jump_right");
                     else
                         this.play("run_right");
-                } else if(prop.vx<0) {
-                    if(prop.vy!==0)
+                } else if(this.p.vx<0) {
+                    if(this.p.vy!==0)
                         this.play("jump_left");
                     else
                         this.play("run_left");
                 }else{
                     if(this.p.direction ==="right"){
-                        if(prop.vy<0)
+                        if(this.p.vy<0)
                             this.play("jump_site_right");
                         else
                             this.play("stand_right");
                     }else{
-                        if(prop.vy<0)
+                        if(this.p.vy<0)
                             this.play("jump_site_left");
                         else
                             this.play("stand_left");
@@ -323,35 +322,37 @@ Q.Sprite.extend("Arthur",{
     },
     colMapa:function(collision){
         if(collision.tile === 91)
-            this.muerte();
+            this.muerto();
     },
-    fire:function(prop){
-        prop.shoot=0;
+    fire:function(){
+        this.p.shoot=0;
         var vel=250;
-        var mano=prop.h/2;
-        var conf=(prop.direction ==="right")?{x:prop.x+mano,y:prop.y,vx:vel}:{x:prop.x+mano,y:prop.y,vx:-vel};
+        var mano=this.p.h/2;
+        var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel}:{x:this.p.x+mano,y:this.p.y,vx:-vel};
         Q.stage().insert(new Q.Lanza(conf));
     },
-    hit:function(prop){
-        var ac=(prop.vy>0)? {x: this.p.x-50,y:this.p.y-25}:{x: this.p.x-50};
-        if(prop.sheet==="arthurArmo"){
+    hit:function(){
+        var ac=(this.p.vy>0)? {x: this.p.x-50,y:this.p.y-25}:{x: this.p.x-50};
+        if(this.p.sheet==="arthurArmo"){
             this.animate(ac,0.3,{
                 callback:function(){
-                    prop.sheet="arthurNude";
+                    this.p.sheet="arthurNude";
                 }
             });  
-        }else{
-            prop.muerto=true;
-            prop.type= SPRITE_NONE;
+        }else
+            this.muerto();
+    },
+    muerto:function(){
+        this.p.muerto=true;
+            this.p.type= SPRITE_NONE;
             this.del("platformerControls");
-            prop.sheet="arthurDie";
-            if(prop.direction ==="right")
+            this.p.sheet="arthurDie";
+            if(this.p.direction ==="right")
                         this.play("dieArthurRight");
                     else
                         this.play("dieArthurLeft");
-        }
     },
-    muerte:function(){
+    respawn:function(){
         Q.state.dec("lives",1); 
         if( Q.state.get("lives")>0)
             this.loadLevel();
