@@ -7,6 +7,7 @@ var SPRITE_PLAYER = 8;
 var SPRITE_LANZA = 16;
 var SPRITE_TUMBA = 32;
 var SPRITE_PREMIO = 64;
+var SPRITE_ANTORCHA = 128;
 var backMusic;
 /* global Quintus */
 var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
@@ -371,7 +372,10 @@ Q.Sprite.extend("Arthur",{
         var mano=this.p.h/2;
         var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel}:{x:this.p.x+mano,y:this.p.y,vx:-vel};
         Q.stage().insert(new Q.Lanza(conf));
-        //this.itsAFrog();
+
+        //PRUEBA DE LAZAMIENTO DEL OBJCTO ANTORCHA
+        /*var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,ax:0,ay:70}:{x:this.p.x+mano,y:this.p.y,vx:-vel,ax:0,ay:70};
+        Q.stage().insert(new Q.Antorcha(conf));*/
     },
     hit:function(){
         var ac=(this.p.vy>0)? {x: this.p.x-50,y:this.p.y-25}:{x: this.p.x-50};
@@ -625,6 +629,43 @@ Q.Sprite.extend("Lanza",{
         this.destroy();
     }
  });
+
+//Antorchas
+Q.MovingSprite.extend ( "Antorcha" , {
+    init: function(p) {
+        this._super(p, {
+            asset: "jar.png",
+            frame: 0, 
+            gravity:0, 
+            vx:201,         
+            type: SPRITE_ANTORCHA,
+            collisionMask: SPRITE_TUMBA | SPRITE_ENEMY 
+        }); 
+        this.add('2d');
+        this.on("bump.top,bump.down,bump.left,bump.right","kill"); 
+        this.asset("jar.png");         
+    },
+
+    kill: function(collision){
+        if(collision.obj.p.type===SPRITE_ENEMY){
+            Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+            collision.obj.hit(collision.obj.p);
+        } else if(collision.obj.p.type===SPRITE_TUMBA) 
+            Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+
+        this.destroy();
+    },
+
+    draw: function (ctx) {
+        //ctx.fillStyle = "negro" ;
+        ctx.beginPath ();
+        ctx.arc(-this.p.cx,
+              -this.p.cy,
+              this.p.w/2,0,Math.PI*2);
+        ctx.fill();
+    }
+});
+
 //Tumbas saltables
 /*Tamaños de las tuambas para calcular su centro y colocar la base en el suelo
  * grave0:44x40
