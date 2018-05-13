@@ -50,7 +50,7 @@ Q.preload(function(){
 //Asignacion de teclas
 Q.input.keyboardControls({
     P: "pausa",
-    X:"",
+    X:"frog",
     SPACE:"fire"
 });
 //Modo de pausa del juego
@@ -166,24 +166,38 @@ Q.component("GeneradorPremios", {
 /*-----------------------------ANIMACIONES------------------------------------*/
 //Animacion de Arthur
 Q.animations('Arthur', {
+    //Movimiento basico
     run_right: { frames: [0,1,2,3], rate: 1/5}, 
     run_left: { frames: [4,5,6,7], rate:1/5 },
     stand_right:{ frames: [2], rate:1 },
     stand_left:{ frames: [6], rate:1 },
+    //Salto
     jump_right:{ frames: [8,9], rate:1/2,loop:false},
     jump_left:{ frames: [15,14], rate:1/2,loop:false},
     jump_site_right:{ frames: [11], rate:1 },
     jump_site_left:{ frames: [12], rate:1 },
-    duck_right:{frames: [10], rate:1},
-    duck_left:{frames: [13], rate:1},
+    //Agachado
+    duck_right:{frames: [0], rate:1},
+    duck_left:{frames: [1], rate:1},
+    //Disparo
     shoot_right:{frames: [16,17], rate:1/5,loop:false},
     shoot_left:{frames: [23,22], rate:1/5,loop:false},
-    shoot_duck_right:{frames: [18,19], rate:1/5,loop:false},
-    shoot_duck_left:{frames: [21,20], rate:1/5,loop:false},
+    shoot_duck_right:{frames: [2,3], rate:1/5,loop:false},
+    shoot_duck_left:{frames: [5,4], rate:1/5,loop:false},
+    //Muerte
     dieArthurRight:{frames:[1,2,3,8,9,10],rate:1/3,next: '',trigger:"dead",loop:false},
     dieArthurLeft:{frames:[6,5,4,8,9,10],rate:1/3,next: '',trigger:"dead",loop:false},
+    //Aux
     arthurVago:{frames:[12],rate:1},
-    arthurWinner:{frames:[11],rate:1}
+    arthurWinner:{frames:[11],rate:1},
+    //Rana
+    arthurFrogRight:{frames:[0,1,2,3],rate:1/5},
+    arthurFrogLeft:{frames:[7,6,5,4],rate:1/5},
+    arthurFrogStandRight:{frames:[3],rate:1},
+    arthurFrogStandLeft:{frames:[4],rate:1},
+    //Destruccion de la armadura
+    destroyArmoRight:{frames:[0,1,2,3],rate:1/5,next: 'stand_right',trigger:"nude",loop:false},
+    destroyArmoLeft:{frames:[7,6,5,4],rate:1/5,next: 'stand_left',trigger:"nude",loop:false}
 });
 //Animacion del Crow
 Q.animations('Crow', {
@@ -238,6 +252,9 @@ Q.Sprite.extend("Arthur",{
             muerto:false,
             shootDelay:0.3,//En segundos
             shoot:0,
+            frog:false,
+            frogTime:0,
+            frogMaxTime:5,
             type:SPRITE_PLAYER,
             collisionMask: SPRITE_DEFAULT
         });
@@ -247,6 +264,8 @@ Q.Sprite.extend("Arthur",{
         this.add("Timer");
         this.p.jumpSpeed=-400;
         this.on("dead",this,"respawn");
+        this.on("nude",this,function(){this.sheet("arthurNude",true);this.add("platformerControls");});
+        this.on("bump.bottom",this,"colMapa");
         if(this.p.auto!==null){
             if(this.p.auto)
                 this.add("aiBounce");
@@ -262,14 +281,23 @@ Q.Sprite.extend("Arthur",{
                 this.prisas();
             else if(this.Timer.tiempoRest()===0)
                 this.muerto();
-        if(!this.p.muerto)
-            this.animacion(this.p);//Animacion
-        this.colMapa(this.p);
-        if(Q.inputs["fire"] && this.p.shoot>this.p.shootDelay)
+        if(!this.p.muerto){
+            if(!this.p.frog){
+                this.p.jumpSpeed=-400;
+                if(this.p.sheet!=="armoDestroy")
+                    this.animacion();//Animacion
+            }else{
+                this.p.jumpSpeed=-500;
+                this.frogerizado(dt);//Animacion
+            }
+        }
+        if(Q.inputs["fire"] && this.p.shoot>this.p.shootDelay && !this.p.frog)
             this.fire();
     },
     animacion:function(){
         if(Q.inputs["down"]){
+            if(this.p.sheet==="arthurArmo" || this.p.sheet==="arthurNude")
+                this.sheet(this.p.sheet+"Duck",true);
             if(Q.inputs["left"] || Q.inputs["right"])
                 this.p.speed=0;
             else
@@ -286,6 +314,7 @@ Q.Sprite.extend("Arthur",{
                     this.play("duck_left");
            }
         }else if(!Q.inputs["down"]){
+            this.sheet(this.p.sheet.slice(0,10),true);
             if(Q.inputs["fire"]){
                 this.p.speed=0;
                 if(this.p.direction ==="right")
@@ -320,6 +349,18 @@ Q.Sprite.extend("Arthur",{
             }
         }
     },
+    animFrog:function(){
+        if(this.p.vx>0)
+                this.play("arthurFrogRight");
+        else if(this.p.vx<0) 
+                this.play("arthurFrogLeft");
+        else{
+            if(this.p.direction==="right")
+                this.play("arthurFrogStandRight");
+            else
+                this.play("arthurFrogStandLeft");
+        }
+    },
     colMapa:function(collision){
         if(collision.tile === 91)
             this.muerto();
@@ -330,13 +371,19 @@ Q.Sprite.extend("Arthur",{
         var mano=this.p.h/2;
         var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel}:{x:this.p.x+mano,y:this.p.y,vx:-vel};
         Q.stage().insert(new Q.Lanza(conf));
+        //this.itsAFrog();
     },
     hit:function(){
         var ac=(this.p.vy>0)? {x: this.p.x-50,y:this.p.y-25}:{x: this.p.x-50};
+        this.del("platformerControls");
         if(this.p.sheet==="arthurArmo"){
             this.animate(ac,0.3,{
                 callback:function(){
-                    this.p.sheet="arthurNude";
+                    this.sheet("armoDestroy",true);
+                    if(this.p.direction==="right")
+                        this.play("destroyArmoRight");
+                    else
+                        this.play("destroyArmoLeft");
                 }
             });  
         }else
@@ -344,13 +391,14 @@ Q.Sprite.extend("Arthur",{
     },
     muerto:function(){
         this.p.muerto=true;
-            this.p.type= SPRITE_NONE;
-            this.del("platformerControls");
-            this.p.sheet="arthurDie";
-            if(this.p.direction ==="right")
-                        this.play("dieArthurRight");
-                    else
-                        this.play("dieArthurLeft");
+        this.p.vx=0;
+        this.p.type= SPRITE_NONE;
+        this.del("platformerControls");
+        this.p.sheet="arthurDie";
+        if(this.p.direction ==="right")
+                    this.play("dieArthurRight");
+                else
+                    this.play("dieArthurLeft");
     },
     respawn:function(){
         Q.state.dec("lives",1); 
@@ -359,6 +407,23 @@ Q.Sprite.extend("Arthur",{
     },
     prisas:function(){
         
+    },
+    itsAFrog:function(){
+        if(!this.p.frog){
+            this.p.frog=true;
+            this.p.speed=200;
+            this.sheet("arthurFrog",true);
+        }
+    },
+    frogerizado:function(dt){
+        if(this.p.frogTime>=this.p.frogMaxTime){
+            this.p.frog=false;
+            this.sheet("arthurNude",true);
+            this.p.frogTime=0;
+        }else{
+            this.p.frogTime+=dt;
+            this.animFrog();
+        }
     }
 });
 /*---------------------------------PNJ----------------------------------------*/

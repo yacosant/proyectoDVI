@@ -1,5 +1,9 @@
 {
     "arthurArmo":{"sx":0,"sy":0,"tileW":64,"tileH":64,"frames":28},
+    "arthurArmoDuck":{"sx":0,"sy":352,"tileW":64,"tileH":48,"frames":6},
     "arthurNude":{"sx":0,"sy":64,"tileW":64,"tileH":64,"frames":28},
-    "arthurDie":{"sx":0,"sy":128,"tileW":64,"tileH":64,"frames":13}
+    "arthurNudeDuck":{"sx":0,"sy":400,"tileW":64,"tileH":48,"frames":6},
+    "arthurDie":{"sx":0,"sy":128,"tileW":64,"tileH":64,"frames":13},
+    "arthurFrog":{"sx":0,"sy":192,"tileW":32,"tileH":32,"frames":8},
+    "armoDestroy":{"sx":0,"sy":224,"tileW":128,"tileH":128,"frames":8}
 }
