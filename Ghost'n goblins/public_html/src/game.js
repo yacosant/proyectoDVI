@@ -198,8 +198,8 @@ Q.animations('Arthur', {
     arthurFrogStandRight:{frames:[3],rate:1},
     arthurFrogStandLeft:{frames:[4],rate:1},
     //Destruccion de la armadura
-    destroyArmoRight:{frames:[0,1,2,3],rate:1/5,next: 'stand_right',trigger:"nude",loop:false},
-    destroyArmoLeft:{frames:[7,6,5,4],rate:1/5,next: 'stand_left',trigger:"nude",loop:false}
+    destroyArmoRight:{frames:[0,1,2,3],rate:1/3,next: '',trigger:"nude",loop:false},
+    destroyArmoLeft:{frames:[7,6,5,4],rate:1/3,next: '',trigger:"nude",loop:false}
 });
 //Animacion del Crow
 Q.animations('Crow', {
@@ -250,16 +250,19 @@ Q.Sprite.extend("Arthur",{
             sheet:"arthurArmo",
             sprite:"Arthur",
             frame:0,
-            auto:false,
-            muerto:false,
-            shootDelay:0.3,//En segundos
-            shoot:0,
-            frog:false,
-            frogTime:0,
-            frogMaxTime:5,
-            type:SPRITE_PLAYER,
+            type:SPRITE_PLAYER,//Colisiones
             collisionMask: SPRITE_DEFAULT,
-            armaEquipada: "lanza"
+            auto:false,//Estados
+            muerto:false,
+            frog:false,
+            hit:false,
+            ArmoDestroy:false,
+            armaEquipada: "lanza", //Armamento
+            shootDelay:0.3,//Disparo
+            shoot:0,
+            frogTime:0,//Echizado
+            frogMaxTime:5
+            
         });
         this.add("2d,animation,tween");
         this.add("levelManager");
@@ -267,7 +270,7 @@ Q.Sprite.extend("Arthur",{
         this.add("Timer");
         this.p.jumpSpeed=-400;
         this.on("dead",this,"respawn");
-        this.on("nude",this,function(){this.sheet("arthurNude",true);this.add("platformerControls");});
+        this.on("nude",this,"armoDestroyed");
         this.on("bump.bottom",this,"colMapa");
         if(this.p.auto!==null){
             if(this.p.auto)
@@ -279,25 +282,26 @@ Q.Sprite.extend("Arthur",{
     step:function(dt){
         this.p.shoot+=dt; //Aumentamos el tiempo sin disparar
         this.Timer.step(dt);
-            //Comprobamos el tiempo
-            if(this.Timer.tiempoRest()<100 && !this.p.prisa)
-                this.prisas();
-            else if(this.Timer.tiempoRest()===0)
-                this.muerto();
+        //Comprobamos el tiempo
+        if(this.Timer.tiempoRest()<100 && !this.p.prisa)
+            this.prisas();
+        else if(this.Timer.tiempoRest()===0)
+            this.muerto();
         if(!this.p.muerto){
-            if(!this.p.frog){
-                this.p.jumpSpeed=-400;
-                if(this.p.sheet!=="armoDestroy")
-                    this.animacion();//Animacion
-            }else{
+            if(this.p.hit)
+                this.animArmo();
+            if(this.p.frog){
                 this.p.jumpSpeed=-500;
-                this.frogerizado(dt);//Animacion
+                this.frogerizado(dt);//Animacion  
+            }else{
+                this.p.jumpSpeed=-400;
+                this.animBase();//Animacion
             }
         }
         if(Q.inputs["fire"] && this.p.shoot>this.p.shootDelay && !this.p.frog)
             this.fire();
     },
-    animacion:function(){
+    animBase:function(){
         if(Q.inputs["down"]){
             if(this.p.sheet==="arthurArmo" || this.p.sheet==="arthurNude")
                 this.sheet(this.p.sheet+"Duck",true);
@@ -353,6 +357,8 @@ Q.Sprite.extend("Arthur",{
         }
     },
     animFrog:function(){
+        if(this.p.sheet!=="arthurFrog")
+            this.sheet("arthurFrog",true);
         if(this.p.vx>0)
                 this.play("arthurFrogRight");
         else if(this.p.vx<0) 
@@ -364,22 +370,35 @@ Q.Sprite.extend("Arthur",{
                 this.play("arthurFrogStandLeft");
         }
     },
+    animArmo:function(){
+        if(this.p.sheet!=="armoDest")
+            this.sheet("armoDest",true);
+        if(!this.p.ArmoDestroy){
+            this.p.ArmoDestroy=true;
+            if(this.p.direction==="right")
+                this.play("destroyArmoRight",3,0);
+            else
+                this.play("destroyArmoLeft",3,0);
+        }
+        if(this.p.frame===3)
+            this.armoDestroyed();
+    },
     colMapa:function(collision){
         if(collision.tile === 91)
             this.muerto();
     },
     fire:function(){
-        if(this.p.armaEquipada == "lanza"){
+        if(this.p.armaEquipada === "lanza"){
             this.p.shoot=0;
             var vel=250;
             var mano=this.p.h/2;
             var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel}:{x:this.p.x+mano,y:this.p.y,vx:-vel};
             Q.stage().insert(new Q.Lanza(conf));
-        }else if(this.p.armaEquipada == "antorcha"){    
+        }else if(this.p.armaEquipada === "antorcha"){    
             //PRUEBA DE LAZAMIENTO DEL OBJCTO ANTORCHA
             /*var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,ax:0,ay:70,asset: "jar.png",type: SPRITE_ANTORCHA,collisionMask: SPRITE_TUMBA | SPRITE_ENEMY }:{x:this.p.x+mano,y:this.p.y,vx:-vel,ax:0,ay:70,asset: "jar.png",type: SPRITE_ANTORCHA,collisionMask: SPRITE_TUMBA | SPRITE_ENEMY};
             Q.stage().insert(new Q.Antorcha(conf));*/
-        }else if(this.p.armaEquipada == "daga"){    
+        }else if(this.p.armaEquipada === "daga"){    
             this.p.shoot=0;
             var vel=800;
             var mano=this.p.h/2;
@@ -387,20 +406,15 @@ Q.Sprite.extend("Arthur",{
             Q.stage().insert(new Q.Daga(conf));
         }
     },
-    hit:function(){
-        var ac=(this.p.vy>0)? {x: this.p.x-50,y:this.p.y-25}:{x: this.p.x-50};
+    hit:function(col){
+        var ac=(this.p.vy>0)? {x: this.p.x-50,y:this.p.y-100}:{x: this.p.x-50};
         this.del("platformerControls");
+        this.del("2d");
+        this.p.type=SPRITE_NONE;
         if(this.p.sheet==="arthurArmo"){
-            this.animate(ac,0.3,{
-                callback:function(){
-                    this.sheet("armoDestroy",true);
-                    if(this.p.direction==="right")
-                        this.play("destroyArmoRight");
-                    else
-                        this.play("destroyArmoLeft");
-                }
-            });  
-        }else
+            this.p.hit=true;
+            this.animate(ac,0.3);  
+        }else if(this.p.sheet==="arthurNude" || this.p.sheet==="arthurFrog")
             this.muerto();
     },
     muerto:function(){
@@ -426,7 +440,6 @@ Q.Sprite.extend("Arthur",{
         if(!this.p.frog){
             this.p.frog=true;
             this.p.speed=200;
-            this.sheet("arthurFrog",true);
         }
     },
     frogerizado:function(dt){
@@ -438,6 +451,13 @@ Q.Sprite.extend("Arthur",{
             this.p.frogTime+=dt;
             this.animFrog();
         }
+    },
+    armoDestroyed:function(){
+        this.sheet("arthurNude",true);
+        this.add("platformerControls");
+        this.add("2d");
+        this.p.type=SPRITE_PLAYER;
+        this.p.hit=false;
     }
 });
 /*---------------------------------PNJ----------------------------------------*/
@@ -578,7 +598,7 @@ Q.Sprite.extend("Plant",{
     },
     matar:function(collision){
         if(collision.obj.p.type===SPRITE_PLAYER) 
-            collision.obj.hit(collision.obj.p);
+            collision.obj.hit(collision);
     },
     
     hit: function(){
@@ -744,7 +764,7 @@ Q.Sprite.extend("Premio",{
     },
     take: function(collision){
         if(collision.obj.p.type === SPRITE_PLAYER){
-            if(this.asset == "jar.png"){
+            if(this.asset === "jar.png"){
                 collision.obj.p.armaEquipada = "antorcha";
                 this.destroy();
             }
