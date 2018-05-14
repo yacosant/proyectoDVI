@@ -407,12 +407,14 @@ Q.Sprite.extend("Arthur",{
         }
     },
     hit:function(col){
-        var ac=(this.p.vy>0)? {x: this.p.x-50,y:this.p.y-100}:{x: this.p.x-50};
+        var ac=(this.p.vy>0)? {x: this.p.x-70,y:this.p.y-50}:{x: this.p.x-50};
         this.del("platformerControls");
         this.del("2d");
         this.p.type=SPRITE_NONE;
         if(this.p.sheet==="arthurArmo"){
             this.p.hit=true;
+            this.p.x -= col.separate[0];
+            this.p.y -= col.separate[1];
             this.animate(ac,0.3);  
         }else if(this.p.sheet==="arthurNude" || this.p.sheet==="arthurFrog")
             this.muerto();
@@ -499,7 +501,7 @@ Q.Sprite.extend("Zombie",{
     },
     matar:function(collision){
         if(collision.obj.p.type===SPRITE_PLAYER) 
-            collision.obj.hit(collision.obj.p);
+            collision.obj.hit(collision);
         else if(collision.tile === 40){
             this.play("zombieBye");
             this.p.vx=0;
@@ -547,7 +549,7 @@ Q.Sprite.extend("Crow",{
     },
     matar:function(collision){
         if(collision.obj.p.type===SPRITE_PLAYER) 
-            collision.obj.hit(collision.obj.p);
+            collision.obj.hit(collision);
     },
 
     hit: function(){
