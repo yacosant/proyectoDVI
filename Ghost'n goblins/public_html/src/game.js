@@ -8,6 +8,7 @@ var SPRITE_LANZA = 16;
 var SPRITE_TUMBA = 32;
 var SPRITE_PREMIO = 64;
 var SPRITE_ANTORCHA = 128;
+var SPRITE_DAGA = 256;
 var backMusic;
 /* global Quintus */
 var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
@@ -257,7 +258,8 @@ Q.Sprite.extend("Arthur",{
             frogTime:0,
             frogMaxTime:5,
             type:SPRITE_PLAYER,
-            collisionMask: SPRITE_DEFAULT
+            collisionMask: SPRITE_DEFAULT,
+            armaEquipada: "lanza"
         });
         this.add("2d,animation,tween");
         this.add("levelManager");
@@ -367,15 +369,23 @@ Q.Sprite.extend("Arthur",{
             this.muerto();
     },
     fire:function(){
-        this.p.shoot=0;
-        var vel=250;
-        var mano=this.p.h/2;
-        var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel}:{x:this.p.x+mano,y:this.p.y,vx:-vel};
-        Q.stage().insert(new Q.Lanza(conf));
-
-        //PRUEBA DE LAZAMIENTO DEL OBJCTO ANTORCHA
-        /*var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,ax:0,ay:70}:{x:this.p.x+mano,y:this.p.y,vx:-vel,ax:0,ay:70};
-        Q.stage().insert(new Q.Antorcha(conf));*/
+        if(this.p.armaEquipada == "lanza"){
+            this.p.shoot=0;
+            var vel=250;
+            var mano=this.p.h/2;
+            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel}:{x:this.p.x+mano,y:this.p.y,vx:-vel};
+            Q.stage().insert(new Q.Lanza(conf));
+        }else if(this.p.armaEquipada == "antorcha"){    
+            //PRUEBA DE LAZAMIENTO DEL OBJCTO ANTORCHA
+            /*var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,ax:0,ay:70,asset: "jar.png",type: SPRITE_ANTORCHA,collisionMask: SPRITE_TUMBA | SPRITE_ENEMY }:{x:this.p.x+mano,y:this.p.y,vx:-vel,ax:0,ay:70,asset: "jar.png",type: SPRITE_ANTORCHA,collisionMask: SPRITE_TUMBA | SPRITE_ENEMY};
+            Q.stage().insert(new Q.Antorcha(conf));*/
+        }else if(this.p.armaEquipada == "daga"){    
+            this.p.shoot=0;
+            var vel=800;
+            var mano=this.p.h/2;
+            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel}:{x:this.p.x+mano,y:this.p.y,vx:-vel};
+            Q.stage().insert(new Q.Daga(conf));
+        }
     },
     hit:function(){
         var ac=(this.p.vy>0)? {x: this.p.x-50,y:this.p.y-25}:{x: this.p.x-50};
@@ -608,8 +618,41 @@ Q.Sprite.extend("Lanza",{
             asset: "lance.png",
             frame: 0, 
             gravity:0, 
+            damage: 30,
             vx:201,         
             type: SPRITE_LANZA,
+            collisionMask: SPRITE_TUMBA | SPRITE_ENEMY 
+        }); 
+        this.add('2d');
+        this.on("bump.top,bump.down,bump.left,bump.right","kill"); 
+        if(this.p.vx < 0){
+            this.p.flip = "x";
+        }                    
+    },
+
+
+
+    kill: function(collision){
+        if(collision.obj.p.type===SPRITE_ENEMY){
+            Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+            collision.obj.hit(collision.obj.p);
+        } else if(collision.obj.p.type===SPRITE_TUMBA) 
+            Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+
+        this.destroy();
+    }
+ });
+
+//Daga
+Q.Sprite.extend("Daga",{
+    init: function(p) {
+        this._super(p, {
+            asset: "lance.png",
+            frame: 0, 
+            gravity:0, 
+            damage: 70,
+            vx:201,         
+            type: SPRITE_DAGA,
             collisionMask: SPRITE_TUMBA | SPRITE_ENEMY 
         }); 
         this.add('2d');
@@ -637,6 +680,7 @@ Q.MovingSprite.extend ( "Antorcha" , {
             asset: "jar.png",
             frame: 0, 
             gravity:0, 
+            damage: 50,
             vx:201,         
             type: SPRITE_ANTORCHA,
             collisionMask: SPRITE_TUMBA | SPRITE_ENEMY 
@@ -688,12 +732,23 @@ Q.Sprite.extend("Tumba",{
 Q.Sprite.extend("Premio",{
     init: function(p) {
         this._super(p, {
-            asset: "jar.png", 
-            puntos: 0,       
+            asset: "", 
+            puntos: 0,  
+            gravity: 0,     
             type: SPRITE_PREMIO,
             collisionMask: SPRITE_PLAYER | SPRITE_TILES
         }); 
-        this.add('2d');                   
+        this.add('2d'); 
+        this.p.static = true;  
+        this.on("bump.top,bump.down,bump.left,bump.right","take");                   
+    },
+    take: function(collision){
+        if(collision.obj.p.type === SPRITE_PLAYER){
+            if(this.asset == "jar.png"){
+                collision.obj.p.armaEquipada = "antorcha";
+                this.destroy();
+            }
+        }
     }
  });
 //Burst
@@ -877,7 +932,7 @@ Q.scene("L1",function(stage) {
     //stage.insert(new Q.Lanza({x:(24*32)+16,y:(15*32)+16}));
     stage.insert(new Q.Plant({x:(20*32)+16,y:(15*32)+16}));
     stage.insert(new Q.Tumba({x:(25*32)+16,y:(16*32)+12}));
-    //stage.insert(new Q.Premio({x:(20*32)+16,y:(16*32)}));
+    //stage.insert(new Q.Premio({x:(40*32)+16,y:(16*32),asset:"jar.png"}));
    // stage.insert(new Q.Crow({x:(25*32)+16,y:(8*32)+16}));
     stage.add("viewport").follow(arthur,{x:true,y:false});
 });
