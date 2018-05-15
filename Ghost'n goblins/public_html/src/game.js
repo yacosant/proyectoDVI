@@ -21,7 +21,7 @@ var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .enableSound();//Habilita el uso de audio
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png"]);
+Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png"]);
 //JSON'S 
 Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json"]);
 //Musica
@@ -38,7 +38,7 @@ Q.preload(function(){
     Q.compileSheets("plant.png", "plant.json");
     //Estado global de juego
     Q.state.set({ score: 0, lives: 4, //Puntuaciones
-                  level:1,respX:0,respY:0, //Nivel y punto del respawn
+                  level:1,maxLevel:2,respX:0,respY:0, //Nivel y punto del respawn
                   pause:false,enJuego:false
                 });
     //Controlador de la musica de fondo
@@ -110,13 +110,13 @@ Q.component("levelManager",{
                 Q.stageScene("loseScreen",{label:"Game Over \n Pulsa enter para volver al menu principal"});
             });
         },
-        nextLevel:function(){
+        mapScreen:function(){
             Q.stage(2).show(true);
-            if(Q.state.get("level")>1){
+            if(Q.state.get("level")>Q.state.get("maxLevel")){
                 this.winScreen();
             }else{
-                Q.loadTMX("nextLevel.tmx", function() {
-                   Q.stageScene("nextLevelScreen",{label:"Level "+Q.state.get("level")});
+                Q.loadTMX("mapScreen.tmx", function() {
+                   Q.stageScene("mapScreen");
                });
             }
         },
@@ -124,7 +124,7 @@ Q.component("levelManager",{
             Q.loadTMX("level"+Q.state.get("level")+".tmx", function() {
                Q.stage(2).show();    
                Q.stageScene("L"+Q.state.get("level"));
-           });
+            });
         }
     }
 });
@@ -232,12 +232,10 @@ Q.animations('Plant', {
 Q.animations('Burst', {
   burst: { frames: [0,1,2,3], next: 'burst', trigger:"muerte", rate: 1/5} 
 });
-
 //Animacion de las chispas
 Q.animations('Spark', {
     spark: { frames: [0,1,2], next: 'spark', trigger:"muerte", rate: 1/5} 
   });
-
 //Animacion de a princesa
 Q.animations('Princess', {
     princess: { frames: [0,1,2,3], rate: 1/5} 
@@ -271,6 +269,7 @@ Q.Sprite.extend("Arthur",{
         this.p.jumpSpeed=-400;
         this.on("dead",this,"respawn");
         this.on("nude",this,"armoDestroyed");
+        this.on("frog","itsAFrog");
         this.on("bump.bottom",this,"colMapa");
         if(this.p.auto!==null){
             if(this.p.auto)
@@ -433,7 +432,7 @@ Q.Sprite.extend("Arthur",{
     respawn:function(){
         Q.state.dec("lives",1); 
         if( Q.state.get("lives")>0)
-            this.loadLevel();
+            this.mapScreen();
     },
     prisas:function(){
         
@@ -476,7 +475,6 @@ Q.Sprite.extend("Princess",{
         this.play("princess");
     }
 }); 
-
 /*-------------------------------ENEMIGOS-------------------------------------*/
 //Zombie
 Q.Sprite.extend("Zombie",{ 
@@ -525,7 +523,6 @@ Q.Sprite.extend("Zombie",{
         this.p. vx=80;
     }
 }); 
-
 //Crow
 Q.Sprite.extend("Crow",{ 
     init: function(p) { 
@@ -578,7 +575,6 @@ Q.Sprite.extend("Crow",{
         
     }
 }); 
-
 //Planta
 Q.Sprite.extend("Plant",{ 
     init: function(p) { 
@@ -664,7 +660,6 @@ Q.Sprite.extend("Lanza",{
         this.destroy();
     }
  });
-
 //Daga
 Q.Sprite.extend("Daga",{
     init: function(p) {
@@ -694,7 +689,6 @@ Q.Sprite.extend("Daga",{
         this.destroy();
     }
  });
-
 //Antorchas
 Q.MovingSprite.extend ( "Antorcha" , {
     init: function(p) {
@@ -731,7 +725,6 @@ Q.MovingSprite.extend ( "Antorcha" , {
         ctx.fill();
     }
 });
-
 //Tumbas saltables
 /*Tamaños de las tuambas para calcular su centro y colocar la base en el suelo
  * grave0:44x40
@@ -813,6 +806,25 @@ Q.Sprite.extend("Spark",{
         this.destroy();
     }
 }); 
+//Marador de posicion para la mapScreen
+Q.Sprite.extend("Marker",{
+    init: function(p) { 
+        this._super(p, { 
+            asset: "marker.png",
+            timeWait:5,
+            time:0,
+            x:0,
+            y:0  
+        }); 
+        this.add("levelManager");
+    },
+    step:function(dt){
+        if(this.p.time>this.p.timeWait)
+            this.loadLevel();
+        else
+            this.p.time+=dt;
+    }
+});
 /*----------------------------------HUD---------------------------------------*/
 //Puntuacion
 Q.UI.Text.extend("Score",{
@@ -879,7 +891,7 @@ Q.scene("initScreen",function(stage){
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
     Q.state.set({ score:0, lives:4,level:1,world:1,pause:false,enJuego:false });
     //Musica principal del juego
-    Q.input.on("confirm",this,function(){
+   Q.input.on("confirm",this,function(){
         Q.loadTMX("level1.tmx", function() {
             Q.stageScene("HUD",2);
             Q.stageScene("L1");
@@ -918,12 +930,12 @@ Q.scene("winScreen",function(stage){
     stage.insert(new Q.Princess({x:(12*34)+17,y:(15*34)+17}));
 });
 //Pantalla de siguiente nivel
-Q.scene("nextLevelScreen",function(stage){
-    Q.stage(2).show();
+Q.scene("mapScreen",function(stage){
+    var markerPos=[{},{x:(1*32)+16,y:15*32},{x:(3*32)+16,y:(14*32)+13},{x:(5*32)+14,y:(14*32)+11},{x:(6*32)+12,y:(14*32)+10},{x:(9*32)+6,y:(14*32)+10},{x:(10*32)+20,y:(14*32)+5},{x:(10*32)+20,y:(14*32)+5}];
+    Q.stage(2).show(false);
     Q.state.set("enJuego",false);
-    Q.stageTMX("nextLevel.tmx",stage);
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-100,size:32,color: "#ffffff",label: stage.options.label }));
-    stage.insert(new Q.Mario({x:(1*34),y:13*34,limInfMapa:17*34,auto:true,vx:140}));
+    Q.stageTMX("mapScreen.tmx",stage);
+    stage.insert(new Q.Marker(markerPos[Q.state.get("level")]));
 });
 //Mensaje de juego pausado
 Q.scene('pauseMessage',function(stage) {
