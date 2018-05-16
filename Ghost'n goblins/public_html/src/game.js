@@ -21,9 +21,9 @@ var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .enableSound();//Habilita el uso de audio
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png"]);
+Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json"]);
+Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","bullet.json"]);
 //Musica
 Q.preload([]);
 //Funcion de inicio
@@ -36,6 +36,9 @@ Q.preload(function(){
     Q.compileSheets("burst.png", "burst.json");
     Q.compileSheets("spark.png", "spark.json");
     Q.compileSheets("plant.png", "plant.json");
+    Q.compileSheets("devil.png", "devil.json");
+    Q.compileSheets("bullet.png", "bullet.json");
+
     //Estado global de juego
     Q.state.set({ score: 0, lives: 4, //Puntuaciones
                   level:1,maxLevel:2,respX:0,respY:0, //Nivel y punto del respawn
@@ -214,7 +217,7 @@ Q.animations('Zombie', {
 });
 //Animacion de la bullet
 Q.animations('Bullet', {
-    bullet: { frames: [0,1,2,3], rate: 1/2}
+    bullet: { frames: [0,1,2,3], rate: 1/5}
 });
 //Animacion de Devil
 Q.animations('Devil', {
@@ -239,6 +242,12 @@ Q.animations('Spark', {
 //Animacion de a princesa
 Q.animations('Princess', {
     princess: { frames: [0,1,2,3], rate: 1/5} 
+});
+//Animacion del demonio
+Q.animations('Devil', {
+    devil: { frames: [0,1,2], rate: 1/5},
+    devilMove: { frames: [3], rate: 1},
+    devilGoes: { frames: [4,5], rate: 1/3}
 });
 
 /*-------------------------------JUGADOR--------------------------------------*/
@@ -487,7 +496,7 @@ Q.Sprite.extend("Zombie",{
             flip: "x",
             reload:0,
             timeReload:3,
-            life:1,
+            life:30,
             type: SPRITE_ENEMY,
             collisionMask: SPRITE_PLAYER | SPRITE_DEFAULT
         }); 
@@ -506,9 +515,9 @@ Q.Sprite.extend("Zombie",{
         }   
     },
     
-    hit: function(){
-        this.p.life--;
-        if(this.p.life===0) this.muerte();
+    hit: function(damage){
+        this.p.life=-damage;
+        if(this.p.life<=0) this.muerte();
     },
 
     muerte:function() {
@@ -536,7 +545,7 @@ Q.Sprite.extend("Crow",{
             sprite: "Crow",
             frame: 0,
             flip: "x",
-            life:2,
+            life:60,
             type: SPRITE_ENEMY,
             collisionMask: SPRITE_PLAYER | SPRITE_DEFAULT
         }); 
@@ -549,9 +558,9 @@ Q.Sprite.extend("Crow",{
             collision.obj.hit(collision);
     },
 
-    hit: function(){
-        this.p.life--;
-        if(this.p.life===0) muerte();
+    hit: function(damage){
+        this.p.life=-damage;
+        if(this.p.life<=0) this.muerte();
     },
 
     muerte:function() {
@@ -586,7 +595,7 @@ Q.Sprite.extend("Plant",{
             frame: 0,
             reload:0,
             timeReload:3,
-            life:1,
+            life:30,
             type: SPRITE_ENEMY,
             collisionMask: SPRITE_PLAYER | SPRITE_DEFAULT
         }); 
@@ -599,12 +608,69 @@ Q.Sprite.extend("Plant",{
             collision.obj.hit(collision);
     },
     
-    hit: function(){
-        this.p.life--;
+    hit: function(damage){
+        this.p.life=-damage;
         this.play("plantL");
         this.p.lengua=true;
         this.p.reload=0;
-        if(this.p.life===0) this.muerte();
+        if(this.p.life<=0) this.muerte();
+    },
+
+    muerte:function() {
+        this.destroy();
+    },
+    step:function(dt){
+        this.p.reload+=dt;
+
+        if(this.p.reload>this.p.timeReload){
+            var art = Q("Arthur").last();
+                Q.stage().insert(new Q.Bullet({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y}));
+            this.p.reload=0;
+            if(this.p.lengua){
+                this.p.timeReload+=2,75;
+                this.play("plant");
+                this.p.lengua=false;
+                var art = Q("Arthur").last();
+                Q.stage().insert(new Q.Bullet({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y}));
+            }
+            else{
+                this.p.timeReload-=2,75;
+                this.play("plantL");
+                this.p.lengua=true;
+            } 
+        }
+    }
+}); 
+
+//Devil
+Q.Sprite.extend("Devil",{ 
+    init: function(p) { 
+        this._super(p, { 
+            vx:50,
+            vy:15,
+            gravity: 0,
+            reload:0,
+            timeReload:5,
+            sheet: "devil",
+            sprite: "Devil",
+            frame: 0,
+            flip: "x",
+            life:120,
+            type: SPRITE_ENEMY,
+            collisionMask: SPRITE_PLAYER | SPRITE_DEFAULT
+        }); 
+        this.add("2d,aiBounce,aiBounce2,animation");  
+        this.on("bump.top,bump.down,bump.left,bump.right","matar");
+        this.play("devil");
+    },
+    matar:function(collision){
+        if(collision.obj.p.type===SPRITE_PLAYER) 
+            collision.obj.hit(collision);
+    },
+
+    hit: function(damage){
+        this.p.life=-damage;
+        if(this.p.life<=0) this.muerte();
     },
 
     muerte:function() {
@@ -615,17 +681,17 @@ Q.Sprite.extend("Plant",{
 
         if(this.p.reload>this.p.timeReload){
             this.p.reload=0;
-            if(this.p.lengua){
-                this.p.timeReload+=2,75;
-                this.play("plant");
-                this.p.lengua=false;
+            if(this.p.flip==='x'){
+                this.p.flip=false;
+                this.p.vx=-50;
             }
             else{
-                this.p.timeReload-=2,75;
-                this.play("plantL");
-                this.p.lengua=true;
+                this.p.flip='x';
+                this.p.vx=50;
             } 
         }
+        
+        
     }
 }); 
 /*------------------------------ELEMENTOS--------------------------------------*/
@@ -653,7 +719,7 @@ Q.Sprite.extend("Lanza",{
     kill: function(collision){
         if(collision.obj.p.type===SPRITE_ENEMY){
             Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
-            collision.obj.hit(collision.obj.p);
+            collision.obj.hit(this.p.damage);
         } else if(collision.obj.p.type===SPRITE_TUMBA) 
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
 
@@ -682,7 +748,7 @@ Q.Sprite.extend("Daga",{
     kill: function(collision){
         if(collision.obj.p.type===SPRITE_ENEMY){
             Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
-            collision.obj.hit(collision.obj.p);
+            collision.obj.hit(this.p.damage);
         } else if(collision.obj.p.type===SPRITE_TUMBA) 
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
 
@@ -709,7 +775,7 @@ Q.MovingSprite.extend ( "Antorcha" , {
     kill: function(collision){
         if(collision.obj.p.type===SPRITE_ENEMY){
             Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
-            collision.obj.hit(collision.obj.p);
+            collision.obj.hit(this.p.damage);
         } else if(collision.obj.p.type===SPRITE_TUMBA) 
             Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
 
@@ -825,6 +891,45 @@ Q.Sprite.extend("Marker",{
             this.p.time+=dt;
     }
 });
+
+//Bala de Planta
+Q.Sprite.extend("Bullet",{
+    init: function(p) {
+        this._super(p, {
+            sheet: "bullet",
+            sprite: "Bullet",
+            frame: 0, 
+            gravity:0, 
+            xo:0,
+            yo:0,
+            x:0,
+            y:0, 
+            vx:350,
+            vy:0,        
+            type: SPRITE_ENEMY,
+            collisionMask: SPRITE_DEFAULT | SPRITE_PLAYER
+        }); 
+        this.add('animation,2d');
+        this.on("bump.top,bump.bottom,bump.left,bump.right","kill"); 
+        if(this.p.vx < 0){
+            this.p.flip = "x";
+        }     
+        this.play("bullet"); 
+        if(this.p.xo<0) this.p.vx*=-1;  
+        this.p.vy= this.p.vx*(this.p.yo/this.p.xo);    
+    },
+
+    kill: function(collision){
+        if(collision.obj.p.type===SPRITE_PLAYER){
+            Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+            collision.obj.hit(collision.obj.p);
+        } else if(collision.obj.p.type===SPRITE_DEFAULT) 
+            Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+
+        this.destroy();
+    }
+ });
+
 /*----------------------------------HUD---------------------------------------*/
 //Puntuacion
 Q.UI.Text.extend("Score",{
