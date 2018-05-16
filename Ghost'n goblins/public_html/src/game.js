@@ -31,14 +31,24 @@ Q.preload([]);
 Q.preload(function(){
     //Compilacion del las sheets
     Q.compileSheets("ArthurV2.png","ArthurV2.json");
+    //Enemigos
     Q.compileSheets("zombie.png", "zombie.json");
     Q.compileSheets("crow.png", "crow.json");
+    Q.compileSheets("devil.png", "devil.json");
+    Q.compileSheets("plant.png", "plant.json");
+    //PNJ
     Q.compileSheets("princess.png", "princess.json");
+    //Efectos
     Q.compileSheets("burst.png", "burst.json");
     Q.compileSheets("spark.png", "spark.json");
-    Q.compileSheets("plant.png", "plant.json");
-    Q.compileSheets("devil.png", "devil.json");
+    Q.compileSheets("fire.png", "fire.json");
+    //Proyectiles
     Q.compileSheets("bullet.png", "bullet.json");
+    Q.compileSheets("antorcha.png", "antorcha.json");
+    //Objetos
+    Q.compileSheets("antorchaMov.png", "antorchaMov.json");
+    Q.compileSheets("lanzaMov.png", "lanzaMov.json");
+    Q.compileSheets("cuchilloMov.png", "cuchilloMov.png");
 
     //Estado global de juego
     Q.state.set({ score: 0, lives: 4, //Puntuaciones
@@ -232,16 +242,18 @@ Q.animations('Plant', {
     plant: { frames: [0,1,2], rate: 1/5},
     plantL: { frames: [3,4], rate: 1/5}
 });
-//Animacion dela sangre
+//Animacion de la sangre
 Q.animations('Burst', {
   burst: { frames: [0,1,2,3], next: 'burst', trigger:"muerte", rate: 1/5} 
 });
-
+//Animacion del fuego
+Q.animations('Fire', {
+  burning: { frames: [0,1,2,3], next: 'burning', trigger:"muerte", rate: 1/5} 
+});
 //Animacion de las chispas
 Q.animations('Spark', {
     spark: { frames: [0,1,2], next: 'spark', trigger:"muerte", rate: 1/5} 
-  });
-
+});
 //Animacion de a princesa
 Q.animations('Princess', {
     princess: { frames: [0,1,2,3], rate: 1/5} 
@@ -252,7 +264,14 @@ Q.animations('Devil', {
     devilMove: { frames: [3], rate: 1},
     devilGoes: { frames: [4,5], rate: 1/3}
 });
-
+//Animacion giro antorcha
+Q.animations('Torch', {
+  girar: { frames: [0,1,2,3,4,5,6,7], rate: 1/5, loop:true} 
+});
+//Animacion de los abjetos de tipo arma
+Q.animations('WeaponObj', {
+  shine: { frames: [0,1,2,3],rate: 1/5,loop:true} 
+});
 /*-------------------------------JUGADOR--------------------------------------*/
 Q.Sprite.extend("Arthur",{
     init:function(p) {
