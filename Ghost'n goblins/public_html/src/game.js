@@ -106,8 +106,8 @@ Q.component("levelManager",{
         },
         loseScreen:function(){
             Q.stage(2).show(true);
-            Q.loadTMX("endGame.tmx", function() {
-                Q.stageScene("loseScreen",{label:"Game Over \n Pulsa enter para volver al menu principal"});
+            Q.loadTMX("loseScreen.tmx", function() {
+                Q.stageScene("loseScreen",{label:"Game Over! \n Pulsa enter para volver al menu principal"});
             });
         },
         mapScreen:function(){
@@ -374,6 +374,7 @@ Q.Sprite.extend("Arthur",{
             this.sheet("armoDest",true);
         if(!this.p.ArmoDestroy){
             this.p.ArmoDestroy=true;
+            this.p.frame=0;
             if(this.p.direction==="right")
                 this.play("destroyArmoRight",3,0);
             else
@@ -433,6 +434,8 @@ Q.Sprite.extend("Arthur",{
         Q.state.dec("lives",1); 
         if( Q.state.get("lives")>0)
             this.mapScreen();
+        else
+            this.loseScreen();
     },
     prisas:function(){
         
@@ -811,7 +814,7 @@ Q.Sprite.extend("Marker",{
     init: function(p) { 
         this._super(p, { 
             asset: "marker.png",
-            timeWait:5,
+            timeWait:2,
             time:0,
             x:0,
             y:0  
@@ -901,12 +904,10 @@ Q.scene("initScreen",function(stage){
 });
 //Pantalla de perdido
 Q.scene("loseScreen",function(stage){
-    Q.stage(2).show();
+    Q.stage(2).show(true);
     Q.state.set("enJuego",false);
-    Q.stageTMX("endGame.tmx",stage);
+    Q.stageTMX("loseScreen.tmx",stage);
     stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-100,size:32,color: "#ffffff",label: stage.options.label }));
-    stage.insert(new Q.Goomba({x:(1*34),y:13*34,vx:80}));
-    stage.insert(new Q.Goomba({x:(23*34),y:13*34,vx:-80}));
     Q.input.on("confirm",this,function(){
         Q.loadTMX("mainMenu.tmx", function() {
             Q.stageScene("initScreen");
