@@ -19,12 +19,11 @@ Q.SPRITE_PREMIO = 64;
 Q.SPRITE_ANTORCHA = 128;
 Q.SPRITE_DAGA = 256;
 Q.SPRITE_EXPLOSION = 512;
-Q.SPRITE_ESCALERA = 1024;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","lanzaMov.png","ArthurV2.png","cuchilloMov.png","cuchilloHUD.png","zombie.png","crow.png","princess.png","antorchaMov.png","fire.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","antorcha.png","armour.png"]);
+Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json","lanzaMov.json","cuchilloMov.json","zombie.json","crow.json", "princess.json","burst.json","antorchaMov.json","fire.json", "spark.json","plant.json","devil.json","bullet.json","antorcha.json"]);
+Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","bullet.json","shuriken.json","antorcha.json"]);
 //Musica
 Q.preload([]);
 //Funcion de inicio
@@ -45,6 +44,7 @@ Q.preload(function(){
     //Proyectiles
     Q.compileSheets("bullet.png", "bullet.json");
     Q.compileSheets("antorcha.png", "antorcha.json");
+    Q.compileSheets("shuriken.png", "shuriken.json");
     //Objetos
     Q.compileSheets("antorchaMov.png", "antorchaMov.json");
     Q.compileSheets("lanzaMov.png", "lanzaMov.json");
@@ -235,9 +235,9 @@ Q.animations('Bullet', {
 });
 //Animacion de Devil
 Q.animations('Devil', {
-  devil: { frames: [0,1,2], rate: 1/5}, 
-  devilHide: { frames: [4,5], rate:1/2 },
-  devilFly: { frames: [4], rate:1/2 },
+  devil: { frames: [0,1,2], rate: 1/8}, 
+  devilHide: { frames: [4], rate:1/4 },
+  devilFly: { frames: [3], rate:1/2 },
   devilPrincess:{ frames: [6], rate:1/2 }
 });
 //Animacion de la planta
@@ -261,12 +261,6 @@ Q.animations('Spark', {
 Q.animations('Princess', {
     princess: { frames: [0,1,2,3], rate: 1/5} 
 });
-//Animacion del demonio
-Q.animations('Devil', {
-    devil: { frames: [0,1,2], rate: 1/5},
-    devilMove: { frames: [3], rate: 1},
-    devilGoes: { frames: [4,5], rate: 1/3}
-});
 //Animacion giro antorcha
 Q.animations('Torch', {
   girar: { frames: [0,1,2,3,4,5,6,7], rate: 1/5, loop:true} 
@@ -275,6 +269,10 @@ Q.animations('Torch', {
 Q.animations('WeaponObj', {
   shine: { frames: [0,1,2,3],rate: 1/5,loop:true} 
 });
+//Animacion de los abjetos de tipo arma
+Q.animations('Shuriken', {
+    shuriken: { frames: [0,1],rate: 1/5,loop:true} 
+  });
 /*-------------------------------JUGADOR--------------------------------------*/
 Q.Sprite.extend("Arthur",{
     init:function(p) {
@@ -528,7 +526,7 @@ Q.Sprite.extend("Princess",{
             sheet: "princess",
             sprite: "Princess",
             frame: 0,
-            type: Q.Q.SPRITE_DEFAULT
+            type: Q.SPRITE_DEFAULT
         }); 
         this.play("princess");
     }
@@ -685,11 +683,14 @@ Q.Sprite.extend("Plant",{
 Q.Sprite.extend("Devil",{ 
     init: function(p) { 
         this._super(p, { 
-            vx:50,
-            vy:15,
+            vx:250,
+            vy:100,
+            xo:0,
+            yo:0,
             gravity: 0,
             reload:0,
-            timeReload:5,
+            timeReload:0.5,
+            oculto:false,
             sheet: "devil",
             sprite: "Devil",
             frame: 0,
@@ -708,7 +709,7 @@ Q.Sprite.extend("Devil",{
     },
 
     hit: function(damage){
-        this.p.life=-damage;
+        this.p.life-=damage;
         if(this.p.life<=0) this.muerte();
     },
     muerte:function() {
@@ -716,18 +717,38 @@ Q.Sprite.extend("Devil",{
     },
     step:function(dt){
         this.p.reload+=dt;
+        var art = Q("Arthur").last();
+        this.p.xo=art.p.x-this.p.x;
+        this.p.yo=art.p.y-this.p.y;
 
+        var rnd= Math.floor((Math.random() * 100) + 1);
+       
         if(this.p.reload>this.p.timeReload){
             this.p.reload=0;
-            if(this.p.flip==='x'){
-                this.p.flip=false;
-                this.p.vx=-50;
+            if( this.p.oculto){
+                this.p.oculto=false;
             }
-            else{
-                this.p.flip='x';
-                this.p.vx=50;
-            } 
         }
+
+        if(0<rnd && rnd<2){ //Ataca
+            this.play("devil");
+            Q.stage().insert(new Q.Shuriken({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y}));
+        }
+        else if(2<rnd && rnd<5){ //Teletransporta
+            if(this.p.xo<0) this.p.vx*=-1;  
+            this.p.vy= this.p.vx*(this.p.yo/this.p.xo)+20;  
+            this.play("devilFly");
+        }
+        else if(5<rnd && rnd<7){ //Oculta
+            this.play("devilHide");
+            this.p.oculto=true;
+        }
+
+       if(this.p.vx<0)this.p.flip=false;
+       else this.p.flip='x';
+
+       if(this.p.oculto) this.p.type=Q.SPRITE_DEFAULT;
+       else this.p.type=Q.SPRITE_ENEMY;
     }
 }); 
 /*------------------------------ELEMENTOS--------------------------------------*/
@@ -942,16 +963,51 @@ Q.Sprite.extend("Bullet",{
     },
 
     kill: function(collision){
+        this.destroy();
         if(collision.obj.p.type===Q.SPRITE_PLAYER){
             Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
-            collision.obj.hit(collision.obj.p);
+            collision.obj.hit(collision);
         } else if(collision.obj.p.type===Q.SPRITE_DEFAULT) 
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
-
-        this.destroy();
     }
  });
 
+ //Shuriken de Devil
+Q.Sprite.extend("Shuriken",{
+    init: function(p) {
+        this._super(p, {
+            sheet: "shuriken",
+            sprite: "Shuriken",
+            frame: 0, 
+            gravity:0, 
+            xo:0,
+            yo:0,
+            x:0,
+            y:0, 
+            vx:350,
+            vy:0,        
+            type: Q.SPRITE_ENEMY,
+            collisionMask: Q.SPRITE_DEFAULT | Q.SPRITE_PLAYER
+        }); 
+        this.add('animation,2d');
+        this.on("bump.top,bump.bottom,bump.left,bump.right","kill"); 
+        if(this.p.vx < 0){
+            this.p.flip = "x";
+        }     
+        this.play("shuriken"); 
+        if(this.p.xo<0) this.p.vx*=-1;  
+        this.p.vy= this.p.vx*(this.p.yo/this.p.xo);    
+    },
+
+    kill: function(collision){
+        this.destroy();
+        if(collision.obj.p.type===Q.SPRITE_PLAYER){
+            Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+            collision.obj.hit(collision);
+        } else if(collision.obj.p.type===Q.SPRITE_DEFAULT) 
+            Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+    }
+ });
 /*----------------------------------Premios---------------------------------------*/
 //Default de recompensa
 Q.Sprite.extend("Premio",{
@@ -1201,7 +1257,7 @@ Q.scene("L1",function(stage) {
     stage.insert(arthur);
    // stage.insert(new Q.Zombie({x:(24*32)+16,y:(15*32)+16}));
     //stage.insert(new Q.Lanza({x:(24*32)+16,y:(15*32)+16}));
-    stage.insert(new Q.Plant({x:(20*32)+16,y:(15*32)+16}));
+    stage.insert(new Q.Devil({x:(25*32)+16,y:(15*32)+16}));
     stage.insert(new Q.Tumba({x:(25*32)+16,y:(16*32)+12}));
     //stage.insert(new Q.Premio({x:(40*32)+16,y:(16*32),asset:"jar.png"}));
     //stage.insert(new Q.ObjArmadura({x:(40*32)+16,y:(16*32)}));
