@@ -444,12 +444,12 @@ Q.Sprite.extend("Arthur",{
         this.del("platformerControls");
         this.del("2d");
         this.p.type=SPRITE_NONE;
-        if(this.p.sheet==="arthurArmo"){
+        if(this.p.sheet==="arthurArmo" || this.p.sheet==="arthurArmoDuck"){
             this.p.hit=true;
             this.p.x -= col.separate[0];
             this.p.y -= col.separate[1];
             this.animate(ac,0.3);  
-        }else if(this.p.sheet==="arthurNude" || this.p.sheet==="arthurFrog")
+        }else if(this.p.sheet==="arthurNude" || this.p.sheet==="arthurNudeDuck" ||this.p.sheet==="arthurFrog")
             this.muerto();
     },
     muerto:function(){
