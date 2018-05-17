@@ -22,9 +22,9 @@ var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .enableSound();//Habilita el uso de audio
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png"]);
+Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","fire.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","antorcha.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","bullet.json"]);
+Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json","burst.json","fire.json", "spark.json","plant.json","devil.json","bullet.json","antorcha.json"]);
 //Musica
 Q.preload([]);
 //Funcion de inicio
@@ -791,23 +791,24 @@ Q.Sprite.extend("Daga",{
 Q.MovingSprite.extend ( "Antorcha" , {
     init: function(p) {
         this._super(p, {
-            asset: "jar.png",
+            sheet: "antorcha",
+            sprite: "Torch",
             gravity:0, 
             damage: 50,        
             type: SPRITE_ANTORCHA,
             collisionMask: SPRITE_TUMBA | SPRITE_ENEMY | SPRITE_DEFAULT
         }); 
-        this.add('2d');
+        this.add('2d, animation');
         this.on("bump.top,bump.bottom,bump.left,bump.right","kill"); 
-            
+        this.play('girar');
     },
 
     kill: function(collision){
         if(collision.obj.p.type===SPRITE_ENEMY){
-            Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+            Q.stage().insert(new Q.Fire({x:collision.obj.p.x,y:collision.obj.p.y}));
             collision.obj.hit(collision.obj.p);
         }else if(collision.obj.p.type !== SPRITE_EXPLOSION){
-            Q.stage().insert(new Q.Burst({x:this.p.x,y:this.p.y}));
+            Q.stage().insert(new Q.Fire({x:this.p.x,y:this.p.y}));
         }
 
         this.destroy();
@@ -889,13 +890,13 @@ Q.Sprite.extend("Fire",{
         this._super(p, { 
             vx:0,
             vy:0,
-            sheet: "burst",
-            sprite: "Burst",
+            sheet: "fire",
+            sprite: "Fire",
             frame: 0,
-            type: SPRITE_DEFAULT
+            type: SPRITE_EXPLOSION
         }); 
         this.add("2d,animation");  
-        this.play("burst");
+        this.play("burning");
         this.on("muerte", "muerte");
     },
     
@@ -912,7 +913,7 @@ Q.Sprite.extend("Spark",{
             sheet: "spark",
             sprite: "Spark",
             frame: 0,
-            type: SPRITE_DEFAULT
+            type: SPRITE_EXPLOSION
         }); 
         this.add("2d,animation");  
         this.play("spark");
@@ -1120,7 +1121,7 @@ Q.scene("L1",function(stage) {
     //stage.insert(new Q.Lanza({x:(24*32)+16,y:(15*32)+16}));
     stage.insert(new Q.Plant({x:(20*32)+16,y:(15*32)+16}));
     stage.insert(new Q.Tumba({x:(25*32)+16,y:(16*32)+12}));
-    //stage.insert(new Q.Premio({x:(40*32)+16,y:(16*32),asset:"jar.png"}));
+    stage.insert(new Q.Premio({x:(40*32)+16,y:(16*32),asset:"jar.png"}));
    // stage.insert(new Q.Crow({x:(25*32)+16,y:(8*32)+16}));
     stage.add("viewport").follow(arthur,{x:true,y:false});
 });
