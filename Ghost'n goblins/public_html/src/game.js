@@ -1,3 +1,4 @@
+
 /*---------------------------CARGA DE QUINTUS---------------------------------*/
 var SPRITE_NONE=0;
 var SPRITE_DEFAULT=1;
@@ -178,7 +179,7 @@ Q.component("GeneradorPremios", {
             }
         }
     });
-  
+
 /*-----------------------------ANIMACIONES------------------------------------*/
 //Animacion de Arthur
 Q.animations('Arthur', {
@@ -291,7 +292,7 @@ Q.Sprite.extend("Arthur",{
             shoot:0,
             frogTime:0,//Echizado
             frogMaxTime:5
-            
+
         });
         this.add("2d,animation,tween");
         this.add("levelManager");
@@ -471,7 +472,7 @@ Q.Sprite.extend("Arthur",{
             this.loseScreen();
     },
     prisas:function(){
-        
+
     },
     itsAFrog:function(){
         if(!this.p.frog){
@@ -542,7 +543,7 @@ Q.Sprite.extend("Zombie",{
             this.p.vx=0;
         }   
     },
-    
+
     hit: function(damage){
         this.p.life=-damage;
         if(this.p.life<=0) this.muerte();
@@ -609,8 +610,8 @@ Q.Sprite.extend("Crow",{
                 this.p.vx=50;
             } 
         }
-        
-        
+
+
     }
 }); 
 
@@ -637,7 +638,7 @@ Q.Sprite.extend("Plant",{
         if(collision.obj.p.type===SPRITE_PLAYER) 
             collision.obj.hit(collision);
     },
-    
+
     hit: function(damage){
         this.p.life=-damage;
         this.play("plantL");
@@ -720,8 +721,8 @@ Q.Sprite.extend("Devil",{
                 this.p.vx=50;
             } 
         }
-        
-        
+
+
     }
 }); 
 /*------------------------------ELEMENTOS--------------------------------------*/
@@ -854,7 +855,7 @@ Q.Sprite.extend("Premio",{
             }
             else if(this.p.asset === "daga.png"){
                 collision.obj.p.armaEquipada = "daga";
-                
+
             }else{
                 //actualizar puntos
             }
@@ -877,9 +878,9 @@ Q.Sprite.extend("Burst",{
         this.play("burst");
         this.on("muerte", "muerte");
     },
-    
+
     muerte:function(collision) {
-        
+
         this.destroy();
     }
 }); 
@@ -899,7 +900,7 @@ Q.Sprite.extend("Fire",{
         this.play("burning");
         this.on("muerte", "muerte");
     },
-    
+
     muerte:function() {
         this.destroy();
     }
@@ -919,7 +920,7 @@ Q.Sprite.extend("Spark",{
         this.play("spark");
         this.on("muerte", "muerte");
     },
-    
+
     muerte:function() {
         this.destroy();
     }
