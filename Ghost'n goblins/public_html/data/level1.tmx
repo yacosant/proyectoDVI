@@ -1,10 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.5" orientation="orthogonal" renderorder="right-down" width="200" height="20" tilewidth="32" tileheight="32" infinite="0" backgroundcolor="#000000" nextobjectid="1">
+<map version="1.0" orientation="orthogonal" width="200" height="20" tilewidth="32" tileheight="32">
  <tileset firstgid="1" name="tiles" tilewidth="32" tileheight="32" tilecount="154" columns="11">
   <image source="../images/tiles.png" width="352" height="448"/>
+  <tile id="8">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="9">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="19">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="30">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="31">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="41">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="42">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="52">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="53">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="155" name="tiles" tilewidth="32" tileheight="32" tilecount="154" columns="11">
   <image source="../images/tiles.png" width="352" height="448"/>
+ </tileset>
+ <tileset firstgid="309" name="Tiles" tilewidth="70" tileheight="70" spacing="2" tilecount="156" columns="12">
+  <image source="../../../../../../Desktop/platformer_full/images/tiles.png" width="914" height="936"/>
+  <tile id="8">
+   <properties>
+    <property name="points" value="0,0 1,1 0,1"/>
+   </properties>
+  </tile>
+  <tile id="19">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="25">
+   <properties>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="31">
+   <properties>
+    <property name="ladder" value="true"/>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="32">
+   <properties>
+    <property name="points" value="0,1 1,0 1,1"/>
+   </properties>
+  </tile>
+  <tile id="40">
+   <properties>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="69">
+   <properties>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="81">
+   <properties>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
+  <tile id="98">
+   <properties>
+    <property name="sensor" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <imagelayer name="Background">
   <image source="../images/bg_empty.png" trans="000000" width="800" height="800"/>
@@ -2259,8 +2369,8 @@
    <tile gid="5"/>
    <tile gid="48"/>
    <tile gid="6"/>
-   <tile gid="9"/>
-   <tile gid="10"/>
+   <tile gid="148"/>
+   <tile gid="149"/>
    <tile gid="4"/>
    <tile gid="47"/>
    <tile gid="4"/>
@@ -2273,8 +2383,8 @@
    <tile gid="18"/>
    <tile gid="19"/>
    <tile gid="6"/>
-   <tile gid="9"/>
-   <tile gid="10"/>
+   <tile gid="148"/>
+   <tile gid="149"/>
    <tile gid="4"/>
    <tile gid="18"/>
    <tile gid="19"/>
@@ -2286,8 +2396,8 @@
    <tile gid="5"/>
    <tile gid="4"/>
    <tile gid="6"/>
-   <tile gid="9"/>
-   <tile gid="10"/>
+   <tile gid="148"/>
+   <tile gid="149"/>
    <tile gid="48"/>
    <tile gid="72"/>
    <tile/>
@@ -2459,8 +2569,8 @@
    <tile gid="3"/>
    <tile gid="3"/>
    <tile gid="3"/>
-   <tile gid="20"/>
-   <tile gid="21"/>
+   <tile/>
+   <tile/>
    <tile gid="3"/>
    <tile gid="3"/>
    <tile gid="3"/>
@@ -2473,8 +2583,6 @@
    <tile/>
    <tile gid="20"/>
    <tile gid="21"/>
-   <tile gid="20"/>
-   <tile gid="21"/>
    <tile/>
    <tile/>
    <tile/>
@@ -2486,8 +2594,10 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile gid="20"/>
-   <tile gid="21"/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
    <tile gid="17"/>
    <tile gid="17"/>
    <tile gid="16"/>
@@ -2659,8 +2769,8 @@
    <tile gid="15"/>
    <tile gid="15"/>
    <tile gid="15"/>
-   <tile gid="31"/>
-   <tile gid="32"/>
+   <tile/>
+   <tile/>
    <tile gid="13"/>
    <tile gid="13"/>
    <tile gid="15"/>
@@ -2673,8 +2783,8 @@
    <tile gid="15"/>
    <tile gid="15"/>
    <tile gid="15"/>
-   <tile gid="31"/>
-   <tile gid="32"/>
+   <tile/>
+   <tile/>
    <tile gid="15"/>
    <tile gid="15"/>
    <tile gid="15"/>
@@ -2686,8 +2796,8 @@
    <tile gid="15"/>
    <tile gid="15"/>
    <tile gid="15"/>
-   <tile gid="31"/>
-   <tile gid="32"/>
+   <tile/>
+   <tile/>
    <tile gid="13"/>
    <tile gid="13"/>
    <tile gid="13"/>
@@ -2859,8 +2969,8 @@
    <tile gid="14"/>
    <tile gid="14"/>
    <tile gid="14"/>
-   <tile gid="42"/>
-   <tile gid="43"/>
+   <tile/>
+   <tile/>
    <tile gid="14"/>
    <tile gid="14"/>
    <tile gid="14"/>
@@ -2873,8 +2983,8 @@
    <tile gid="14"/>
    <tile gid="14"/>
    <tile gid="14"/>
-   <tile gid="42"/>
-   <tile gid="43"/>
+   <tile/>
+   <tile/>
    <tile gid="14"/>
    <tile gid="14"/>
    <tile gid="14"/>
@@ -2886,8 +2996,8 @@
    <tile gid="14"/>
    <tile gid="14"/>
    <tile gid="14"/>
-   <tile gid="42"/>
-   <tile gid="43"/>
+   <tile/>
+   <tile/>
    <tile gid="14"/>
    <tile gid="14"/>
    <tile gid="14"/>
@@ -3059,8 +3169,8 @@
    <tile gid="12"/>
    <tile gid="12"/>
    <tile gid="12"/>
-   <tile gid="42"/>
-   <tile gid="43"/>
+   <tile/>
+   <tile/>
    <tile gid="12"/>
    <tile gid="12"/>
    <tile gid="12"/>
@@ -3073,8 +3183,8 @@
    <tile gid="12"/>
    <tile gid="12"/>
    <tile gid="12"/>
-   <tile gid="42"/>
-   <tile gid="43"/>
+   <tile/>
+   <tile/>
    <tile gid="12"/>
    <tile gid="12"/>
    <tile gid="12"/>
@@ -3086,8 +3196,8 @@
    <tile gid="12"/>
    <tile gid="12"/>
    <tile gid="12"/>
-   <tile gid="42"/>
-   <tile gid="43"/>
+   <tile/>
+   <tile/>
    <tile gid="12"/>
    <tile gid="14"/>
    <tile gid="14"/>
@@ -3259,8 +3369,8 @@
    <tile gid="25"/>
    <tile gid="25"/>
    <tile gid="25"/>
-   <tile gid="53"/>
-   <tile gid="54"/>
+   <tile/>
+   <tile/>
    <tile gid="25"/>
    <tile gid="25"/>
    <tile gid="25"/>
@@ -3273,8 +3383,8 @@
    <tile gid="25"/>
    <tile gid="25"/>
    <tile gid="25"/>
-   <tile gid="53"/>
-   <tile gid="54"/>
+   <tile/>
+   <tile/>
    <tile gid="25"/>
    <tile gid="25"/>
    <tile gid="25"/>
@@ -3286,8 +3396,8 @@
    <tile gid="25"/>
    <tile gid="25"/>
    <tile gid="25"/>
-   <tile gid="53"/>
-   <tile gid="54"/>
+   <tile/>
+   <tile/>
    <tile gid="12"/>
    <tile gid="12"/>
    <tile gid="14"/>
@@ -6466,8 +6576,8 @@
    <tile gid="3"/>
    <tile gid="3"/>
    <tile gid="3"/>
-   <tile/>
-   <tile gid="1"/>
+   <tile gid="9"/>
+   <tile gid="10"/>
    <tile gid="3"/>
    <tile gid="3"/>
    <tile gid="3"/>
@@ -6480,8 +6590,8 @@
    <tile gid="45"/>
    <tile gid="3"/>
    <tile gid="3"/>
-   <tile/>
-   <tile/>
+   <tile gid="9"/>
+   <tile gid="10"/>
    <tile gid="3"/>
    <tile gid="45"/>
    <tile gid="3"/>
@@ -6493,8 +6603,8 @@
    <tile gid="3"/>
    <tile gid="3"/>
    <tile gid="3"/>
-   <tile/>
-   <tile/>
+   <tile gid="9"/>
+   <tile gid="10"/>
    <tile gid="3"/>
    <tile gid="3"/>
    <tile/>
@@ -6666,6 +6776,8 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="20"/>
+   <tile gid="21"/>
    <tile/>
    <tile/>
    <tile/>
@@ -6678,6 +6790,8 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="20"/>
+   <tile gid="21"/>
    <tile/>
    <tile/>
    <tile/>
@@ -6689,12 +6803,8 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
+   <tile gid="20"/>
+   <tile gid="21"/>
    <tile/>
    <tile/>
    <tile/>
@@ -6866,6 +6976,8 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="31"/>
+   <tile gid="32"/>
    <tile/>
    <tile/>
    <tile/>
@@ -6878,6 +6990,8 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="31"/>
+   <tile gid="32"/>
    <tile/>
    <tile/>
    <tile/>
@@ -6889,12 +7003,8 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
+   <tile gid="31"/>
+   <tile gid="32"/>
    <tile/>
    <tile/>
    <tile/>
@@ -7066,6 +7176,8 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="42"/>
+   <tile gid="43"/>
    <tile/>
    <tile/>
    <tile/>
@@ -7078,6 +7190,8 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="42"/>
+   <tile gid="43"/>
    <tile/>
    <tile/>
    <tile/>
@@ -7089,12 +7203,8 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
+   <tile gid="42"/>
+   <tile gid="43"/>
    <tile/>
    <tile/>
    <tile/>
@@ -7266,6 +7376,8 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="53"/>
+   <tile gid="54"/>
    <tile/>
    <tile/>
    <tile/>
@@ -7278,6 +7390,8 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="53"/>
+   <tile gid="54"/>
    <tile/>
    <tile/>
    <tile/>
@@ -7289,12 +7403,8 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
+   <tile gid="53"/>
+   <tile gid="54"/>
    <tile/>
    <tile/>
    <tile/>
