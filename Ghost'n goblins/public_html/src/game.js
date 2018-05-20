@@ -1,4 +1,4 @@
-
+window.addEventListener("load",function() {
 /*---------------------------CARGA DE QUINTUS---------------------------------*/
 var backMusic;
 /* global Quintus */
@@ -137,7 +137,7 @@ Q.component("levelManager",{
         loadLevel:function(){
             Q.loadTMX("level"+Q.state.get("level")+".tmx", function() {
                Q.stage(2).show();    
-               Q.stageScene("L"+Q.state.get("level"));
+               Q.stageScene("L"+Q.state.get("level"),Q("Player").first());
             });
         }
     }
@@ -272,10 +272,10 @@ Q.animations('WeaponObj', {
 //Animacion de los abjetos de tipo arma
 Q.animations('Shuriken', {
     shuriken: { frames: [0,1],rate: 1/5,loop:true} 
-  });
+});
 /*-------------------------------JUGADOR--------------------------------------*/
-Q.Sprite.extend("Arthur",{
-    init:function(p) {
+Q.Sprite.extend("Player",{
+init:function(p) {
         this._super(p, {
             sheet:"arthurArmo",
             sprite:"Arthur",
@@ -292,7 +292,8 @@ Q.Sprite.extend("Arthur",{
             shoot:0,
             frogTime:0,//Echizado
             frogMaxTime:5,
-            onLadder: false
+            onLadder: false,
+            ladderX:0
             
         });
         this.add("2d,animation,tween");
@@ -328,6 +329,22 @@ Q.Sprite.extend("Arthur",{
                 this.prisas();
             else if(this.Timer.tiempoRest()===0)
                 this.muerto();
+            if(this.p.onLadder) {
+                this.p.gravity = 0;
+
+                if(Q.inputs['up']) {
+                  this.p.vy = -this.p.speed;
+                  this.p.x = this.p.ladderX;
+                  this.play("climb");
+                } else if(Q.inputs['down']) {
+                  this.p.vy = this.p.speed;
+                  this.p.x = this.p.ladderX;
+                  this.play("climb");
+                } else {
+                  this.p.vy = 0;
+                  this.animBase();
+                }
+            }
             if(!this.p.muerto){
                 if(this.p.hit){
                     this.animArmo();
@@ -517,6 +534,7 @@ Q.Sprite.extend("Arthur",{
         this.p.hit=false;
     }
 });
+
 /*---------------------------------PNJ----------------------------------------*/
 //Princess
 Q.Sprite.extend("Princess",{ 
@@ -661,14 +679,14 @@ Q.Sprite.extend("Plant",{
         this.p.reload+=dt;
 
         if(this.p.reload>this.p.timeReload){
-            var art = Q("Arthur").last();
+            var art = Q("Player").last();
                 Q.stage().insert(new Q.Bullet({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y}));
             this.p.reload=0;
             if(this.p.lengua){
                 this.p.timeReload+=2,75;
                 this.play("plant");
                 this.p.lengua=false;
-                var art = Q("Arthur").last();
+                var art = Q("Player").last();
                 Q.stage().insert(new Q.Bullet({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y}));
             }
             else{
@@ -717,7 +735,7 @@ Q.Sprite.extend("Devil",{
     },
     step:function(dt){
         this.p.reload+=dt;
-        var art = Q("Arthur").last();
+        var art = Q("Player").last();
         this.p.xo=art.p.x-this.p.x;
         this.p.yo=art.p.y-this.p.y;
 
@@ -1187,9 +1205,9 @@ Q.scene("initScreen",function(stage){
     Q.state.set({ score:0, lives:4,level:1,world:1,pause:false,enJuego:false });
     //Musica principal del juego
    Q.input.on("confirm",this,function(){
-        Q.loadTMX("level1.tmx", function() {
+        Q.loadTMX("level2.tmx", function() {
+            Q.stageScene("L1",Q("Player").first());
             Q.stageScene("HUD",2);
-            Q.stageScene("L1");
             Q.input.off("confirm");
         });
     });
@@ -1239,39 +1257,10 @@ Q.scene('pauseMessage',function(stage) {
   container.fit(20);
 });
 /*----------------------------------NIVELES-----------------------------------*/ 
-/*Posicion de un objeto en el mapa
-    * y= (numTileY*TamTile) + [tamTile/2]  16*32 + 16
-    * x= (numTileX*TamTile) + [tamTile/2]  48*32 + 16
-*/
-//level 1
+// Create a new scene called level 1
 Q.scene("L1",function(stage) {
-    Q.stage(2).show(false);
-    Q.state.set("enJuego",true);
-    if(Q.state.get("respX")===0 && Q.state.get("respY")===0){
-        Q.state.set("respX",(17*32));
-        Q.state.set("respY",15*32);
-    }
-    var arthur= new Q.Arthur({x:Q.state.get("respX")+16,y:Q.state.get("respY")+16,limInfMapa:17*32});
-    Q.stageTMX("level1.tmx",stage);
-    //Insertamos a Sir Arthur
-    stage.insert(arthur);
-   // stage.insert(new Q.Zombie({x:(24*32)+16,y:(15*32)+16}));
-    //stage.insert(new Q.Lanza({x:(24*32)+16,y:(15*32)+16}));
-    stage.insert(new Q.Devil({x:(25*32)+16,y:(15*32)+16}));
-    stage.insert(new Q.Tumba({x:(25*32)+16,y:(16*32)+12}));
-    //stage.insert(new Q.Premio({x:(40*32)+16,y:(16*32),asset:"jar.png"}));
-    //stage.insert(new Q.ObjArmadura({x:(40*32)+16,y:(16*32)}));
-   // stage.insert(new Q.Crow({x:(25*32)+16,y:(8*32)+16}));
-    stage.add("viewport").follow(arthur,{x:true,y:false});
+  Q.stageTMX("level2.tmx",stage);
+  //stage.insert(new Q.Devil({x:(25*32)+16,y:(15*32)+16}));
+  stage.add("viewport").follow(Q("Player").first(),{x:true,y:false});
 });
-/*----------------------------------TESTING-----------------------------------*/
-Q.scene("testing",function(stage) {
-    var arthur= new Q.Arthur({x:(14*32)-17,y:8*32,limInfMapa:17*34});
-    Q.stageTMX("testing.tmx",stage);
-    //Insertamos a Sir Arthur
-    stage.insert(arthur);
-    stage.insert(new Q.Zombie({x:(16*32)-17,y:12*32}));
-    stage.insert(new Q.Crow({x:(16*32)-17,y:8*32}));
-    stage.add("viewport").follow(arthur,{x:true,y:false});
-    //stage.viewport.offsetY=-100;
 });
