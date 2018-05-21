@@ -1261,6 +1261,7 @@ Q.scene('pauseMessage',function(stage) {
 Q.scene("L1",function(stage) {
   Q.stageTMX("level2.tmx",stage);
   //stage.insert(new Q.Devil({x:(25*32)+16,y:(15*32)+16}));
-  stage.add("viewport").follow(Q("Player").first(),{x:true,y:false});
+  stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
+  stage.viewport.offset(0,200);
 });
 });
