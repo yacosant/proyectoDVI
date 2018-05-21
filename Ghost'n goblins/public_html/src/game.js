@@ -150,7 +150,9 @@ Q.component("Timer",{
         cont:0,
         maxTime:300,
         segDesc:1,
-        descuento:1
+        descuento:1,
+        prisa:false,
+        stopTimer:false
       });
       Q.state.set("timer",props.maxTime);
     },
@@ -158,9 +160,11 @@ Q.component("Timer",{
         var prop = this.entity.p;
         prop.cont+=dt;
         //Por defecto cada 1 segundo
-        if(prop.cont>prop.segDesc){
-            prop.cont=0;
-            Q.state.dec("timer",prop.descuento);
+        if(!prop.stopTimer){
+            if(prop.cont>prop.segDesc){
+                prop.cont=0;
+                Q.state.dec("timer",prop.descuento);
+            }
         }
     },
     tiempoRest:function (){
@@ -205,7 +209,7 @@ Q.animations('Arthur', {
     dieArthurLeft:{frames:[6,5,4,8,9,10],rate:1/3,next: '',trigger:"dead",loop:false},
     //Trepar
     arthurClimb:{frames:[24,27],rate:1/3,loop:true},
-    arthurClimbEnd:{frames:[25,26],rate:1/3,next: 'stand_right',loop:false},
+    arthurClimbEnd:{frames:[25,26],rate:1/2,next: 'stand_right',loop:false},
     //Aux
     arthurVago:{frames:[12],rate:1},
     arthurWinner:{frames:[11],rate:1},
@@ -292,8 +296,9 @@ init:function(p) {
             shoot:0,
             frogTime:0,//Echizado
             frogMaxTime:5,
-            onLadder: false,
-            ladderX:0
+            onLadder: false,//Escaleras
+            ladderX:0,
+            ladderTile:0
             
         });
         this.add("2d,animation,tween");
@@ -318,51 +323,36 @@ init:function(p) {
         if(colObj.p.ladder) { 
             this.p.onLadder = true;
             this.p.ladderX = colObj.p.x;
-          }
+            this.p.ladderTile=colObj.tile;
+        }      
     },
     step:function(dt){
-        if(!this.p.subiendoEscalera){
-            this.p.shoot+=dt; //Aumentamos el tiempo sin disparar
-            this.Timer.step(dt);
-            //Comprobamos el tiempo
-            if(this.Timer.tiempoRest()<100 && !this.p.prisa)
-                this.prisas();
-            else if(this.Timer.tiempoRest()===0)
-                this.muerto();
-            if(this.p.onLadder) {
-                this.p.gravity = 0;
-
-                if(Q.inputs['up']) {
-                  this.p.vy = -this.p.speed;
-                  this.p.x = this.p.ladderX;
-                  this.play("climb");
-                } else if(Q.inputs['down']) {
-                  this.p.vy = this.p.speed;
-                  this.p.x = this.p.ladderX;
-                  this.play("climb");
-                } else {
-                  this.p.vy = 0;
-                  this.animBase();
-                }
-            }
-            if(!this.p.muerto){
-                if(this.p.hit){
-                    this.animArmo();
-                }else if(this.p.frog){
-                    this.p.jumpSpeed=-500;
-                    this.frogerizado(dt);//Animacion  
-                }else if(this.p.subiendoEscalera){
-                    this.animEscalera();
-                }else{
-                    this.p.jumpSpeed=-400;
-                    this.animBase();//Animacion
-                }
-            }
-            if(Q.inputs["fire"] && this.p.shoot>this.p.shootDelay && !this.p.frog){
-                this.fire();
+        this.p.shoot+=dt; //Aumentamos el tiempo sin disparar
+        this.Timer.step(dt);
+        //Comprobamos el tiempo
+        if(this.Timer.tiempoRest()<100 && !this.p.prisa)
+            this.prisas();
+        else if(this.Timer.tiempoRest()===0)
+            this.muerto();
+        if(!this.p.onLadder)
+            this.p.gravity=1;
+        if(!this.p.muerto){
+            if(this.p.hit){
+                this.animArmo();
+            }else if(this.p.frog){
+                this.p.jumpSpeed=-500;
+                this.frogerizado(dt);//Animacion  
+            }else if(this.p.onLadder){
+                this.animEscalera();
+                this.p.onLadder = false;
+            }else{
+                this.p.jumpSpeed=-400;
+                this.animBase();//Animacion
             }
         }
-        this.p.subiendoEscalera = false;
+        if(Q.inputs["fire"] && this.p.shoot>this.p.shootDelay && !this.p.frog){
+            this.fire();
+        } 
     },
     animBase:function(){
         if(Q.inputs["down"]){
@@ -448,7 +438,22 @@ init:function(p) {
             this.armoDestroyed();
     },
     animEscalera:function(){
-        this.play("arthurClimb");
+        this.p.gravity = 0;
+        if(Q.inputs['up']) {
+          this.p.vy = -this.p.speed;
+          this.p.x = this.p.ladderX;
+          if(this.p.ladderTile===8 ||this.p.ladderTile===9)
+            this.play("arthurClimbEnd");
+          else
+            this.play("arthurClimb");
+        } else if(Q.inputs['down']) {
+          this.p.vy = this.p.speed;
+          this.p.x = this.p.ladderX;
+          this.play("arthurClimb");
+        } else {
+            this.p.vy = 0;
+            this.animBase();
+        }
     },
     colMapa:function(collision){
         if(collision.tile === 91)
@@ -491,6 +496,7 @@ init:function(p) {
     },
     muerto:function(){
         this.p.muerto=true;
+        this.p.stopTimer=true;
         this.p.vx=0;
         this.p.type= Q.SPRITE_NONE;
         this.del("platformerControls");
@@ -508,7 +514,7 @@ init:function(p) {
             this.loseScreen();
     },
     prisas:function(){
-
+        this.p.prisa=true;
     },
     itsAFrog:function(){
         if(!this.p.frog){
@@ -1262,6 +1268,6 @@ Q.scene("L1",function(stage) {
   Q.stageTMX("level2.tmx",stage);
   //stage.insert(new Q.Devil({x:(25*32)+16,y:(15*32)+16}));
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
-  stage.viewport.offset(0,200);
+  stage.viewport.offset(0,204);
 });
 });
