@@ -1,6 +1,5 @@
 window.addEventListener("load",function() {
 /*---------------------------CARGA DE QUINTUS---------------------------------*/
-var backMusic;
 /* global Quintus */
 var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .include("Sprites, Scenes, Input, 2D, Anim,UI,TMX,Audio")//Librerias del quintus cargadas
@@ -25,7 +24,11 @@ Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png
 //JSON'S 
 Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","bullet.json","shuriken.json","antorcha.json"]);
 //Musica
-Q.preload([]);
+Q.preload(["gngTheme.ogg","gngEndTheme.ogg","gameover.ogg","timer.ogg","insertCoin.ogg",//General
+           "arthurRow.ogg","die.ogg","jumpEnd.ogg","jumpStart.ogg","putArmour.ogg","removeArmour.ogg",//Arthur
+           "burst.ogg","hitGrave.ogg","doorOpen.ogg","lance.ogg","torch.ogg","treasurePickUp.ogg","weaponPickUp.ogg","extraLife.ogg",//Efectos sonoros
+           "enemyHit.ogg","bossHit.ogg","bossDeath.ogg","zombieBorn.ogg","crow.ogg","crowDie.ogg"//Enemigos
+       ]);
 //Funcion de inicio
 Q.preload(function(){
     //Compilacion del las sheets
@@ -73,11 +76,13 @@ Q.input.keyboardControls({
 Q.input.on("pausa",function() {
     if(Q.state.get("enJuego")){
         if(Q.state.get("pause")) {
+            Q.audio.play("gngTheme.ogg",{loop:true});
             Q.state.set("pause",false);
             Q.stage().unpause();
             Q.stage(2).show(false);
             Q.clearStage(3);
         }else{
+            Q.audio.stop();
             Q.stage(2).show(true);
             Q.state.set("pause",true);
             Q.audio.stop();
@@ -136,7 +141,7 @@ Q.component("levelManager",{
         },
         loadLevel:function(){
             Q.loadTMX("level"+Q.state.get("level")+".tmx", function() {
-               Q.stage(2).show();    
+               Q.stage(2).show();
                Q.stageScene("L"+Q.state.get("level"),Q("Player").first());
             });
         }
@@ -290,6 +295,7 @@ init:function(p) {
             muerto:false,
             frog:false,
             hit:false,
+            jump:false,
             ArmoDestroy:false,
             armaEquipada: "lanza", //Armamento
             shootDelay:0.3,//Disparo
@@ -384,25 +390,33 @@ init:function(p) {
             }else{
                 this.p.speed=200;
                 if(this.p.vx>0){
-                    if(this.p.vy!==0)
+                    if(this.p.vy!==0){
+                        this.p.jump=true;
+                        Q.audio.play("jumpStart.ogg",{debounce:1000});
                         this.play("jump_right");
-                    else
+                    }else
                         this.play("run_right");
                 } else if(this.p.vx<0) {
-                    if(this.p.vy!==0)
+                    if(this.p.vy!==0){
+                        this.p.jump=true;
+                        Q.audio.play("jumpStart.ogg",{debounce:1000});
                         this.play("jump_left");
-                    else
+                    }else
                         this.play("run_left");
                 }else{
                     if(this.p.direction ==="right"){
-                        if(this.p.vy<0)
+                        if(this.p.vy<0){
+                            this.p.jump=true;
+                            Q.audio.play("jumpStart.ogg",{debounce:1000});
                             this.play("jump_site_right");
-                        else
+                        }else
                             this.play("stand_right");
                     }else{
-                        if(this.p.vy<0)
+                        if(this.p.vy<0){
+                            this.p.jump=true;
+                            Q.audio.play("jumpStart.ogg",{debounce:1000});
                             this.play("jump_site_left");
-                        else
+                        }else
                             this.play("stand_left");
                     }
                 }
@@ -456,6 +470,10 @@ init:function(p) {
         }
     },
     colMapa:function(collision){
+        if(this.p.jump){
+            Q.audio.play("jumpEnd.ogg");
+            this.p.jump=false;
+        }
         if(collision.tile === 91)
             this.muerto();
     },
@@ -500,6 +518,8 @@ init:function(p) {
         this.p.vx=0;
         this.p.type= Q.SPRITE_NONE;
         this.del("platformerControls");
+        Q.audio.stop("gngTheme.ogg");
+        Q.audio.play("die.ogg");
         this.p.sheet="arthurDie";
         if(this.p.direction ==="right")
                     this.play("dieArthurRight");
@@ -514,6 +534,7 @@ init:function(p) {
             this.loseScreen();
     },
     prisas:function(){
+        Q.audio.play("timer.ogg");
         this.p.prisa=true;
     },
     itsAFrog:function(){
@@ -533,6 +554,7 @@ init:function(p) {
         }
     },
     armoDestroyed:function(){
+        Q.audio.play("removeArmour.ogg");
         this.sheet("arthurNude",true);
         this.add("platformerControls");
         this.add("2d");
@@ -540,7 +562,6 @@ init:function(p) {
         this.p.hit=false;
     }
 });
-
 /*---------------------------------PNJ----------------------------------------*/
 //Princess
 Q.Sprite.extend("Princess",{ 
@@ -789,7 +810,8 @@ Q.Sprite.extend("Lanza",{
             collisionMask: Q.SPRITE_TUMBA | Q.SPRITE_ENEMY 
         }); 
         this.add('2d');
-        this.on("bump.top,bump.bottom,bump.left,bump.right","kill"); 
+        this.on("bump.top,bump.bottom,bump.left,bump.right","kill");
+        Q.audio.play("lance.ogg");
         if(this.p.vx < 0){
             this.p.flip = "x";
         }                    
@@ -817,7 +839,8 @@ Q.Sprite.extend("Daga",{
             collisionMask: Q.SPRITE_TUMBA | Q.SPRITE_ENEMY 
         }); 
         this.add('2d');
-        this.on("bump.top,bump.down,bump.left,bump.right","kill"); 
+        this.on("bump.top,bump.down,bump.left,bump.right","kill");
+        Q.audio.play("lance.ogg");
         if(this.p.vx < 0){
             this.p.flip = "x";
         }                    
@@ -845,7 +868,8 @@ Q.MovingSprite.extend ( "Antorcha" , {
             collisionMask: Q.SPRITE_TUMBA | Q.SPRITE_ENEMY | Q.SPRITE_DEFAULT
         }); 
         this.add('2d, animation');
-        this.on("bump.top,bump.bottom,bump.left,bump.right","kill"); 
+        this.on("bump.top,bump.bottom,bump.left,bump.right","kill");
+        Q.audio.play("torch.ogg");
         this.play('girar');
     },
 
@@ -1222,6 +1246,8 @@ Q.scene("initScreen",function(stage){
 Q.scene("loseScreen",function(stage){
     Q.stage(2).show(true);
     Q.state.set("enJuego",false);
+    Q.audio.stop();
+    Q.audio.play("gameover.ogg");
     Q.stageTMX("loseScreen.tmx",stage);
     stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-100,size:32,color: "#ffffff",label: stage.options.label }));
     Q.input.on("confirm",this,function(){
@@ -1235,7 +1261,7 @@ Q.scene("winScreen",function(stage){
     Q.state.set("enJuego",false);
     Q.stageTMX("finalscreen.tmx",stage);
     Q.audio.stop();
-    Q.audio.play("music_win_game.ogg");
+    Q.audio.play("gngEndTheme.ogg");
     var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/5, fill: "rgba(66,66,66,0.8)"}));        
     container.insert(new Q.UI.Text({x:0, y: 10,color:"#ffffff",label:"Has ganado!"}));
     container.insert(new Q.UI.Text({x:0, y: 50,color:"#ffffff",label:"Autores"}));
@@ -1266,8 +1292,10 @@ Q.scene('pauseMessage',function(stage) {
 // Create a new scene called level 1
 Q.scene("L1",function(stage) {
   Q.stageTMX("level2.tmx",stage);
+  Q.state.set("enJuego",true);
   //stage.insert(new Q.Devil({x:(25*32)+16,y:(15*32)+16}));
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
   stage.viewport.offset(0,204);
+  Q.audio.play("gngTheme.ogg",{loop:true});
 });
 });
