@@ -20,9 +20,9 @@ Q.SPRITE_DAGA = 256;
 Q.SPRITE_EXPLOSION = 512;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png", "zombie.png","crow.png", "armour.png" ,"princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","cuchillo.png"]);
+Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png", "zombie.png","crow.png", "armour.png" ,"princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","fire.png","cuchillo.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","bullet.json","shuriken.json","antorcha.json"]);
+Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json"]);
 //Musica
 Q.preload([//"level_1-2_theme.mp3","level_1-2_theme_boss.mp3",//back music
            //"level_3-4_theme.mp3","level_3-4_theme_boss.mp3",
@@ -917,7 +917,7 @@ Q.MovingSprite.extend ( "Antorcha" , {
     kill: function(collision){
         if(collision.obj.p.type===Q.SPRITE_ENEMY){
             Q.stage().insert(new Q.Fire({x:collision.obj.p.x,y:collision.obj.p.y}));
-            collision.obj.hit(collision.obj.p);
+            collision.obj.hit(this.p.damage);
         }else if(collision.obj.p.type !== Q.SPRITE_EXPLOSION){
             Q.stage().insert(new Q.Fire({x:this.p.x,y:this.p.y}));
         }
@@ -1308,6 +1308,7 @@ Q.scene("winScreen",function(stage){
     container.insert(new Q.UI.Text({x:0, y: 50,color:"#ffffff",label:"Autores"}));
     container.insert(new Q.UI.Text({x:0, y: 80,color:"#ffffff",label:"Jose Luis Sánchez Gárcia"}));
     container.insert(new Q.UI.Text({x:0, y: 110,color:"#ffffff",label:"Yaco Alejandro Santiago Pérez"}));
+    container.insert(new Q.UI.Text({x:0, y: 110,color:"#ffffff",label:"Andrea Martín Arias"}));
     container.insert(new Q.UI.Text({x:0, y: 200,color:"#ffffff",label:"Dedicado a Shigeru Miyamoto"}));
     container.fit(20);
     stage.insert(new Q.Mario({x:(11*34)+17,y:(15*34)+17,auto:null,vx:0}));
