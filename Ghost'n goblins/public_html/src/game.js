@@ -21,7 +21,7 @@ Q.SPRITE_DAGA = 256;
 Q.SPRITE_EXPLOSION = 512;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","fire.png","antorchaMov.png","lanzaMov.png","cuchilloMov.png"]);
+Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png"]);
 //JSON'S 
 Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json"]);
 //Musica
@@ -933,13 +933,13 @@ Q.MovingSprite.extend ( "Antorcha" , {
  * grave2:38x42
  */
 Q.Sprite.extend("Tumba",{
-    init: function(p) {
-        this._super(p, {
-            asset: "grave0.png", 
+    init: function(p,defaults) {
+        this._super(p,Q._defaults(defaults||{}, {
+            asset: p.tipo, 
             gravity: 0,
             type: Q.SPRITE_TUMBA,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_TILES
-        }); 
+        })); 
         this.add('2d');
         this.p.static = true;                   
     }
