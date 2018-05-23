@@ -543,8 +543,6 @@ init:function(p) {
     hit:function(col){
         var ac=(this.p.vy>0)? {x: this.p.x-70,y:this.p.y-50}:{x: this.p.x-50};
         this.del("platformerControls");
-        this.del("2d");
-        this.p.type=Q.SPRITE_NONE;
         if(this.p.sheet==="arthurArmo" || this.p.sheet==="arthurArmoDuck"){
             this.p.hit=true;
             Q.audio.play("removeArmour.ogg");
@@ -598,7 +596,6 @@ init:function(p) {
     armoDestroyed:function(){
         this.sheet("arthurNude",true);
         this.add("platformerControls");
-        this.add("2d");
         this.p.type=Q.SPRITE_PLAYER;
         this.p.hit=false;
     }
@@ -938,7 +935,7 @@ Q.Sprite.extend("Tumba",{
             asset: p.tipo, 
             gravity: 0,
             type: Q.SPRITE_TUMBA,
-            collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_TILES
+            collisionMask: Q.SPRITE_PLAYER 
         })); 
         this.add('2d');
         this.p.static = true;                   
@@ -1360,5 +1357,6 @@ Q.scene("L1",function(stage) {
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
   stage.viewport.offset(0,204);
   backMusic.playMusic(false);
+   stage.insert(new Q.Zombie({x:(25*32)+16,y:(14*32)+16}));
 });
 });
