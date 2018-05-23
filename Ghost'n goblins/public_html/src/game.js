@@ -20,7 +20,7 @@ Q.SPRITE_DAGA = 256;
 Q.SPRITE_EXPLOSION = 512;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png"]);
+Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png"]);
 //JSON'S 
 Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","bullet.json","shuriken.json","antorcha.json"]);
 //Musica
@@ -1056,6 +1056,27 @@ Q.Sprite.extend("Shuriken",{
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
     }
  });
+
+  //Plataforma agua
+  Q.Sprite.extend("movingPlataform",{
+    init: function(p) {
+        this._super(p, {
+            asset: "movingPlatform.png", 
+            gravity: 0,
+            type: Q.SPRITE_DEFAULT,
+            vx:100,
+            x:0,
+            dir:'d',
+           collisionMask: Q.SPRITE_DEFAULT
+        }); 
+        this.add('2d , aiBounce');        
+        this.on("bump.top","col");    
+    },
+
+    col: function(collision){
+        if(collision.obj.p.type===Q.SPRITE_PLAYER) collision.obj.p.x=this.p.x;
+    }
+});
 /*----------------------------------Premios---------------------------------------*/
 //Default de recompensa
 Q.Sprite.extend("Premio",{
@@ -1296,6 +1317,7 @@ Q.scene("L1",function(stage) {
   //stage.insert(new Q.Devil({x:(25*32)+16,y:(15*32)+16}));
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
   stage.viewport.offset(0,204);
+  stage.insert(new Q.movingPlataform({x:(111*32)+16,y:(18*32)+16}));
   Q.audio.play("gngTheme.ogg",{loop:true});
 });
 });
