@@ -1,5 +1,6 @@
 window.addEventListener("load",function() {
 /*---------------------------CARGA DE QUINTUS---------------------------------*/
+var backMusic;
 /* global Quintus */
 var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .include("Sprites, Scenes, Input, 2D, Anim,UI,TMX,Audio")//Librerias del quintus cargadas
@@ -20,14 +21,14 @@ Q.SPRITE_DAGA = 256;
 Q.SPRITE_EXPLOSION = 512;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png"]);
+Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","fire.png","antorchaMov.png","lanzaMov.png","cuchilloMov.png"]);
 //JSON'S 
 Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json"]);
 //Musica
-Q.preload([//"level_1-2_theme.mp3","level_1-2_theme_boss.mp3",//back music
-           //"level_3-4_theme.mp3","level_3-4_theme_boss.mp3",
-           //"level_5-6_theme.mp3","level_5-6_theme_boss.mp3",
-           //"level_7_theme.mp3",
+Q.preload(["level_1-2_theme.ogg","level_1-2_theme_boss.ogg",//back music
+           "level_3-4_theme.ogg","level_3-4_theme_boss.ogg",
+           "level_5-6_theme.ogg","level_5-6_theme_boss.ogg",
+           "level_7_theme.ogg",
            "gngEndTheme.ogg","gameover.ogg","timer.ogg","insertCoin.ogg",//General
            "arthurRow.ogg","die.ogg","jumpEnd.ogg","jumpStart.ogg","putArmour.ogg","removeArmour.ogg",//Arthur
            "burst.ogg","hitGrave.ogg","doorOpen.ogg","lance.ogg","torch.ogg","treasurePickUp.ogg","weaponPickUp.ogg","extraLife.ogg",//Efectos sonoros
@@ -64,7 +65,7 @@ Q.preload(function(){
                   pause:false,enJuego:false
                 });
     //Controlador de la musica de fondo
-    //backMusic= new Q.backMusic();
+    backMusic= new Q.backMusic();
     //Carga del menu principal
     Q.loadTMX("mainMenu.tmx", function() {
         Q.stageScene("initScreen");
@@ -81,7 +82,7 @@ Q.input.keyboardControls({
 Q.input.on("pausa",function() {
     if(Q.state.get("enJuego")){
         if(Q.state.get("pause")) {
-            //Q.backMusic.playMusic();
+            backMusic.playMusic();
             Q.state.set("pause",false);
             Q.stage().unpause();
             Q.stage(2).show(false);
@@ -116,23 +117,23 @@ Q.Class.extend("backMusic", {
     playMusic:function(boss){
         Q.audio.stop();
         const lvl=Q.state.get("level");
-        if(lvl===1 || lvl===2)
+        if(lvl===1 || lvl===2){
             if(!boss)
-                Q.audio.play("level_1-2_theme.mp3",{loop:true});
+                Q.audio.play("level_1-2_theme.ogg",{loop:true});
             else
-                Q.audio.play("level_1-2_theme_boss.mp3",{loop:true});
-        if(lvl===3 || lvl===4)
+                Q.audio.play("level_1-2_theme_boss.ogg",{loop:true});
+        }else if(lvl===3 || lvl===4){
             if(!boss)
-                Q.audio.play("level_3-4_theme.mp3",{loop:true});
+                Q.audio.play("level_3-4_theme.ogg",{loop:true});
             else
-                Q.audio.play("level_3-4_theme_boss.mp3",{loop:true});
-        if(lvl===5 || lvl===6)
+                Q.audio.play("level_3-4_theme_boss.ogg",{loop:true});
+        }else if(lvl===5 || lvl===6){
             if(!boss)
-                Q.audio.play("level_5-6_theme.mp3",{loop:true});
+                Q.audio.play("level_5-6_theme.ogg",{loop:true});
             else
-                Q.audio.play("level_5-6_theme_boss.mp3",{loop:true});
-        else
-            Q.audio.play("level_7_theme.mp3",{loop:true});
+                Q.audio.play("level_5-6_theme_boss.ogg",{loop:true});
+        }else
+            Q.audio.play("level_7_theme.ogg",{loop:true});
     }
 });
 //Gestor de niveles
@@ -177,7 +178,7 @@ Q.component("Timer",{
       var props = this.entity.p; 
       Q._defaults(props,{
         cont:0,
-        maxTime:300,
+        maxTime:150,
         segDesc:1,
         descuento:1,
         prisa:false,
@@ -219,7 +220,7 @@ Q.component("GeneradorPremios", {
                 if(Q.state.get("armaArthur") !== "lanza"){
                      Q.stage().insert(new Q.ObjLanza({x: x, y: y}));
                 }
-            }else if(randomNumber == 10){
+            }else if(randomNumber === 10){
                 if(Q.state.get("armaArthur") !== "daga"){
                       Q.stage().insert(new Q.ObjDaga({x: x, y: y}));
                 }
@@ -546,6 +547,7 @@ init:function(p) {
         this.p.type=Q.SPRITE_NONE;
         if(this.p.sheet==="arthurArmo" || this.p.sheet==="arthurArmoDuck"){
             this.p.hit=true;
+            Q.audio.play("removeArmour.ogg");
             this.p.x -= col.separate[0];
             this.p.y -= col.separate[1];
             this.animate(ac,0.3);  
@@ -594,7 +596,6 @@ init:function(p) {
         }
     },
     armoDestroyed:function(){
-        Q.audio.play("removeArmour.ogg");
         this.sheet("arthurNude",true);
         this.add("platformerControls");
         this.add("2d");
@@ -1265,7 +1266,7 @@ Q.UI.Text.extend("Lives",{
 Q.UI.Text.extend("Timer",{
     init:function(p) {
         this._super({
-            label: "Tiempo\n 300",    
+            label: "Tiempo\n 150",    
             x: 600,
             y: 0,
             color:"#ffffff"
@@ -1356,16 +1357,8 @@ Q.scene('pauseMessage',function(stage) {
 Q.scene("L1",function(stage) {
   Q.stageTMX("level2.tmx",stage);
   Q.state.set("enJuego",true);
-  //stage.insert(new Q.Devil({x:(25*32)+16,y:(15*32)+16}));
-  stage.insert(new Q.Zombie({x:(25*32)+16,y:(14*32)+16}));
-  stage.insert(new Q.Zombie({x:(26*32)+16,y:(14*32)+16}));
-  stage.insert(new Q.Zombie({x:(27*32)+16,y:(14*32)+16}));
-  stage.insert(new Q.Zombie({x:(28*32)+16,y:(14*32)+16}));
-  stage.insert(new Q.Zombie({x:(29*32)+16,y:(14*32)+16}));
-  stage.insert(new Q.Zombie({x:(30*32)+16,y:(14*32)+16}));
-  stage.insert(new Q.Zombie({x:(31*32)+16,y:(14*32)+16}));
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
   stage.viewport.offset(0,204);
-  //Q.backMusic.playMusic();
+  backMusic.playMusic(false);
 });
 });
