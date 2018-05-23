@@ -24,7 +24,11 @@ Q.preload(["main_title.png","ArthurV2.png","zombie.png","crow.png","princess.png
 //JSON'S 
 Q.preload(["ArthurV2.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","bullet.json","shuriken.json","antorcha.json"]);
 //Musica
-Q.preload(["gngTheme.ogg","gngEndTheme.ogg","gameover.ogg","timer.ogg","insertCoin.ogg",//General
+Q.preload([//"level_1-2_theme.mp3","level_1-2_theme_boss.mp3",//back music
+           //"level_3-4_theme.mp3","level_3-4_theme_boss.mp3",
+           //"level_5-6_theme.mp3","level_5-6_theme_boss.mp3",
+           //"level_7_theme.mp3",
+           "gngEndTheme.ogg","gameover.ogg","timer.ogg","insertCoin.ogg",//General
            "arthurRow.ogg","die.ogg","jumpEnd.ogg","jumpStart.ogg","putArmour.ogg","removeArmour.ogg",//Arthur
            "burst.ogg","hitGrave.ogg","doorOpen.ogg","lance.ogg","torch.ogg","treasurePickUp.ogg","weaponPickUp.ogg","extraLife.ogg",//Efectos sonoros
            "enemyHit.ogg","bossHit.ogg","bossDeath.ogg","zombieBorn.ogg","crow.ogg","crowDie.ogg"//Enemigos
@@ -76,7 +80,7 @@ Q.input.keyboardControls({
 Q.input.on("pausa",function() {
     if(Q.state.get("enJuego")){
         if(Q.state.get("pause")) {
-            Q.audio.play("gngTheme.ogg",{loop:true});
+            //Q.backMusic.playMusic();
             Q.state.set("pause",false);
             Q.stage().unpause();
             Q.stage(2).show(false);
@@ -108,7 +112,26 @@ Q.component('aiBounce2', {
   });
 //Control musica principal
 Q.Class.extend("backMusic", {
-    playMusic:function(){
+    playMusic:function(boss){
+        Q.audio.stop();
+        const lvl=Q.state.get("level");
+        if(lvl===1 || lvl===2)
+            if(!boss)
+                Q.audio.play("level_1-2_theme.mp3",{loop:true});
+            else
+                Q.audio.play("level_1-2_theme_boss.mp3",{loop:true});
+        if(lvl===3 || lvl===4)
+            if(!boss)
+                Q.audio.play("level_3-4_theme.mp3",{loop:true});
+            else
+                Q.audio.play("level_3-4_theme_boss.mp3",{loop:true});
+        if(lvl===5 || lvl===6)
+            if(!boss)
+                Q.audio.play("level_5-6_theme.mp3",{loop:true});
+            else
+                Q.audio.play("level_5-6_theme_boss.mp3",{loop:true});
+        else
+            Q.audio.play("level_7_theme.mp3",{loop:true});
     }
 });
 //Gestor de niveles
@@ -474,7 +497,7 @@ init:function(p) {
             Q.audio.play("jumpEnd.ogg");
             this.p.jump=false;
         }
-        if(collision.tile === 91)
+        if(collision.tile === 91 && !this.p.muerto)
             this.muerto();
     },
     fire:function(){
@@ -518,7 +541,7 @@ init:function(p) {
         this.p.vx=0;
         this.p.type= Q.SPRITE_NONE;
         this.del("platformerControls");
-        Q.audio.stop("gngTheme.ogg");
+        Q.audio.stop();
         Q.audio.play("die.ogg");
         this.p.sheet="arthurDie";
         if(this.p.direction ==="right")
@@ -1296,6 +1319,6 @@ Q.scene("L1",function(stage) {
   //stage.insert(new Q.Devil({x:(25*32)+16,y:(15*32)+16}));
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
   stage.viewport.offset(0,204);
-  Q.audio.play("gngTheme.ogg",{loop:true});
+  //Q.backMusic.playMusic();
 });
 });
