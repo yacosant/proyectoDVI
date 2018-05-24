@@ -944,7 +944,7 @@ Q.MovingSprite.extend ( "Antorcha" , {
 
     kill: function(collision){
         if(collision.obj.p.type===Q.SPRITE_ENEMY){
-            Q.stage().insert(new Q.Fire({x:collision.obj.p.x,y:collision.obj.p.y}));
+            Q.stage().insert(new Q.Fire({x:collision.obj.p.x+collision.obj.p.h,y:collision.obj.p.y}));
             collision.obj.hit(this.p.damage);
             Q.audio.play("enemyHit.ogg");
         }else if(collision.obj.p.type !== Q.SPRITE_EXPLOSION){
@@ -1151,10 +1151,9 @@ Q.Sprite.extend("Premio",{
             sprite: "Premio",
             puntos: 0,     
             type: Q.SPRITE_PREMIO,
-            collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
+            collisionMask: Q.SPRITE_DEFAULT | Q.SPRITE_PLAYER 
         }); 
         this.add('2d,animation'); 
-        this.p.static = true;  
         this.on("bump.top,bump.down,bump.left,bump.right","take");
         this.play('shine');                   
     },
@@ -1170,14 +1169,12 @@ Q.Sprite.extend("Vida",{
     init: function(p) {
         this._super(p, {
             asset: "1up.png",
-            puntos: 200,  
-            gravity: 0,     
+            puntos: 200,    
             type: Q.SPRITE_PREMIO,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
         this.add('2d,animation'); 
         this.play("shine");
-        this.p.static = true;  
         this.on("bump.top,bump.down,bump.left,bump.right","take");                   
     },
     take: function(collision){
@@ -1192,14 +1189,12 @@ Q.Sprite.extend("ObjAntorcha",{
         this._super(p, {
             sheet: "antorchaMov", 
             sprite: "WeaponObj",
-            puntos: 100,  
-            gravity: 0,     
+            puntos: 100,    
             type: Q.SPRITE_PREMIO,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
         this.add('2d,animation'); 
         this.play("shine");
-        this.p.static = true;  
         this.on("bump.top,bump.down,bump.left,bump.right","take");                   
     },
     take: function(collision){
@@ -1217,13 +1212,11 @@ Q.Sprite.extend("ObjDaga",{
             sheet: "cuchilloMov", 
             sprite: "WeaponObj",
             puntos: 200,  
-            gravity: 0,     
             type: Q.SPRITE_PREMIO,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
         this.add('2d,animation'); 
         this.play("shine");
-        this.p.static = true;  
         this.on("bump.top,bump.down,bump.left,bump.right","take");                   
     },
     take: function(collision){
@@ -1241,13 +1234,11 @@ Q.Sprite.extend("ObjLanza",{
             sheet: "lanzaMov", 
             sprite: "WeaponObj",
             puntos: 100,  
-            gravity: 0,     
             type: Q.SPRITE_PREMIO,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
         this.add('2d,animation'); 
         this.play();
-        this.p.static = true;  
         this.on("bump.top,bump.down,bump.left,bump.right","take");                   
     },
     take: function(collision){
@@ -1263,13 +1254,11 @@ Q.Sprite.extend("ObjArmadura",{
     init: function(p) {
         this._super(p, {
             asset: "armour.png",
-            puntos: 200,  
-            gravity: 0,     
+            puntos: 200,      
             type: Q.SPRITE_PREMIO,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
         this.add('2d'); 
-        this.p.static = true;  
         this.on("bump.top,bump.down,bump.left,bump.right","take");                   
     },
     take: function(collision){
