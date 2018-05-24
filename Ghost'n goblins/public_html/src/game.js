@@ -57,7 +57,8 @@ Q.preload(function(){
     Q.compileSheets("antorchaMov.png", "antorchaMov.json");
     Q.compileSheets("lanzaMov.png", "lanzaMov.json");
     Q.compileSheets("cuchilloMov.png", "cuchilloMov.json");
-
+    Q.compileSheets("busto.png","busto.json");
+    Q.compileSheets("busto2.png","busto.json");
     //Estado global de juego
     Q.state.set({ score: 0, lives: 4, //Puntuaciones
                   armaArthur: "lanza",
@@ -315,13 +316,17 @@ Q.animations('Princess', {
 Q.animations('Torch', {
   girar: { frames: [0,1,2,3,4,5,6,7], rate: 1/5, loop:true} 
 });
-//Animacion de los abjetos de tipo arma
+//Animacion de los objetos de tipo arma
 Q.animations('WeaponObj', {
   shine: { frames: [0,1,2,3],rate: 1/5,loop:true} 
 });
-//Animacion de los abjetos de tipo arma
+//Animacion de los objetos de tipo arma
 Q.animations('Shuriken', {
     shuriken: { frames: [0,1],rate: 1/5,loop:true} 
+});
+//Animacion de los collectables de tipo busto
+Q.animations('Busto', {
+    shine: { frames: [0,1],rate: 1/5,loop:true} 
 });
 /*-------------------------------JUGADOR--------------------------------------*/
 Q.Sprite.extend("Player",{
