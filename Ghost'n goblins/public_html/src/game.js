@@ -350,20 +350,28 @@ init:function(p) {
             frogMaxTime:5,
             onLadder: false,//Escaleras
             ladderX:0,
-            ladderTile:0
+            ladderTile:0,
+            respawnPoints:[{x:0,y:0},
+                           {x:(16*32)+16,y:(21*32)+16},//level1 point 1
+                           {x:(132*32)+16,y:(21*32)+16}//level1 point 2
+                          ]
             
         });
+        //add's
         this.add("2d,animation,tween");
         this.add("levelManager");
-        
         this.add("Timer");
+        //Definiciones
         this.p.jumpSpeed=-400;
+        this.p.x=this.p.respawnPoints[Q.state.get("level")].x;
+        this.p.y=this.p.respawnPoints[Q.state.get("level")].y;
+        //Triggers
         this.on("sensor.tile","subirEscalera");
         this.on("bump.bottom",this,"colMapa");
         this.on("dead",this,"respawn");
         this.on("nude",this,"armoDestroyed");
         this.on("bump.bottom",this,"colMapa");
-        
+        //Tipo de movimiento
         if(this.p.auto!==null){
             if(this.p.auto)
                 this.add("aiBounce");
@@ -526,7 +534,7 @@ init:function(p) {
     fire:function(){
         if(Q.state.get("armaArthur") === "lanza"){
             this.p.shoot=0;
-            var vel=250;
+            var vel=400;
             var mano=this.p.h/2;
             var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel}:{x:this.p.x+mano,y:this.p.y,vx:-vel};
             Q.stage().insert(new Q.Lanza(conf));
@@ -534,7 +542,6 @@ init:function(p) {
             this.p.shoot=0;
             var vel=200;
             var mano=this.p.h/2;
-            //PRUEBA DE LAZAMIENTO DEL OBJCTO ANTORCHA
             var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,vy:-50,ax:0,ay:70 }:{x:this.p.x+mano,y:this.p.y,vy:-50,vx:-vel,ax:0,ay:70};
             Q.stage().insert(new Q.Antorcha(conf));
         }else if(Q.state.get("armaArthur") === "daga"){    
@@ -929,11 +936,6 @@ Q.MovingSprite.extend ( "Antorcha" , {
     }
 });
 //Tumbas saltables
-/*Tamaños de las tuambas para calcular su centro y colocar la base en el suelo
- * grave0:44x40
- * grave1:36x40
- * grave2:38x42
- */
 Q.Sprite.extend("Tumba",{
     init: function(p,defaults) {
         this._super(p,Q._defaults(defaults||{}, {
@@ -1063,7 +1065,6 @@ Q.Sprite.extend("Bullet",{
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
     }
  });
-
  //Shuriken de Devil
 Q.Sprite.extend("Shuriken",{
     init: function(p) {
@@ -1100,26 +1101,25 @@ Q.Sprite.extend("Shuriken",{
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
     }
  });
+//Plataforma agua
+Q.Sprite.extend("movingPlataform",{
+  init: function(p) {
+      this._super(p, {
+          asset: "movingPlatform.png", 
+          gravity: 0,
+          type: Q.SPRITE_DEFAULT,
+          vx:100,
+          x:0,
+          dir:'d',
+         collisionMask: Q.SPRITE_DEFAULT
+      }); 
+      this.add('2d , aiBounce');        
+      this.on("bump.top","col");    
+  },
 
-  //Plataforma agua
-  Q.Sprite.extend("movingPlataform",{
-    init: function(p) {
-        this._super(p, {
-            asset: "movingPlatform.png", 
-            gravity: 0,
-            type: Q.SPRITE_DEFAULT,
-            vx:100,
-            x:0,
-            dir:'d',
-           collisionMask: Q.SPRITE_DEFAULT
-        }); 
-        this.add('2d , aiBounce');        
-        this.on("bump.top","col");    
-    },
-
-    col: function(collision){
-        if(collision.obj.p.type===Q.SPRITE_PLAYER) collision.obj.p.x=this.p.x;
-    }
+  col: function(collision){
+      if(collision.obj.p.type===Q.SPRITE_PLAYER) collision.obj.p.x=this.p.x;
+  }
 });
 /*----------------------------------Premios---------------------------------------*/
 //Default de recompensa
