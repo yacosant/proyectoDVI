@@ -206,12 +206,12 @@ Q.component("Timer",{
 Q.component("GeneradorPremios", {
     extend: {
         generar: function(x,y){
-            var listaPremios = [{asset: "jar.png", puntos: 200}, {asset: "armour.png", puntos: 400}];
+            var listaPremios = [{sheet: "busto", puntos: 200}, {sheet: "busto2", puntos: 400}];
             var maxPremios = listaPremios.length - 1;
-            var randomNumber = Math.floor(Math.random() * (11 - 0) + 0);
+            var randomNumber = Math.floor(Math.random() * (20 - 0) + 0);
             if(randomNumber <= 5){
                 var randomPremio = Math.floor(Math.random() * (2 - 0) + 0);
-                Q.stage().insert(new Q.Premio({x: x, y: y, asset: listaPremios[randomPremio].asset, puntos: listaPremios[randomPremio].puntos}));
+                Q.stage().insert(new Q.Premio({x: x, y: y, sheet: listaPremios[randomPremio].sheet, puntos: listaPremios[randomPremio].puntos}));
             }else if(randomNumber > 5 && randomNumber <=7){
                 if(Q.state.get("armaArthur") !== "antorcha"){
                     Q.stage().insert(new Q.ObjAntorcha({x: x, y: y}));
@@ -225,6 +225,11 @@ Q.component("GeneradorPremios", {
                 if(Q.state.get("armaArthur") !== "daga"){
                       Q.stage().insert(new Q.ObjDaga({x: x, y: y}));
                 }
+            }
+            else if(randomNumber > 10 && randomNumber <=11){
+               
+                Q.stage().insert(new Q.ObjArmadura({x: x, y: y}));
+                
             }
         }
     }
