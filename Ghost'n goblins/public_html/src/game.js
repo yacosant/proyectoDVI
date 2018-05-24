@@ -21,9 +21,9 @@ Q.SPRITE_DAGA = 256;
 Q.SPRITE_EXPLOSION = 512;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png"]);
+Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","busto.png", "busto2.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json"]);
+Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "busto.json"]);
 //Musica
 Q.preload(["level_1-2_theme.ogg","level_1-2_theme_boss.ogg",//back music
            "level_3-4_theme.ogg","level_3-4_theme_boss.ogg",
@@ -206,7 +206,7 @@ Q.component("Timer",{
 Q.component("GeneradorPremios", {
     extend: {
         generar: function(x,y){
-            var listaPremios = [{sheet: "busto", puntos: 200}, {sheet: "busto2", puntos: 400}];
+            var listaPremios = [{sheet: "busto", puntos: 200}, {sheet: "busto", puntos: 400}];
             var maxPremios = listaPremios.length - 1;
             var randomNumber = Math.floor(Math.random() * (20 - 0) + 0);
             if(randomNumber <= 5){
@@ -226,9 +226,13 @@ Q.component("GeneradorPremios", {
                       Q.stage().insert(new Q.ObjDaga({x: x, y: y}));
                 }
             }
-            else if(randomNumber > 10 && randomNumber <=11){
+            else if(randomNumber === 11){
                
                 Q.stage().insert(new Q.ObjArmadura({x: x, y: y}));
+                
+            }else if(randomNumber === 12){
+               
+                Q.stage().insert(new Q.Vida({x: x, y: y}));
                 
             }
         }
@@ -1143,21 +1147,44 @@ Q.Sprite.extend("Shuriken",{
 Q.Sprite.extend("Premio",{
     init: function(p) {
         this._super(p, {
-            asset: "jar.png", 
+            sheet: "",
+            sprite: "Busto",
             puntos: 0,  
             gravity: 0,     
             type: Q.SPRITE_PREMIO,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
-        this.add('2d'); 
+        this.add('2d', 'animation'); 
+        this.p.static = true;  
+        this.on("bump.top,bump.down,bump.left,bump.right","take");
+        this.play('shine');                   
+    },
+    take: function(collision){
+        if(collision.obj.p.type === Q.SPRITE_PLAYER){
+           Q.state.inc(score,this.p.puntos);
+           this.destroy();
+        }
+    }
+ });
+
+Q.Sprite.extend("Vida",{
+    init: function(p) {
+        this._super(p, {
+            asset: "1up.png",
+            puntos: 200,  
+            gravity: 0,     
+            type: Q.SPRITE_PREMIO,
+            collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
+        }); 
+        this.add('2d,animation'); 
+        this.play("shine");
         this.p.static = true;  
         this.on("bump.top,bump.down,bump.left,bump.right","take");                   
     },
     take: function(collision){
-        if(collision.obj.p.type === Q.SPRITE_PLAYER){
-           //actualizar puntos
-           this.destroy();
-        }
+        Q.state.inc(lives,1);
+        Q.state.inc(score,this.p.puntos);
+        this.destroy();
     }
  });
 
@@ -1166,7 +1193,7 @@ Q.Sprite.extend("ObjAntorcha",{
         this._super(p, {
             sheet: "antorchaMov", 
             sprite: "WeaponObj",
-            puntos: 0,  
+            puntos: 100,  
             gravity: 0,     
             type: Q.SPRITE_PREMIO,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
@@ -1179,6 +1206,7 @@ Q.Sprite.extend("ObjAntorcha",{
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
             Q.state.set("armaArthur","antorcha");
+            Q.state.inc(score,this.p.puntos);
             this.destroy();
         }
     }
@@ -1189,7 +1217,7 @@ Q.Sprite.extend("ObjDaga",{
         this._super(p, {
             sheet: "cuchilloMov", 
             sprite: "WeaponObj",
-            puntos: 0,  
+            puntos: 200,  
             gravity: 0,     
             type: Q.SPRITE_PREMIO,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
@@ -1202,6 +1230,7 @@ Q.Sprite.extend("ObjDaga",{
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
            Q.state.set("armaArthur","daga");
+           Q.state.inc(score,this.p.puntos);
             this.destroy();
         }
     }
@@ -1212,7 +1241,7 @@ Q.Sprite.extend("ObjLanza",{
         this._super(p, {
             sheet: "lanzaMov", 
             sprite: "WeaponObj",
-            puntos: 0,  
+            puntos: 100,  
             gravity: 0,     
             type: Q.SPRITE_PREMIO,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
@@ -1225,6 +1254,7 @@ Q.Sprite.extend("ObjLanza",{
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
             Q.state.set("armaArthur","lanza");
+            Q.state.inc(score,this.p.puntos);
             this.destroy();
         }
     }
@@ -1234,7 +1264,7 @@ Q.Sprite.extend("ObjArmadura",{
     init: function(p) {
         this._super(p, {
             asset: "armour.png",
-            puntos: 0,  
+            puntos: 200,  
             gravity: 0,     
             type: Q.SPRITE_PREMIO,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
@@ -1246,6 +1276,7 @@ Q.Sprite.extend("ObjArmadura",{
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
             collision.obj.p.sheet = "arthurArmo";
+            Q.state.inc(score,this.p.puntos);
             this.destroy();
         }
     }
