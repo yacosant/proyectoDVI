@@ -1181,7 +1181,7 @@ Q.Sprite.extend("Vida",{
         this.on("bump.top,bump.down,bump.left,bump.right","take");                   
     },
     take: function(collision){
-        Q.state.inc(lives,1);
+        Q.state.inc("lives",1);
         Q.state.inc("score",this.p.puntos);
         this.destroy();
     }
