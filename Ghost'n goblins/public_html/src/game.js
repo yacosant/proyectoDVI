@@ -1161,7 +1161,7 @@ Q.Sprite.extend("Premio",{
     },
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
-           Q.state.inc(score,this.p.puntos);
+           Q.state.inc("score",this.p.puntos);
            this.destroy();
         }
     }
@@ -1182,8 +1182,8 @@ Q.Sprite.extend("Vida",{
         this.on("bump.top,bump.down,bump.left,bump.right","take");                   
     },
     take: function(collision){
-        Q.state.inc(lives,1);
-        Q.state.inc(score,this.p.puntos);
+        Q.state.inc("lives",1);
+        Q.state.inc("score",this.p.puntos);
         this.destroy();
     }
  });
@@ -1206,7 +1206,7 @@ Q.Sprite.extend("ObjAntorcha",{
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
             Q.state.set("armaArthur","antorcha");
-            Q.state.inc(score,this.p.puntos);
+            Q.state.inc("score",this.p.puntos);
             this.destroy();
         }
     }
@@ -1230,7 +1230,7 @@ Q.Sprite.extend("ObjDaga",{
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
            Q.state.set("armaArthur","daga");
-           Q.state.inc(score,this.p.puntos);
+           Q.state.inc("score",this.p.puntos);
             this.destroy();
         }
     }
@@ -1254,7 +1254,7 @@ Q.Sprite.extend("ObjLanza",{
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
             Q.state.set("armaArthur","lanza");
-            Q.state.inc(score,this.p.puntos);
+            Q.state.inc("score",this.p.puntos);
             this.destroy();
         }
     }
@@ -1276,7 +1276,7 @@ Q.Sprite.extend("ObjArmadura",{
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
             collision.obj.p.sheet = "arthurArmo";
-            Q.state.inc(score,this.p.puntos);
+            Q.state.inc("score",this.p.puntos);
             this.destroy();
         }
     }
