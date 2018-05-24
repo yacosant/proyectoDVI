@@ -1,0 +1,5 @@
+{
+    "busto":{"sx":0,"sy":0,"tileW":32,"tileH":32,"frames":2},
+    "busto2":{"sx":0,"sy":32,"tileW":32,"tileH":32,"frames":2},
+    "gema":{"sx":0,"sy":64,"tileW":32,"tileH":32,"frames":2}
+}
