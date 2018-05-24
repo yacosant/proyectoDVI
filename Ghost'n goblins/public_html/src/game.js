@@ -19,11 +19,13 @@ Q.SPRITE_PREMIO = 64;
 Q.SPRITE_ANTORCHA = 128;
 Q.SPRITE_DAGA = 256;
 Q.SPRITE_EXPLOSION = 512;
+Q.SPRITE_CRUZ=1024;
+Q.SPRITE_PUERTA=2048;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png"]);
+Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json"]);
+Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json","cross.json","door.json"]);
 //Musica
 Q.preload(["level_1-2_theme.ogg","level_1-2_theme_boss.ogg",//back music
            "level_3-4_theme.ogg","level_3-4_theme_boss.ogg",
@@ -58,6 +60,8 @@ Q.preload(function(){
     Q.compileSheets("lanzaMov.png", "lanzaMov.json");
     Q.compileSheets("cuchilloMov.png", "cuchilloMov.json");
     Q.compileSheets("items.png","items.json");
+    Q.compileSheets("cross.png","cross.json");
+    Q.compileSheets("door.png","door.json");
     //Estado global de juego
     Q.state.set({ score: 0, lives: 4, //Puntuaciones
                   armaArthur: "lanza",
@@ -337,6 +341,14 @@ Q.animations('Shuriken', {
 //Animacion de los premios
 Q.animations('Premio', {
     shine: { frames: [0,1],rate: 1/5,loop:true} 
+});
+//Animacion de la cruz
+Q.animations('Cross', {
+    shine: { frames: [0,1,2,3],rate: 1/5,loop:true} 
+});
+//Animacion de la puerta
+Q.animations('Door', {
+    open: { frames: [0,1,2],rate: 1/2} 
 });
 /*-------------------------------JUGADOR--------------------------------------*/
 Q.Sprite.extend("Player",{
@@ -811,6 +823,7 @@ Q.Sprite.extend("Devil",{
             reload:0,
             timeReload:0.5,
             oculto:false,
+            activo:false,
             sheet: "devil",
             sprite: "Devil",
             frame: 0,
@@ -819,9 +832,8 @@ Q.Sprite.extend("Devil",{
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
-        this.add("2d,aiBounce,aiBounce2,animation");  
+        this.add("2d,animation");  
         this.on("bump.top,bump.down,bump.left,bump.right","matar");
-        this.play("devil");
     },
     matar:function(collision){
         if(collision.obj.p.type===Q.SPRITE_PLAYER) 
@@ -834,42 +846,53 @@ Q.Sprite.extend("Devil",{
     },
     muerte:function() {
         Q.audio.play("bossDeath.ogg");
+        Q("Cross").first().show();
         this.destroy();
     },
     step:function(dt){
-        this.p.reload+=dt;
         var art = Q("Player").last();
-        this.p.xo=art.p.x-this.p.x;
-        this.p.yo=art.p.y-this.p.y;
-
-        var rnd= Math.floor((Math.random() * 100) + 1);
-       
-        if(this.p.reload>this.p.timeReload){
-            this.p.reload=0;
-            if( this.p.oculto){
-                this.p.oculto=false;
-            }
-        }
-
-        if(0<rnd && rnd<2){ //Ataca
+        if(!this.p.activo && art.p.x+(20*32)>this.p.x){
+            this.p.activo=true;
+            Q.audio.stop();
+            backMusic.playMusic(true);
+            this.add("aiBounce,aiBounce2,");
             this.play("devil");
-            Q.stage().insert(new Q.Shuriken({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y}));
         }
-        else if(2<rnd && rnd<5){ //Teletransporta
-            if(this.p.xo<0) this.p.vx*=-1;  
-            this.p.vy= this.p.vx*(this.p.yo/this.p.xo)+20;  
-            this.play("devilFly");
-        }
-        else if(5<rnd && rnd<7){ //Oculta
-            this.play("devilHide");
-            this.p.oculto=true;
-        }
+        if(this.p.activo){
+            this.p.reload+=dt;
+            
+            this.p.xo=art.p.x-this.p.x;
+            this.p.yo=art.p.y-this.p.y;
 
-       if(this.p.vx<0)this.p.flip=false;
-       else this.p.flip='x';
+            var rnd= Math.floor((Math.random() * 100) + 1);
 
-       if(this.p.oculto) this.p.type=Q.SPRITE_DEFAULT;
-       else this.p.type=Q.SPRITE_ENEMY;
+            if(this.p.reload>this.p.timeReload){
+                this.p.reload=0;
+                if( this.p.oculto){
+                    this.p.oculto=false;
+                }
+            }
+
+            if(0<rnd && rnd<2){ //Ataca
+                this.play("devil");
+                Q.stage().insert(new Q.Shuriken({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y}));
+            }
+            else if(2<rnd && rnd<5){ //Teletransporta
+                if(this.p.xo<0) this.p.vx*=-1;  
+                this.p.vy= this.p.vx*(this.p.yo/this.p.xo)+20;  
+                this.play("devilFly");
+            }
+            else if(5<rnd && rnd<7){ //Oculta
+                this.play("devilHide");
+                this.p.oculto=true;
+            }
+
+           if(this.p.vx<0)this.p.flip=false;
+           else this.p.flip='x';
+
+           if(this.p.oculto) this.p.type=Q.SPRITE_DEFAULT;
+           else this.p.type=Q.SPRITE_ENEMY;
+        }
     }
 }); 
 /*--------------------------------ARMAS---------------------------------------*/
@@ -1292,6 +1315,52 @@ Q.Sprite.extend("Vida",{
         }
     }
  });
+ //cruz(llave de la puerta)
+ Q.Sprite.extend("Cross",{
+    init: function(p) {
+        this._super(p, {
+            sheet: "cross", 
+            sprite: "Cross",
+            puntos: 10000,
+            hidden:true,
+            gravity:0,
+            type: Q.SPRITE_CRUZ,
+            collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
+        }); 
+        this.add('2d,animation'); 
+        this.play("shine");
+        this.on("bump.top,bump.down,bump.left,bump.right","take");                   
+    },
+    take: function(collision){
+        if(collision.obj.p.type === Q.SPRITE_PLAYER){
+            Q.audio.play("weaponPickUp.ogg");
+            Q.state.inc("score",this.p.puntos);
+            Q.state.set("armaArthur","cruz");
+            this.destroy();
+        }
+    },
+    show:function(){
+        this.p.hidden=false;
+        this.p.gravity=1;
+    }
+ });
+ //Puerta
+ Q.Sprite.extend("Door",{
+    init: function(p) {
+        this._super(p, {
+            sheet: "door",
+            sprite:"Door",
+            frame:0,
+            puntos: 200,
+            type: Q.SPRITE_PUERTA,
+            collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
+        }); 
+        this.add('2d,animation');             
+    },
+    step: function(dt){
+
+    }
+ });
 /*----------------------------------HUD---------------------------------------*/
 //Puntuacion
 Q.UI.Text.extend("Score",{
@@ -1416,15 +1485,19 @@ Q.scene('pauseMessage',function(stage) {
 /*----------------------------------NIVELES-----------------------------------*/ 
 // Nivel 1
 Q.scene("L1",function(stage) {
-  Q.stageTMX("level2.tmx",stage);
   Q.state.set("enJuego",true);
+  var levelAssets = [
+      ["Zombie",{x:(25*32)+16,y:(21*32)+16}],
+      //["Zombie",{x:(27*32)+16,y:(21*32)+16}],
+      //["Zombie",{x:(29*32)+16,y:(21*32)+16}],
+      //["Zombie",{x:(31*32)+16,y:(21*32)+16}],
+      //["Zombie",{x:(33*32)+16,y:(21*32)+16}],
+      ["Devil",{x:(272*32)+16,y:(16*32)+16}]
+    ];
+  Q.stageTMX("level2.tmx",stage);
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
   stage.viewport.offset(0,204);
   backMusic.playMusic(false);
-  stage.insert(new Q.Zombie({x:(25*32)+16,y:(14*32)+16}));
-  stage.insert(new Q.Zombie({x:(27*32)+16,y:(14*32)+16}));
-  stage.insert(new Q.Zombie({x:(29*32)+16,y:(14*32)+16}));
-  stage.insert(new Q.Zombie({x:(31*32)+16,y:(14*32)+16}));
-  stage.insert(new Q.Zombie({x:(33*32)+16,y:(14*32)+16}));
+  stage.loadAssets(levelAssets);
 });
 });
