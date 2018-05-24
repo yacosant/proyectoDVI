@@ -639,10 +639,11 @@ Q.Sprite.extend("Zombie",{
     matar:function(collision){
         if(collision.obj.p.type===Q.SPRITE_PLAYER) 
             collision.obj.hit(collision);
-        else if(collision.tile === 40){
+        else if(collision.tile === 44){
             this.play("zombieBye");
             this.p.vx=0;
-        }   
+        }else if(collision.tile === 91 )
+            this.destroy();
     },
     hit: function(damage){
         this.p.life=-damage;
@@ -657,6 +658,7 @@ Q.Sprite.extend("Zombie",{
         else this.p.flip='x';
     },
     camina:function(){
+        Q.audio.play("zombieBorn.ogg");
         this.p. vx=80;
     }
 }); 
@@ -690,6 +692,7 @@ Q.Sprite.extend("Crow",{
         if(this.p.life<=0) this.muerte();
     },
     muerte:function() {
+        Q.audio.play("crowDie.ogg");
         this.destroy();
     },
     step:function(dt){
@@ -697,6 +700,7 @@ Q.Sprite.extend("Crow",{
 
         if(this.p.reload>this.p.timeReload){
             this.p.reload=0;
+            Q.audio.play("crow.ogg");
             if(this.p.flip==='x'){
                 this.p.flip=false;
                 this.p.vx=-50;
@@ -797,6 +801,7 @@ Q.Sprite.extend("Devil",{
         if(this.p.life<=0) this.muerte();
     },
     muerte:function() {
+        Q.audio.play("bossDeath.ogg");
         this.destroy();
     },
     step:function(dt){
@@ -859,9 +864,11 @@ Q.Sprite.extend("Lanza",{
         if(collision.obj.p.type===Q.SPRITE_ENEMY){
             Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
             collision.obj.hit(this.p.damage);
-        } else if(collision.obj.p.type===Q.SPRITE_TUMBA) 
+            Q.audio.play("enemyHit.ogg");
+        } else if(collision.obj.p.type===Q.SPRITE_TUMBA){
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
-
+            Q.audio.play("hitGrave.ogg");
+        }
         this.destroy();
     }
  });
@@ -888,10 +895,12 @@ Q.Sprite.extend("Daga",{
     kill: function(collision){
         if(collision.obj.p.type===Q.SPRITE_ENEMY){
             Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+            Q.audio.play("enemyHit.ogg");
             collision.obj.hit(this.p.damage);
-        } else if(collision.obj.p.type===Q.SPRITE_TUMBA) 
+        } else if(collision.obj.p.type===Q.SPRITE_TUMBA){ 
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
-
+            Q.audio.play("hitGrave.ogg");
+        }
         this.destroy();
     }
  });
@@ -916,6 +925,7 @@ Q.MovingSprite.extend ( "Antorcha" , {
         if(collision.obj.p.type===Q.SPRITE_ENEMY){
             Q.stage().insert(new Q.Fire({x:collision.obj.p.x,y:collision.obj.p.y}));
             collision.obj.hit(this.p.damage);
+            Q.audio.play("enemyHit.ogg");
         }else if(collision.obj.p.type !== Q.SPRITE_EXPLOSION){
             Q.stage().insert(new Q.Fire({x:this.p.x,y:this.p.y}));
         }
@@ -958,7 +968,7 @@ Q.Sprite.extend("Burst",{
     },
 
     muerte:function(collision) {
-
+        Q.audio.play("burst.ogg");
         this.destroy();
     }
 }); 
@@ -1056,6 +1066,8 @@ Q.Sprite.extend("Bullet",{
             collision.obj.hit(collision);
         } else if(collision.obj.p.type===Q.SPRITE_DEFAULT) 
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+        else if(collision.tile === 91) 
+            this.destroy();
     }
  });
 
