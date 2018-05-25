@@ -292,7 +292,7 @@ Q.animations('Crow', {
 Q.animations('Zombie', {
     zombie: { frames: [7,8,9], rate: 1/3},
     zombieBorn: { frames: [0,1,2,3,4,5,6,7,8,9], next: 'zombie', trigger:"camina", rate: 1/2},
-    zombieBye: { frames: [6,5,4,3,2,1,0],   next: 'zombie', trigger:"muerte", rate: 1/3}
+    zombieBye: { frames: [6,5,4,3,2,1,0],   next: 'zombie', trigger:"bye", rate: 1/3}
 });
 //Animacion de la bullet
 Q.animations('Bullet', {
@@ -672,21 +672,21 @@ Q.Sprite.extend("Zombie",{
             timeReload:3,
             life:30,
             type: Q.SPRITE_ENEMY,
-            collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
+            collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT 
         }); 
         this.add("2d,aiBounce,animation,GeneradorPremios");  
-        this.on("bump.top,bump.down,bump.left,bump.right","matar");
+        this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
         this.on("camina","camina");
-        this.on("muerte","muerte");
+        this.on("bye","bye");
         this.play("zombieBorn");
     },
     matar:function(collision){
         if(collision.obj.p.type===Q.SPRITE_PLAYER) 
             collision.obj.hit(collision);
-        else if(collision.tile === 44){
-            this.play("zombieBye");
+       // else if(collision.obj.p.type===Q.SPRITE_TUMBA/*collision.tile === 44*/){
+         /*   this.play("zombieBye");
             this.p.vx=0;
-        }else if(collision.tile === 91 )
+        }*/else if(collision.tile === 91)
             this.destroy();
     },
     hit: function(damage){
@@ -704,6 +704,9 @@ Q.Sprite.extend("Zombie",{
     camina:function(){
         Q.audio.play("zombieBorn.ogg");
         this.p. vx=80;
+    },
+    bye:function(){
+        this.destroy();
     }
 }); 
 //Crow
@@ -724,7 +727,7 @@ Q.Sprite.extend("Crow",{
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
         this.add("2d,aiBounce,aiBounce2,animation");  
-        this.on("bump.top,bump.down,bump.left,bump.right","matar");
+        this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
         this.play("crow");
     },
     matar:function(collision){
@@ -772,7 +775,7 @@ Q.Sprite.extend("Plant",{
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
         this.add("2d,animation");  
-        this.on("bump.top,bump.down,bump.left,bump.right","matar");
+        this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
         this.play("plant");
     },
     matar:function(collision){
@@ -833,7 +836,7 @@ Q.Sprite.extend("Devil",{
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
         this.add("2d,animation");  
-        this.on("bump.top,bump.down,bump.left,bump.right","matar");
+        this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
     },
     matar:function(collision){
         if(collision.obj.p.type===Q.SPRITE_PLAYER) 
@@ -940,7 +943,7 @@ Q.Sprite.extend("Daga",{
             collisionMask: Q.SPRITE_TUMBA | Q.SPRITE_ENEMY 
         }); 
         this.add('2d');
-        this.on("bump.top,bump.down,bump.left,bump.right","kill");
+        this.on("bump.top,bump.bottom,bump.left,bump.right","kill");
         Q.audio.play("lance.ogg");
         if(this.p.vx < 0){
             this.p.flip = "x";
@@ -1057,6 +1060,9 @@ Q.Sprite.extend("Bullet",{
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
         else if(collision.tile === 91) 
             this.destroy();
+    },
+    hit: function(damage){
+        this.destroy();
     }
  });
  //Shuriken de Devil
@@ -1093,6 +1099,9 @@ Q.Sprite.extend("Shuriken",{
             collision.obj.hit(collision);
         } else if(collision.obj.p.type===Q.SPRITE_DEFAULT) 
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+    },
+    hit: function(damage){
+        this.destroy();
     }
  });
 //Plataforma agua
@@ -1190,7 +1199,7 @@ Q.Sprite.extend("Premio",{
             collisionMask: Q.SPRITE_DEFAULT | Q.SPRITE_PLAYER 
         }); 
         this.add('2d,animation'); 
-        this.on("bump.top,bump.down,bump.left,bump.right","take");
+        this.on("bump.top,bump.bottom,bump.left,bump.right","take");
         this.play('shine');                   
     },
     take: function(collision){
@@ -1213,7 +1222,7 @@ Q.Sprite.extend("ObjAntorcha",{
         }); 
         this.add('2d,animation'); 
         this.play("shine");
-        this.on("bump.top,bump.down,bump.left,bump.right","take");                   
+        this.on("bump.top,bump.bottom,bump.left,bump.right","take");                   
     },
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
@@ -1236,7 +1245,7 @@ Q.Sprite.extend("ObjDaga",{
         }); 
         this.add('2d,animation'); 
         this.play("shine");
-        this.on("bump.top,bump.down,bump.left,bump.right","take");                   
+        this.on("bump.top,bump.bottom,bump.left,bump.right","take");                   
     },
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
@@ -1259,7 +1268,7 @@ Q.Sprite.extend("ObjLanza",{
         }); 
         this.add('2d,animation'); 
         this.play();
-        this.on("bump.top,bump.down,bump.left,bump.right","take");                   
+        this.on("bump.top,bump.bottom,bump.left,bump.right","take");                   
     },
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
@@ -1280,7 +1289,7 @@ Q.Sprite.extend("ObjArmadura",{
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
         this.add('2d'); 
-        this.on("bump.top,bump.down,bump.left,bump.right","take");                   
+        this.on("bump.top,bump.bottom,bump.left,bump.right","take");                   
     },
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
@@ -1304,7 +1313,7 @@ Q.Sprite.extend("Vida",{
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
         this.add('2d,animation'); 
-        this.on("bump.top,bump.down,bump.left,bump.right","take");                   
+        this.on("bump.top,bump.bottom,bump.left,bump.right","take");                   
     },
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
@@ -1329,7 +1338,7 @@ Q.Sprite.extend("Vida",{
         }); 
         this.add('2d,animation'); 
         this.play("shine");
-        this.on("bump.top,bump.down,bump.left,bump.right","take");                   
+        this.on("bump.top,bump.bottom,bump.left,bump.right","take");                   
     },
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
