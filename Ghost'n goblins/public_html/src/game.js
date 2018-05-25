@@ -31,7 +31,7 @@ Q.preload(["level_1-2_theme.ogg","level_1-2_theme_boss.ogg",//back music
            "level_3-4_theme.ogg","level_3-4_theme_boss.ogg",
            "level_5-6_theme.ogg","level_5-6_theme_boss.ogg",
            "level_7_theme.ogg",
-           "gngEndTheme.ogg","gameover.ogg","timer.ogg","insertCoin.ogg",//General
+           "gngEndTheme.ogg","gameover.ogg","timer.ogg","insertCoin.ogg","endLevel.ogg",//General
            "arthurRow.ogg","die.ogg","jumpEnd.ogg","jumpStart.ogg","putArmour.ogg","removeArmour.ogg",//Arthur
            "burst.ogg","hitGrave.ogg","doorOpen.ogg","lance.ogg","torch.ogg","treasurePickUp.ogg","weaponPickUp.ogg","extraLife.ogg",//Efectos sonoros
            "enemyHit.ogg","bossHit.ogg","bossDeath.ogg","zombieBorn.ogg","crow.ogg","crowDie.ogg"//Enemigos
@@ -148,7 +148,7 @@ Q.component("levelManager",{
         },
         winScreen:function(){
             Q.stage(2).show(true);
-            Q.loadTMX("finalscreen.tmx", function() {
+            Q.loadTMX("finalScreen.tmx", function() {
                 Q.stageScene("winScreen",{label:"Has ganado!"});
             });
         },
@@ -253,8 +253,8 @@ Q.animations('Arthur', {
     stand_right:{ frames: [2], rate:1 },
     stand_left:{ frames: [6], rate:1 },
     //Salto
-    jump_right:{ frames: [8,9], rate:1/2,loop:false},
-    jump_left:{ frames: [15,14], rate:1/2,loop:false},
+    jump_right:{ frames: [8,9], rate:1/3,loop:false},
+    jump_left:{ frames: [15,14], rate:1/3,loop:false},
     jump_site_right:{ frames: [11], rate:1 },
     jump_site_left:{ frames: [12], rate:1 },
     //Agachado
@@ -348,11 +348,11 @@ Q.animations('Cross', {
 });
 //Animacion de la puerta
 Q.animations('Door', {
-    open: { frames: [0,1,2],rate: 1/2} 
+    open: { frames: [0,1,2],rate: 1/2,next: '',trigger:"opened",loop:false} 
 });
 /*-------------------------------JUGADOR--------------------------------------*/
 Q.Sprite.extend("Player",{
-init:function(p) {
+    init:function(p) {
         this._super(p, {
             sheet:"arthurArmo",
             sprite:"Arthur",
@@ -376,12 +376,12 @@ init:function(p) {
             ladderTile:0,
             respawnPoints:[{x:0,y:0},//respawn
                            {x:(16*32)+16,y:(21*32)+16},//level1 point 1
-                           {x:(132*32)+16,y:(21*32)+16}//level1 point 2
+                           {x:(132*32)+16,y:(21*32)+16}//level1 point 2 132x
                           ]
             
         });
         //add's
-        this.add("2d,animation,tween");
+        this.add("2d,animation,tween,platformerControls");
         this.add("levelManager");
         this.add("Timer");
         //Posicion de salida
@@ -393,13 +393,6 @@ init:function(p) {
         this.on("dead",this,"respawn");
         this.on("nude",this,"armoDestroyed");
         this.on("bump.bottom",this,"colMapa");
-        //Tipo de movimiento
-        if(this.p.auto!==null){
-            if(this.p.auto)
-                this.add("aiBounce");
-            else
-                this.add("platformerControls");
-        }
     },
     subirEscalera: function(colObj){
         if(colObj.p.ladder) { 
@@ -474,18 +467,18 @@ init:function(p) {
             }else{
                 this.p.speed=200;
                 if(this.p.vx>0){
-                    if(this.p.vy!==0){
+                    if(this.p.vy!==0 && !this.p.jump){
                         this.p.jump=true;
                         Q.audio.play("jumpStart.ogg",{debounce:1000});
                         this.play("jump_right");
-                    }else
+                    }else if(!this.p.jump)
                         this.play("run_right");
                 } else if(this.p.vx<0) {
-                    if(this.p.vy!==0){
+                    if(this.p.vy!==0 && !this.p.jump){
                         this.p.jump=true;
                         Q.audio.play("jumpStart.ogg",{debounce:1000});
                         this.play("jump_left");
-                    }else
+                    }else if(!this.p.jump)
                         this.play("run_left");
                 }else{
                     if(this.p.direction ==="right"){
@@ -642,6 +635,11 @@ init:function(p) {
         this.add("platformerControls");
         this.p.type=Q.SPRITE_PLAYER;
         this.p.hit=false;
+    },
+    win:function(){
+        this.p.x-=1;
+        this.del("platformerControls");
+        this.destroy();
     }
 });
 /*---------------------------------PNJ----------------------------------------*/
@@ -1361,13 +1359,26 @@ Q.Sprite.extend("Vida",{
             sprite:"Door",
             frame:0,
             puntos: 200,
+            gravity:0,
+            static:true,
             type: Q.SPRITE_PUERTA,
-            collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
+            collisionMask:  Q.SPRITE_PLAYER
         }); 
-        this.add('2d,animation');             
+        this.add('2d,animation,levelManager');
+        this.on("bump.left",this,"open");
+        this.on("opened",this,"nextLevel");
     },
-    step: function(dt){
-
+    open:function(collision){
+        if(collision.obj.p.type === Q.SPRITE_PLAYER && Q.state.get("armaArthur")==="cruz"){
+            collision.obj.win();
+            Q.audio.stop();
+            Q.audio.play("endLevel.ogg");
+            this.play("open");
+        }
+    },
+    nextLevel:function(){
+        Q.state.inc("level",1);
+        this.mapScreen();
     }
  });
 /*----------------------------------HUD---------------------------------------*/
@@ -1461,7 +1472,7 @@ Q.scene("loseScreen",function(stage){
 //Pantalla de ganado
 Q.scene("winScreen",function(stage){
     Q.state.set("enJuego",false);
-    Q.stageTMX("finalscreen.tmx",stage);
+    Q.stageTMX("finalScreen.tmx",stage);
     Q.audio.stop();
     Q.audio.play("gngEndTheme.ogg");
     var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/5, fill: "rgba(66,66,66,0.8)"}));        
@@ -1469,7 +1480,7 @@ Q.scene("winScreen",function(stage){
     container.insert(new Q.UI.Text({x:0, y: 50,color:"#ffffff",label:"Autores"}));
     container.insert(new Q.UI.Text({x:0, y: 80,color:"#ffffff",label:"Jose Luis Sánchez Gárcia"}));
     container.insert(new Q.UI.Text({x:0, y: 110,color:"#ffffff",label:"Yaco Alejandro Santiago Pérez"}));
-    container.insert(new Q.UI.Text({x:0, y: 110,color:"#ffffff",label:"Andrea Martín Arias"}));
+    container.insert(new Q.UI.Text({x:0, y: 140,color:"#ffffff",label:"Andrea Martín Arias"}));
     container.insert(new Q.UI.Text({x:0, y: 200,color:"#ffffff",label:"Dedicado a Shigeru Miyamoto"}));
     container.fit(20);
     stage.insert(new Q.Mario({x:(11*34)+17,y:(15*34)+17,auto:null,vx:0}));
@@ -1501,7 +1512,7 @@ Q.scene("L1",function(stage) {
       //["Zombie",{x:(29*32)+16,y:(21*32)+16}],
       //["Zombie",{x:(31*32)+16,y:(21*32)+16}],
       //["Zombie",{x:(33*32)+16,y:(21*32)+16}],
-      ["Devil",{x:(272*32)+16,y:(16*32)+16}]
+      ["Devil",{x:(268*32)+16,y:(16*32)+16}]
     ];
   Q.stageTMX("level2.tmx",stage);
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
