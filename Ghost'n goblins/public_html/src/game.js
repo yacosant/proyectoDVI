@@ -291,7 +291,7 @@ Q.animations('Crow', {
 //Animacion del zombie  
 Q.animations('Zombie', {
     zombie: { frames: [7,8,9], rate: 1/3},
-    zombieBorn: { frames: [0,1,2,3,4,5,6,7,8,9], next: 'zombie', trigger:"camina", rate: 1/2},
+    zombieBorn: { frames: [0,1,2,3,4,5,6,7,8], next: 'zombie', trigger:"camina", rate: 1/5},
     zombieBye: { frames: [6,5,4,3,2,1,0],   next: 'zombie', trigger:"bye", rate: 1/3}
 });
 //Animacion de la bullet
@@ -665,26 +665,26 @@ Q.Sprite.extend("Zombie",{
             sheet: "zombie",
             sprite: "Zombie",
             frame: 0,
-            flip: "x",
+            flip: false,
             reload:0,
+            activo:false,
             timeReload:3,
             life:30,
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT 
         }); 
-        this.add("2d,aiBounce,animation,GeneradorPremios");  
+        this.add("2d,animation,GeneradorPremios");  
         this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
         this.on("camina","camina");
         this.on("bye","bye");
-        this.play("zombieBorn");
     },
     matar:function(collision){
         if(collision.obj.p.type===Q.SPRITE_PLAYER) 
             collision.obj.hit(collision);
-       // else if(collision.obj.p.type===Q.SPRITE_TUMBA/*collision.tile === 44*/){
-         /*   this.play("zombieBye");
-            this.p.vx=0;
-        }*/else if(collision.tile === 91)
+       else if(collision.obj.p.type===Q.SPRITE_TUMBA){
+           this.play("zombieBye");
+           this.p.vx=0;
+        }else if(collision.tile === 91)
             this.destroy();
     },
     hit: function(damage){
@@ -696,12 +696,27 @@ Q.Sprite.extend("Zombie",{
         this.destroy();
     },
     step:function(dt){
-        if(this.p.vx<0)this.p.flip=false;
-        else this.p.flip='x';
+        var art = Q("Player").last();
+        if(!this.p.activo && art.p.x+(10*32)>this.p.x){
+            this.p.activo=true;
+            Q.audio.stop();
+            backMusic.playMusic(true);
+            this.add("aiBounce");
+            this.play("zombieBorn");
+            this.p.vx=-80;
+        }
+        else if(this.p.activo){
+            if(art.p.vx!=0 && art.p.x<this.p.x) this.p.vx=-80;
+            else if(art.p.vx!=0) this.p.vx=80;
+            
+            if(this.p.vx <0)  this.p.flip=false;
+            else this.p.flip='x';
+        }      
+        
+        
     },
     camina:function(){
         Q.audio.play("zombieBorn.ogg");
-        this.p. vx=80;
     },
     bye:function(){
         this.destroy();
@@ -711,22 +726,22 @@ Q.Sprite.extend("Zombie",{
 Q.Sprite.extend("Crow",{ 
     init: function(p) { 
         this._super(p, { 
-            vx:50,
-            vy:15,
+            vx:0,
+            vy:0,
             gravity: 0,
             reload:0,
             timeReload:5,
             sheet: "crow",
             sprite: "Crow",
+            activo: false,
             frame: 0,
             flip: "x",
             life:60,
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
-        this.add("2d,aiBounce,aiBounce2,animation");  
+        this.add("2d,animation");  
         this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
-        this.play("crow");
     },
     matar:function(collision){
         if(collision.obj.p.type===Q.SPRITE_PLAYER) 
@@ -741,20 +756,38 @@ Q.Sprite.extend("Crow",{
         this.destroy();
     },
     step:function(dt){
-        this.p.reload+=dt;
-
-        if(this.p.reload>this.p.timeReload){
-            this.p.reload=0;
-            Q.audio.play("crow.ogg");
-            if(this.p.flip==='x'){
-                this.p.flip=false;
-                this.p.vx=-50;
-            }
-            else{
-                this.p.flip='x';
-                this.p.vx=50;
-            } 
+        var art = Q("Player").last();
+        if(!this.p.activo && art.p.x+(12*32)>this.p.x){
+            this.p.activo=true;
+            Q.audio.stop();
+            backMusic.playMusic(true);
+            this.add("aiBounce, aiBounce2");
+            this.play("crow");
+            this.p.vx=50;
+            this.p.vy=15;
         }
+        else if(this.p.activo){
+            this.p.reload+=dt;
+
+            if(this.p.reload>this.p.timeReload){
+                this.p.reload=0;
+                Q.audio.play("crow.ogg");
+                if(this.p.flip==='x'){
+                    this.p.flip=false;
+                    this.p.vx=-50;
+                }
+                else{
+                    this.p.flip='x';
+                    this.p.vx=50;
+                } 
+            }else{
+                if(art.p.vx!=0 && art.p.x<this.p.x)this.p.vx=-60;
+                else if(art.p.vx!=0)this.p.vx=60;
+                     
+                if(this.p.vx <0)  this.p.flip=false;
+                else this.p.flip='x';
+            }
+        }   
     }
 }); 
 //Planta
@@ -765,6 +798,7 @@ Q.Sprite.extend("Plant",{
             sheet: "plant",
             sprite: "Plant",
             lengua: false,
+            activo:false,
             frame: 0,
             reload:0,
             timeReload:3,
@@ -792,9 +826,13 @@ Q.Sprite.extend("Plant",{
     },
     step:function(dt){
         this.p.reload+=dt;
-
-        if(this.p.reload>this.p.timeReload){
-            var art = Q("Player").last();
+        var art = Q("Player").last();
+        if(!this.p.activo && art.p.x+(12*32)>this.p.x){
+            this.p.activo=true;
+            Q.audio.stop();
+            backMusic.playMusic(true);
+        }
+        else if(this.p.activo && this.p.reload>this.p.timeReload){
                 Q.stage().insert(new Q.Bullet({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y}));
             this.p.reload=0;
             if(this.p.lengua){
@@ -809,6 +847,9 @@ Q.Sprite.extend("Plant",{
                 this.play("plantL");
                 this.p.lengua=true;
             } 
+                  
+            if(this.p.vx <0)  this.p.flip=false;
+            else this.p.flip='x';
         }
     }
 }); 
@@ -856,7 +897,7 @@ Q.Sprite.extend("Devil",{
             this.p.activo=true;
             Q.audio.stop();
             backMusic.playMusic(true);
-            this.add("aiBounce,aiBounce2,");
+            this.add("aiBounce,aiBounce2");
             this.play("devil");
         }
         if(this.p.activo){
@@ -1508,10 +1549,30 @@ Q.scene("L1",function(stage) {
   Q.state.set("enJuego",true);
   var levelAssets = [
       ["Zombie",{x:(25*32)+16,y:(21*32)+16}],
-      //["Zombie",{x:(27*32)+16,y:(21*32)+16}],
-      //["Zombie",{x:(29*32)+16,y:(21*32)+16}],
-      //["Zombie",{x:(31*32)+16,y:(21*32)+16}],
-      //["Zombie",{x:(33*32)+16,y:(21*32)+16}],
+      ["Zombie",{x:(30*32)+16,y:(21*32)+16}],
+      ["Zombie",{x:(35*32)+16,y:(21*32)+16}],
+      ["Zombie",{x:(38*32)+16,y:(21*32)+16}],
+      ["Crow",{x:(39*32)+16,y:(16*32)+16}],
+      ["Zombie",{x:(40*32)+16,y:(21*32)+16}],
+      ["Zombie",{x:(54*32)+16,y:(11*32)+16}],
+      ["Zombie",{x:(60*32)+16,y:(11*32)+16}],
+      ["Zombie",{x:(64*32)+16,y:(11*32)+16}],
+      ["Crow",{x:(61*32)+16,y:(11*32)+16}],
+      ["Crow",{x:(62*32)+16,y:(16*32)+16}],
+      ["Zombie",{x:(66*32)+16,y:(11*32)+16}],
+      ["Crow",{x:(69*32)+16,y:(16*32)+16}],
+      ["Zombie",{x:(70*32)+16,y:(11*32)+16}],
+      ["Crow",{x:(72*32)+16,y:(16*32)+16}],
+      ["Zombie",{x:(100*32)+16,y:(21*32)+16}],
+      ["Crow",{x:(123*32)+16,y:(11*32)+16}],
+      ["Crow",{x:(123*32)+16,y:(16*32)+16}],
+
+      ["Plant",{x:(131*32)+16,y:(21*32)+16}],
+      ["Crow",{x:(133*32)+16,y:(16*32)+16}],
+      ["Zombie",{x:(136*32)+16,y:(21*32)+16}],
+      ["Zombie",{x:(139*32)+16,y:(21*32)+16}],
+      ["Zombie",{x:(142*32)+16,y:(21*32)+16}],
+      ["Plant",{x:(145*32)+16,y:(21*32)+16}],
       ["Devil",{x:(268*32)+16,y:(16*32)+16}]
     ];
   Q.stageTMX("level2.tmx",stage);
