@@ -5,5 +5,6 @@
     "arthurNudeDuck":{"sx":0,"sy":400,"tileW":64,"tileH":48,"frames":6},
     "arthurDie":{"sx":0,"sy":128,"tileW":64,"tileH":64,"frames":13},
     "arthurFrog":{"sx":0,"sy":192,"tileW":32,"tileH":32,"frames":8},
-    "armoDest":{"sx":0,"sy":224,"tileW":128,"tileH":128,"frames":8}
+    "armoDest":{"sx":0,"sy":224,"tileW":128,"tileH":128,"frames":8},
+    "arthurAux":{"sx":0,"sy":448,"tileW":64,"tileH":64,"frames":2}
 }
