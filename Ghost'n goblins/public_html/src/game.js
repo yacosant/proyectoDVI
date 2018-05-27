@@ -23,7 +23,7 @@ Q.SPRITE_CRUZ=1024;
 Q.SPRITE_PUERTA=2048;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png"]);
+Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png"]);
 //JSON'S 
 Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json","cross.json","door.json"]);
 //Musica
@@ -1438,6 +1438,33 @@ Q.UI.Text.extend("Score",{
         this.p.label = "Puntos\n " + score;
     }
 });
+//cuadro
+Q.UI.Button.extend("Cuadro",{
+    init:function(p) {
+        this._super({
+            asset: "cuadro.png",    
+            x: 400,
+            y: 40,
+            });
+        
+    }
+});
+//arma que Arthur tiene equipada
+Q.UI.Text.extend("Arma",{
+    init:function(p) {
+        this._super({
+            asset: "lanceHUD.png",     
+            x: 400,
+            y: 40
+            });
+        Q.state.on("change.armaArthur",this,"arma");
+    },
+    arma:function(lives) {
+        var armaEquipada = Q.state.get("armaArthur");
+        armaEquipada = armaEquipada + ".png";
+        this.p.asset = armaEquipada;
+    }
+});
 //vidas
 Q.UI.Text.extend("Lives",{
     init:function(p) {
@@ -1473,6 +1500,8 @@ Q.scene('HUD',function(stage) {
   var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
   container.insert(new Q.Score());
   container.insert(new Q.Lives());
+  container.insert(new Q.Cuadro());
+  container.insert(new Q.Arma());
   container.insert(new Q.Timer());
   container.fit(5,200);
   stage.show= function(state){
