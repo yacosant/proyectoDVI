@@ -1444,7 +1444,7 @@ Q.UI.Button.extend("Cuadro",{
         this._super({
             asset: "cuadro.png",    
             x: 400,
-            y: 40,
+            y: 150
             });
         
     }
@@ -1455,7 +1455,7 @@ Q.UI.Button.extend("Arma",{
         this._super({
             asset: "lanceHUD.png",     
             x: 400,
-            y: 40
+            y: 150
             });
         Q.state.on("change.armaArthur",this,"arma");
     },
@@ -1507,6 +1507,7 @@ Q.scene('HUD',function(stage) {
   container.insert(new Q.Score());
   container.insert(new Q.Lives());
   container.insert(new Q.Cuadro());
+  container.insert(new Q.Arma());
   /*container.insert(new Q.Cuadro());
   container.insert(new Q.Arma());*/
   container.insert(new Q.Timer());
