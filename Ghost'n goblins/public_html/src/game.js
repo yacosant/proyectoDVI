@@ -1438,7 +1438,39 @@ Q.UI.Text.extend("Score",{
         this.p.label = "Puntos\n " + score;
     }
 });
-
+//cuadro
+Q.UI.Button.extend("Cuadro",{
+    init:function(p) {
+        this._super({
+            asset: "cuadro.png",    
+            x: 400,
+            y: 40,
+            });
+        
+    }
+});
+//arma que Arthur tiene equipada
+Q.UI.Button.extend("Arma",{
+    init:function(p) {
+        this._super({
+            asset: "lanceHUD.png",     
+            x: 400,
+            y: 40
+            });
+        Q.state.on("change.armaArthur",this,"arma");
+    },
+    arma:function(lives) {
+        var armaEquipada = Q.state.get("armaArthur");
+        if(armaEquipada === "lanza"){
+            this.p.asset = "lanceHUD.png";
+        }else if(armaEquipada === "daga"){
+            this.p.asset = "cuchilloHUD.png";
+        }else if(armaEquipada === "antorcha"){
+            this.p.asset = "antorchaHUD.png";
+        }
+        
+    }
+});
 //vidas
 Q.UI.Text.extend("Lives",{
     init:function(p) {
