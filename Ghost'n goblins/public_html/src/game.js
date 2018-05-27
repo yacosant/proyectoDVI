@@ -1474,8 +1474,8 @@ Q.scene('HUD',function(stage) {
   var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
   container.insert(new Q.Score());
   container.insert(new Q.Lives());
-  container.insert(new Q.Cuadro());
-  container.insert(new Q.Arma());
+  /*container.insert(new Q.Cuadro());
+  container.insert(new Q.Arma());*/
   container.insert(new Q.Timer());
   container.fit(5,200);
   stage.show= function(state){
