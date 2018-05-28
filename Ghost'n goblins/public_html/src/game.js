@@ -799,7 +799,7 @@ Q.Sprite.extend("Crow",{
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
-        this.add("2d,animation");  
+        this.add("2d,animation,GeneradorPremios");  
         this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
     },
     matar:function(collision){
@@ -864,7 +864,7 @@ Q.Sprite.extend("Plant",{
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
-        this.add("2d,animation");  
+        this.add("2d,animation,GeneradorPremios");  
         this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
         this.play("plant");
     },
@@ -1567,6 +1567,24 @@ Q.UI.Text.extend("Timer",{
         this.p.label = "Tiempo\n " + time;
     }
 });
+
+/*
+Q.UI.Text.extend("Timer",{
+    init:function(p) {
+        this._super({
+            label: "Tiempo\n",    
+            x: 600,
+            y: 0,                               ---------------- DESCOMENTAR ------------------
+            color:"#ffffff"
+            });
+        Q.state.on("change.timer",this,"timer");
+    },
+    timer:function(time) {
+        var minutes = Q.state.get("timerM");
+        this.p.label = "Tiempo\n "+ minutes + ":" + time;
+    }
+});
+*/
 //Escena del HUD
 Q.scene('HUD',function(stage) {
   var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
