@@ -230,7 +230,7 @@ Q.component("Timer",{
       var props = this.entity.p; 
       Q._defaults(props,{
         cont:0,
-        maxMin: 3,
+        maxMin: 1,
         maxTime:55,
         segDesc:1,
         descuento:1,
@@ -260,7 +260,7 @@ Q.component("Timer",{
     tiempoRest:function (){
             var mint = Q.state.get("timerM");
             var segd = Q.state.get("timer");
-            tiempoTotal = (mint * 60) + segd;
+            var tiempoTotal = (mint * 60) + segd;
             return tiempoTotal;
     }
 });
@@ -1568,7 +1568,7 @@ Q.UI.Text.extend("Lives",{
 Q.UI.Text.extend("Timer",{
     init:function(p) {
         this._super({
-            label: "Tiempo\n",    
+            label: "Tiempo\n 1:55",    
             x: 600,
             y: 0,                              // ---------------- DESCOMENTAR ------------------
             color:"#ffffff"
@@ -1577,7 +1577,12 @@ Q.UI.Text.extend("Timer",{
     },
     timer:function(time) {
         var minutes = Q.state.get("timerM");
-        this.p.label = "Tiempo\n "+ minutes + ":" + time;
+        if(time < 10){
+            segd = "0" + time;
+        }else{
+            segd = time;
+        }
+        this.p.label = "Tiempo\n "+ minutes + ":" + segd;
     }
 });
 
