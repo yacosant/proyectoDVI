@@ -238,7 +238,7 @@ Q.component("Timer",{
         stopTimer:false
       });
 
-      /*Q.state.set("timerM",props.maxMin);       --------------- DESCOMENTAR ---------------- */
+      Q.state.set("timerM",props.maxMin);     /*  --------------- DESCOMENTAR ---------------- */
       Q.state.set("timer",props.maxTime);
 
     },
@@ -250,22 +250,18 @@ Q.component("Timer",{
             if(prop.cont>prop.segDesc){
                 prop.cont=0;
                 Q.state.dec("timer",prop.descuento);
-                /*if(Q.state.get("timer") === 0){
-                    Q.state.dec("timerM",prop.descuento);   --------------- DESCOMENTAR ----------------
+                if(Q.state.get("timer") === 0){
+                    Q.state.dec("timerM",prop.descuento);  /* --------------- DESCOMENTAR ----------------  */
                     Q.state.set("timer",59);
-                }*/
+                }
             }
         }
     },
     tiempoRest:function (){
-            return Q.state.get("timer");
-
-            /*var acabado = false;
-        if(Q.state.get("timerM") === 0 && Q.state.get("timer") === 0){   --------------- DESCOMENTAR ----------------
-            acabado = true;
-        }
-
-        return acabado;*/
+            var mint = Q.state.get("timerM");
+            var segd = Q.state.get("timer");
+            tiempoTotal = (mint * 60) + segd;
+            return tiempoTotal;
     }
 });
 //Generador de recompensas
@@ -467,7 +463,7 @@ Q.Sprite.extend("Player",{
         //Comprobamos el tiempo
         if(this.Timer.tiempoRest()<60 && !this.p.prisa)
             this.prisas();
-        else if(this.Timer.tiempoRest()===0)                    /*    --------------- CAMBIAR ----------------   */
+        else if(this.Timer.tiempoRest()===0)                    
             this.muerto();
         //Controlamos el paso por el punto de respawn
         var level=Q.state.get("level");
@@ -1553,7 +1549,7 @@ Q.UI.Text.extend("Lives",{
     }
 });
 //Temporizador
-Q.UI.Text.extend("Timer",{
+/*Q.UI.Text.extend("Timer",{
     init:function(p) {
         this._super({
             label: "Tiempo\n 150",    
@@ -1566,15 +1562,15 @@ Q.UI.Text.extend("Timer",{
     timer:function(time) {
         this.p.label = "Tiempo\n " + time;
     }
-});
+}); */
 
-/*
+
 Q.UI.Text.extend("Timer",{
     init:function(p) {
         this._super({
             label: "Tiempo\n",    
             x: 600,
-            y: 0,                               ---------------- DESCOMENTAR ------------------
+            y: 0,                              // ---------------- DESCOMENTAR ------------------
             color:"#ffffff"
             });
         Q.state.on("change.timer",this,"timer");
@@ -1584,7 +1580,7 @@ Q.UI.Text.extend("Timer",{
         this.p.label = "Tiempo\n "+ minutes + ":" + time;
     }
 });
-*/
+
 //Escena del HUD
 Q.scene('HUD',function(stage) {
   var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
