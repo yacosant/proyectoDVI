@@ -649,6 +649,7 @@ Q.Sprite.extend("Player",{
     },
     muerto:function(){
         this.p.muerto=true;
+        Q.state.set("armaArthur","lanza");
         this.p.stopTimer=true;
         this.p.vx=0;
         this.p.type= Q.SPRITE_NONE;
@@ -810,6 +811,7 @@ Q.Sprite.extend("Crow",{
         if(this.p.life<=0) this.muerte();
     },
     muerte:function() {
+        this.generar(this.p.x,this.p.y); 
         Q.audio.play("crowDie.ogg");
         this.destroy();
     },
@@ -878,6 +880,7 @@ Q.Sprite.extend("Plant",{
         if(this.p.life<=0) this.muerte();
     },
     muerte:function() {
+        this.generar(this.p.x,this.p.y); 
         this.destroy();
     },
     step:function(dt){
