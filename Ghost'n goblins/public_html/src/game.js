@@ -230,13 +230,17 @@ Q.component("Timer",{
       var props = this.entity.p; 
       Q._defaults(props,{
         cont:0,
-        maxTime:180,
+        maxMin: 3,
+        maxTime:55,
         segDesc:1,
         descuento:1,
         prisa:false,
         stopTimer:false
       });
+
+      /*Q.state.set("timerM",props.maxMin);       --------------- DESCOMENTAR ---------------- */
       Q.state.set("timer",props.maxTime);
+
     },
     step:function(dt){
         var prop = this.entity.p;
@@ -246,11 +250,22 @@ Q.component("Timer",{
             if(prop.cont>prop.segDesc){
                 prop.cont=0;
                 Q.state.dec("timer",prop.descuento);
+                /*if(Q.state.get("timer") === 0){
+                    Q.state.dec("timerM",prop.descuento);   --------------- DESCOMENTAR ----------------
+                    Q.state.set("timer",59);
+                }*/
             }
         }
     },
     tiempoRest:function (){
             return Q.state.get("timer");
+
+            /*var acabado = false;
+        if(Q.state.get("timerM") === 0 && Q.state.get("timer") === 0){   --------------- DESCOMENTAR ----------------
+            acabado = true;
+        }
+
+        return acabado;*/
     }
 });
 //Generador de recompensas
@@ -452,7 +467,7 @@ Q.Sprite.extend("Player",{
         //Comprobamos el tiempo
         if(this.Timer.tiempoRest()<60 && !this.p.prisa)
             this.prisas();
-        else if(this.Timer.tiempoRest()===0)
+        else if(this.Timer.tiempoRest()===0)                    /*    --------------- CAMBIAR ----------------   */
             this.muerto();
         //Controlamos el paso por el punto de respawn
         var level=Q.state.get("level");
@@ -1400,7 +1415,7 @@ Q.Sprite.extend("Vida",{
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
             Q.state.inc("lives",1);
             Q.audio.play("extraLife.ogg");
-            Q.state.inc("score",this.p.puntos);
+           // Q.state.inc("score",this.p.puntos);
             this.destroy();
         }
     }
