@@ -63,9 +63,9 @@ Q.preload(function(){
     Q.compileSheets("cross.png","cross.json");
     Q.compileSheets("door.png","door.json");
     //Estado global de juego
-    Q.state.set({ score: 0, lives: 3, //Puntuaciones
+    Q.state.set({ score: 0, lives: 3,maxLives:5, //Puntuaciones
                   armaArthur: "lanza",
-                  level:1,maxLevel:2,respX:0,respY:0, //Nivel y punto del respawn
+                  level:1,maxLevel:2, //Nivel
                   pause:false,enJuego:false
                 });
     //Controlador de la musica de fondo
@@ -90,14 +90,16 @@ Q.input.on("pausa",function() {
             Q.state.set("pause",false);
             Q.stage().unpause();
             Q.stage(2).show(false);
-            Q.clearStage(3);
+            Q.stage(3).show(false);
+            Q.clearStage(4);
         }else{
             Q.audio.stop();
             Q.stage(2).show(true);
+            Q.stage(3).show(true);
             Q.state.set("pause",true);
             Q.audio.stop();
             Q.stage().pause();
-            Q.stageScene("pauseMessage",3);
+            Q.stageScene("pauseMessage",4);
         }
     }
   });
@@ -193,18 +195,21 @@ Q.component("levelManager",{
         },
         winScreen:function(){
             Q.stage(2).show(true);
+            Q.stage(3).show(true);
             Q.loadTMX("finalScreen.tmx", function() {
                 Q.stageScene("winScreen",{label:"Has ganado!"});
             });
         },
         loseScreen:function(){
             Q.stage(2).show(true);
+            Q.stage(3).show(true);
             Q.loadTMX("loseScreen.tmx", function() {
                 Q.stageScene("loseScreen",{label:"Game Over! \n Pulsa enter para volver al menu principal"});
             });
         },
         mapScreen:function(){
             Q.stage(2).show(true);
+            Q.stage(3).show(true);
             if(Q.state.get("level")>Q.state.get("maxLevel")){
                 this.winScreen();
             }else{
@@ -219,6 +224,7 @@ Q.component("levelManager",{
                 lvl-=1;
             Q.loadTMX("level"+lvl+".tmx", function() {
                Q.stage(2).show();
+               Q.stage(3).show();
                Q.stageScene("L"+lvl,Q("Player").first());
             });
         }
@@ -230,15 +236,15 @@ Q.component("Timer",{
       var props = this.entity.p; 
       Q._defaults(props,{
         cont:0,
-        maxMin: 1,
-        maxTime:55,
+        maxMin: 2,
+        maxTime:30,
         segDesc:1,
         descuento:1,
         prisa:false,
         stopTimer:false
       });
 
-      Q.state.set("timerM",props.maxMin);     /*  --------------- DESCOMENTAR ---------------- */
+      Q.state.set("timerM",props.maxMin);     
       Q.state.set("timer",props.maxTime);
 
     },
@@ -251,7 +257,7 @@ Q.component("Timer",{
                 prop.cont=0;
                 Q.state.dec("timer",prop.descuento);
                 if(Q.state.get("timer") === 0){
-                    Q.state.dec("timerM",prop.descuento);  /* --------------- DESCOMENTAR ----------------  */
+                    Q.state.dec("timerM",prop.descuento);  
                     Q.state.set("timer",59);
                 }
             }
@@ -372,7 +378,7 @@ Q.animations('Burst', {
 });
 //Animacion del fuego
 Q.animations('Fire', {
-  burning: { frames: [0,1,2,3], next: 'burning', trigger:"muerte", rate: 1/5} 
+  burning: { frames: [0,1,2,3], rate: 1/5,loop:true} 
 });
 //Animacion de las chispas
 Q.animations('Spark', {
@@ -415,8 +421,7 @@ Q.Sprite.extend("Player",{
             frame:0,
             type:Q.SPRITE_PLAYER,//Colisiones
             collisionMask: Q.SPRITE_DEFAULT,
-            auto:false,//Estados
-            muerto:false,
+            muerto:false,//Estados
             frog:false,
             hit:false,
             jump:false,
@@ -463,7 +468,7 @@ Q.Sprite.extend("Player",{
         //Comprobamos el tiempo
         if(this.Timer.tiempoRest()<60 && !this.p.prisa)
             this.prisas();
-        else if(this.Timer.tiempoRest()===0)                    
+        else if(this.Timer.tiempoRest()<=0)                    
             this.muerto();
         //Controlamos el paso por el punto de respawn
         var level=Q.state.get("level");
@@ -489,7 +494,7 @@ Q.Sprite.extend("Player",{
                 this.animBase();//Animacion
             }
         }
-        if(Q.inputs["fire"] && this.p.shoot>this.p.shootDelay && !this.p.frog){
+        if(Q.inputs["fire"] && this.p.shoot>this.p.shootDelay && !this.p.frog && !this.p.muerto){
             this.fire();
         } 
     },
@@ -1002,16 +1007,22 @@ Q.Sprite.extend("Lanza",{
             frame: 0, 
             gravity:0, 
             damage: 30,
-            vx:201,         
+            vx:300,
+            distance:1500,
             type: Q.SPRITE_LANZA,
             collisionMask: Q.SPRITE_TUMBA | Q.SPRITE_ENEMY 
         }); 
         this.add('2d');
         this.on("bump.top,bump.bottom,bump.left,bump.right","kill");
+        this.p.distace+=this.p.x;
         Q.audio.play("lance.ogg");
         if(this.p.vx < 0){
             this.p.flip = "x";
         }                    
+    },
+    step:function(){
+        if(this.p.x>this.p.distance)
+            this.destroy();
     },
     kill: function(collision){
         if(collision.obj.p.type===Q.SPRITE_ENEMY){
@@ -1033,18 +1044,23 @@ Q.Sprite.extend("Daga",{
             frame: 0, 
             gravity:0, 
             damage: 70,
-            vx:201,         
+            vx:201,
+            distance:1500,
             type: Q.SPRITE_DAGA,
             collisionMask: Q.SPRITE_TUMBA | Q.SPRITE_ENEMY 
         }); 
         this.add('2d');
         this.on("bump.top,bump.bottom,bump.left,bump.right","kill");
+        this.p.distace+=this.p.x;
         Q.audio.play("lance.ogg");
         if(this.p.vx < 0){
             this.p.flip = "x";
         }                    
     },
-
+    step:function(){
+        if(this.p.x>this.p.distance)
+            this.destroy();
+    },
     kill: function(collision){
         if(collision.obj.p.type===Q.SPRITE_ENEMY){
             Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
@@ -1249,17 +1265,29 @@ Q.Sprite.extend("Fire",{
             vy:0,
             sheet: "fire",
             sprite: "Fire",
-            gravity: 0,
             frame: 0,
-            type: Q.SPRITE_EXPLOSION
+            time:0,
+            maxTime:2,
+            damage:100,
+            type: Q.SPRITE_EXPLOSION,
+            collisionMask: Q.SPRITE_DEFAULT | Q.SPRITE_ENEMY | Q.SPRITE_PLAYER
         }); 
         this.add("2d,animation");  
         this.play("burning");
+        this.on("bump.top,bump.left,bump.right",this, "burn");
         this.on("muerte", "muerte");
     },
-
-    muerte:function() {
-        this.destroy();
+    step:function(dt){
+        if(this.p.time<this.p.maxTime)
+            this.p.time+=dt;
+        else
+            this.destroy();
+    },
+    burn:function(collision){
+        if(collision.obj.p.type === Q.SPRITE_PLAYER)
+            collision.obj.hit(collision);
+        else if(collision.obj.p.type === Q.SPRITE_ENEMY)
+            collision.obj.hit(this.p.damage);
     }
 }); 
 //Spark
@@ -1412,9 +1440,13 @@ Q.Sprite.extend("Vida",{
     },
     take: function(collision){
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
-            Q.state.inc("lives",1);
-            Q.audio.play("extraLife.ogg");
-           // Q.state.inc("score",this.p.puntos);
+            if(Q.state.get("lives")<Q.state.get("maxLives")){
+                Q.state.inc("lives",1);
+                Q.audio.play("extraLife.ogg");
+            }else{
+                Q.audio.play("treasurePickUp.ogg");
+                Q.state.inc("score",this.p.puntos);
+            }
             this.destroy();
         }
     }
@@ -1529,8 +1561,7 @@ Q.UI.Button.extend("Arma",{
             this.p.asset = "cuchilloHUD.png";
         }else if(armaEquipada === "antorcha"){
             this.p.asset = "antorchaHUD.png";
-        }
-        
+        }     
     }
 });
 //vidas
@@ -1549,28 +1580,12 @@ Q.UI.Text.extend("Lives",{
     }
 });
 //Temporizador
-/*Q.UI.Text.extend("Timer",{
-    init:function(p) {
-        this._super({
-            label: "Tiempo\n 150",    
-            x: 600,
-            y: 0,
-            color:"#ffffff"
-            });
-        Q.state.on("change.timer",this,"timer");
-    },
-    timer:function(time) {
-        this.p.label = "Tiempo\n " + time;
-    }
-}); */
-
-
 Q.UI.Text.extend("Timer",{
     init:function(p) {
         this._super({
-            label: "Tiempo\n 1:55",    
+            label: "Tiempo\n 2:30",    
             x: 600,
-            y: 0,                              // ---------------- DESCOMENTAR ------------------
+            y: 0,                              
             color:"#ffffff"
             });
         Q.state.on("change.timer",this,"timer");
@@ -1586,16 +1601,22 @@ Q.UI.Text.extend("Timer",{
     }
 });
 
-//Escena del HUD
+//HUD superior
 Q.scene('HUD',function(stage) {
   var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
   container.insert(new Q.Score());
   container.insert(new Q.Lives());
+  container.insert(new Q.Timer());
+  container.fit(5,200);
+  stage.show= function(state){
+          this.hidden=state;
+  };
+});
+//HUD inferior
+Q.scene('HUD2',function(stage) {
+  var container = stage.insert(new Q.UI.Container({x:0, y: Q.height-180}));
   container.insert(new Q.Cuadro());
   container.insert(new Q.Arma());
-  /*container.insert(new Q.Cuadro());
-  container.insert(new Q.Arma());*/
-  container.insert(new Q.Timer());
   container.fit(5,200);
   stage.show= function(state){
           this.hidden=state;
@@ -1614,6 +1635,7 @@ Q.scene("initScreen",function(stage){
         Q.loadTMX("level2.tmx", function() {
             Q.stageScene("L1",Q("Player").first());
             Q.stageScene("HUD",2);
+            Q.stageScene("HUD2",3);
             Q.input.off("confirm");
         });
     });
@@ -1621,6 +1643,7 @@ Q.scene("initScreen",function(stage){
 //Pantalla de perdido
 Q.scene("loseScreen",function(stage){
     Q.stage(2).show(true);
+    Q.stage(3).show(true);
     Q.state.set("enJuego",false);
     Q.audio.stop();
     Q.audio.play("gameover.ogg");
@@ -1650,6 +1673,7 @@ Q.scene("winScreen",function(stage){
 Q.scene("mapScreen",function(stage){
     var markerPos=[{},{x:(1*32)+16,y:15*32},{x:(3*32)+16,y:(14*32)+13},{x:(5*32)+14,y:(14*32)+11},{x:(6*32)+12,y:(14*32)+10},{x:(9*32)+6,y:(14*32)+10},{x:(10*32)+20,y:(14*32)+5},{x:(10*32)+20,y:(14*32)+5}];
     Q.stage(2).show(false);
+    Q.stage(3).show(false);
     Q.state.set("enJuego",false);
     Q.stageTMX("mapScreen.tmx",stage);
     stage.insert(new Q.Marker(markerPos[Q.state.get("level")]));
