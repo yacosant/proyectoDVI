@@ -1,3 +1,4 @@
+/* global Quintus */
 window.addEventListener("load",function() {
 /*---------------------------CARGA DE QUINTUS---------------------------------*/
 var backMusic;
@@ -430,6 +431,7 @@ Q.Sprite.extend("Player",{
             armaEquipada: "lanza", //Armamento
             shootDelay:0.3,//Disparo
             shoot:0,
+            shootRange:1500,
             frogTime:0,//Echizado
             frogMaxTime:5,
             onLadder: false,//Escaleras
@@ -620,19 +622,19 @@ Q.Sprite.extend("Player",{
             this.p.shoot=0;
             var vel=400;
             var mano=this.p.h/2;
-            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel}:{x:this.p.x+mano,y:this.p.y,vx:-vel};
+            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,distance:this.p.shootRange+this.p.x}:{x:this.p.x+mano,y:this.p.y,vx:-vel,distance:this.p.shootRange+this.p.x};
             Q.stage().insert(new Q.Lanza(conf));
         }else if(Q.state.get("armaArthur") === "antorcha"){    
             this.p.shoot=0;
             var vel=200;
             var mano=this.p.h/2;
-            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,vy:-50,ax:0,ay:70 }:{x:this.p.x+mano,y:this.p.y,vy:-50,vx:-vel,ax:0,ay:70};
+            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,vy:-50,ax:0,ay:70}:{x:this.p.x+mano,y:this.p.y,vy:-50,vx:-vel,ax:0,ay:70};
             Q.stage().insert(new Q.Antorcha(conf));
         }else if(Q.state.get("armaArthur") === "daga"){    
             this.p.shoot=0;
             var vel=800;
             var mano=this.p.h/2;
-            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel}:{x:this.p.x+mano,y:this.p.y,vx:-vel};
+            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,distance:this.p.shootRange+this.p.x}:{x:this.p.x+mano,y:this.p.y,vx:-vel,distance:this.p.shootRange+this.p.x};
             Q.stage().insert(new Q.Daga(conf));
         }
     },
@@ -758,14 +760,14 @@ Q.Sprite.extend("Zombie",{
         this.destroy();
     },
     step:function(dt){
-        var art = Q("Player").last();
-        if(!this.p.activo && art.p.x+(10*32)>this.p.x){
+        var art = Q("Player").first();
+        if(!this.p.activo && art!==undefined && art.p.x+(10*32)>this.p.x){
             this.p.activo=true;
             this.add("aiBounce");
             this.play("zombieBorn");
             this.p.vx=-80;
         }
-        else if(this.p.activo){
+        if(this.p.activo && art!==undefined){
             if(art.p.vx!==0 && art.p.x<this.p.x) this.p.vx=-80;
             else if(art.p.vx!==0) this.p.vx=80;
             
@@ -817,15 +819,15 @@ Q.Sprite.extend("Crow",{
         this.destroy();
     },
     step:function(dt){
-        var art = Q("Player").last();
-        if(!this.p.activo && art.p.x+(12*32)>this.p.x){
+        var art = Q("Player").first();
+        if(!this.p.activo && art!==undefined && art.p.x+(12*32)>this.p.x){
             this.p.activo=true;
             this.add("aiBounce, aiBounce2");
             this.play("crow");
             this.p.vx=50;
             this.p.vy=15;
         }
-        else if(this.p.activo){
+        if(this.p.activo && art!==undefined){
             this.p.reload+=dt;
 
             if(this.p.reload>this.p.timeReload){
@@ -840,8 +842,8 @@ Q.Sprite.extend("Crow",{
                     this.p.vx=50;
                 } 
             }else{
-                if(art.p.vx!=0 && art.p.x<this.p.x)this.p.vx=-60;
-                else if(art.p.vx!=0)this.p.vx=60;
+                if(art.p.vx!==0 && art.p.x<this.p.x)this.p.vx=-60;
+                else if(art.p.vx!==0)this.p.vx=60;
                      
                 if(this.p.vx <0)  this.p.flip=false;
                 else this.p.flip='x';
@@ -861,6 +863,7 @@ Q.Sprite.extend("Plant",{
             frame: 0,
             reload:0,
             timeReload:3,
+            shootRange:1500,
             life:30,
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
@@ -886,19 +889,19 @@ Q.Sprite.extend("Plant",{
     },
     step:function(dt){
         this.p.reload+=dt;
-        var art = Q("Player").last();
-        if(!this.p.activo && art.p.x+(12*32)>this.p.x){
+        var art = Q("Player").first();
+        if(!this.p.activo && art!==undefined && art.p.x+(12*32)>this.p.x){
             this.p.activo=true;     
         }
-        else if(this.p.activo && this.p.reload>this.p.timeReload){
-                Q.stage().insert(new Q.Bullet({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y}));
+        if(this.p.activo && this.p.reload>this.p.timeReload  && art!==undefined){
+                Q.stage().insert(new Q.Bullet({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y,distance:this.p.shootRange+this.p.x}));
             this.p.reload=0;
             if(this.p.lengua){
                 this.p.timeReload+=2,75;
                 this.play("plant");
                 this.p.lengua=false;
-                var art = Q("Player").last();
-                Q.stage().insert(new Q.Bullet({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y}));
+                var art = Q("Player").first();
+                Q.stage().insert(new Q.Bullet({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y,distance:this.p.shootRange+this.p.x}));
             }
             else{
                 this.p.timeReload-=2,75;
@@ -920,6 +923,9 @@ Q.Sprite.extend("Devil",{
             gravity: 0,
             reload:0,
             timeReload:0.5,
+            shoot:0,
+            shootReload:1,
+            shootRange:1500,
             oculto:false,
             activo:false,
             sheet: "devil",
@@ -949,19 +955,19 @@ Q.Sprite.extend("Devil",{
     },
     step:function(dt){
         var art = Q("Player").first();
-        if(!this.p.activo && art.p.x+(20*32)>this.p.x){
+        if(!this.p.activo && art!==undefined && art.p.x+(20*32)>this.p.x){
             this.p.activo=true;
             Q.audio.stop();
             backMusic.playMusic(true);
             this.p.vx=200;
             this.p.vy=200;
             this.add("aiBounceDevil");
-            this.aiBounceDevil.setLimits((21*32)+16,(6*32)+16,247*32,284*32);
+            this.aiBounceDevil.setLimits((22*32)+16,(14*32)+16,247*32,284*32);
             this.play("devil");
         }
-        if(this.p.activo){
+        if(this.p.activo  && art!==undefined){
             this.p.reload+=dt;
-            
+            this.p.shoot+=dt;
             this.p.xo=art.p.x-this.p.x;
             this.p.yo=art.p.y-this.p.y;
 
@@ -976,13 +982,16 @@ Q.Sprite.extend("Devil",{
 
             if(0<rnd && rnd<2){ //Ataca
                 this.play("devil");
-                Q.stage().insert(new Q.Shuriken({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y}));
+                if(this.p.shoot>this.p.shootReload){
+                    Q.stage().insert(new Q.Shuriken({xo:art.p.x-this.p.x,yo:art.p.y-this.p.y,x:this.p.x,y:this.p.y,distance:this.p.shootRange+this.p.x}));
+                    this.p.shoot=0;
+                }
             }
-            else if(2<rnd && rnd<5){ //Teletransporta
+            /*else if(2<rnd && rnd<5){ //Teletransporta
                 if(this.p.xo<0) this.p.vx*=-1;  
                 this.p.vy= this.p.vx*(this.p.yo/this.p.xo)+20;  
                 this.play("devilFly");
-            }
+            }*/
             else if(5<rnd && rnd<7){ //Oculta
                 this.play("devilHide");
                 this.p.oculto=true;
@@ -1008,32 +1017,36 @@ Q.Sprite.extend("Lanza",{
             gravity:0, 
             damage: 30,
             vx:300,
-            distance:1500,
+            distance:0,
             type: Q.SPRITE_LANZA,
-            collisionMask: Q.SPRITE_TUMBA | Q.SPRITE_ENEMY 
+            collisionMask: Q.SPRITE_TUMBA | Q.SPRITE_ENEMY
         }); 
         this.add('2d');
-        this.on("bump.top,bump.bottom,bump.left,bump.right","kill");
-        this.p.distace+=this.p.x;
+        this.on("bump.top,bump.bottom,bump.left,bump.right","kill");    
         Q.audio.play("lance.ogg");
         if(this.p.vx < 0){
             this.p.flip = "x";
-        }                    
+        } 
+        this.p.distace+=this.p.x;                   
     },
     step:function(){
         if(this.p.x>this.p.distance)
             this.destroy();
     },
     kill: function(collision){
-        if(collision.obj.p.type===Q.SPRITE_ENEMY){
-            Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
-            collision.obj.hit(this.p.damage);
-            Q.audio.play("enemyHit.ogg");
+        if(collision.obj.p.type===Q.SPRITE_ENEMY){ 
+            if(collision.obj.p.activo){
+                Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+                collision.obj.hit(this.p.damage);
+                Q.audio.play("enemyHit.ogg");
+            }else
+                 Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+            this.destroy();
         } else if(collision.obj.p.type===Q.SPRITE_TUMBA){
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
             Q.audio.play("hitGrave.ogg");
+            this.destroy();
         }
-        this.destroy();
     }
  });
 //Daga
@@ -1045,7 +1058,7 @@ Q.Sprite.extend("Daga",{
             gravity:0, 
             damage: 70,
             vx:201,
-            distance:1500,
+            distance:0,
             type: Q.SPRITE_DAGA,
             collisionMask: Q.SPRITE_TUMBA | Q.SPRITE_ENEMY 
         }); 
@@ -1063,14 +1076,18 @@ Q.Sprite.extend("Daga",{
     },
     kill: function(collision){
         if(collision.obj.p.type===Q.SPRITE_ENEMY){
-            Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
-            Q.audio.play("enemyHit.ogg");
-            collision.obj.hit(this.p.damage);
+            if(collision.obj.p.activo){
+                Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+                collision.obj.hit(this.p.damage);
+                Q.audio.play("enemyHit.ogg");
+            }else
+                 Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+            this.destroy();
         } else if(collision.obj.p.type===Q.SPRITE_TUMBA){ 
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
             Q.audio.play("hitGrave.ogg");
+            this.destroy();
         }
-        this.destroy();
     }
  });
 //Antorchas
@@ -1148,7 +1165,8 @@ Q.Sprite.extend("Bullet",{
             x:0,
             y:0, 
             vx:350,
-            vy:0,        
+            vy:0,
+            distance:1500,
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_DEFAULT | Q.SPRITE_PLAYER
         }); 
@@ -1156,12 +1174,15 @@ Q.Sprite.extend("Bullet",{
         this.on("bump.top,bump.bottom,bump.left,bump.right","kill"); 
         if(this.p.vx < 0){
             this.p.flip = "x";
-        }     
+        }
         this.play("bullet"); 
         if(this.p.xo<0) this.p.vx*=-1;  
         this.p.vy= this.p.vx*(this.p.yo/this.p.xo);    
     },
-
+    step:function(){
+        if(this.p.x>this.p.distance)
+            this.destroy();
+    },
     kill: function(collision){
         this.destroy();
         if(collision.obj.p.type===Q.SPRITE_PLAYER){
@@ -1189,7 +1210,8 @@ Q.Sprite.extend("Shuriken",{
             x:0,
             y:0, 
             vx:350,
-            vy:0,        
+            vy:0,
+            distance:1500,
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_DEFAULT | Q.SPRITE_PLAYER
         }); 
@@ -1197,12 +1219,15 @@ Q.Sprite.extend("Shuriken",{
         this.on("bump.top,bump.bottom,bump.left,bump.right","kill"); 
         if(this.p.vx < 0){
             this.p.flip = "x";
-        }     
+        }
         this.play("shuriken"); 
         if(this.p.xo<0) this.p.vx*=-1;  
         this.p.vy= this.p.vx*(this.p.yo/this.p.xo);    
     },
-
+    step:function(){
+        if(this.p.x>this.p.distance)
+            this.destroy();
+    },
     kill: function(collision){
         this.destroy();
         if(collision.obj.p.type===Q.SPRITE_PLAYER){
@@ -1267,7 +1292,7 @@ Q.Sprite.extend("Fire",{
             sprite: "Fire",
             frame: 0,
             time:0,
-            maxTime:2,
+            maxTime:1,
             damage:100,
             type: Q.SPRITE_EXPLOSION,
             collisionMask: Q.SPRITE_DEFAULT | Q.SPRITE_ENEMY | Q.SPRITE_PLAYER
@@ -1288,6 +1313,8 @@ Q.Sprite.extend("Fire",{
             collision.obj.hit(collision);
         else if(collision.obj.p.type === Q.SPRITE_ENEMY)
             collision.obj.hit(this.p.damage);
+        else if(collision.tile === 91)
+            this.destroy();
     }
 }); 
 //Spark
@@ -1330,7 +1357,8 @@ Q.Sprite.extend("Premio",{
            Q.audio.play("treasurePickUp.ogg");
            Q.state.inc("score",this.p.puntos);
            this.destroy();
-        }
+        }else if(collision.tile === 91)
+            this.destroy();
     }
  });
 //Arma antorcha
@@ -1353,7 +1381,8 @@ Q.Sprite.extend("ObjAntorcha",{
             Q.state.set("armaArthur","antorcha");
             Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }
+        }else if(collision.tile === 91)
+            this.destroy();
     }
  });
 //Arma Daga
@@ -1376,7 +1405,8 @@ Q.Sprite.extend("ObjDaga",{
            Q.state.set("armaArthur","daga");
            Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }
+        }else if(collision.tile === 91)
+            this.destroy();
     }
  });
 //Arma lanza
@@ -1399,7 +1429,8 @@ Q.Sprite.extend("ObjLanza",{
             Q.state.set("armaArthur","lanza");
             Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }
+        }else if(collision.tile === 91)
+            this.destroy();
     }
  });
 //Armadura
@@ -1423,7 +1454,8 @@ Q.Sprite.extend("ObjArmadura",{
                 Q.audio.play("treasurePickUp.ogg");
             Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }
+        }else if(collision.tile === 91)
+            this.destroy();
     }
  });
  //Vida
@@ -1448,7 +1480,8 @@ Q.Sprite.extend("Vida",{
                 Q.state.inc("score",this.p.puntos);
             }
             this.destroy();
-        }
+        }else if(collision.tile === 91)
+            this.destroy();
     }
  });
  //cruz(llave de la puerta)
@@ -1474,7 +1507,8 @@ Q.Sprite.extend("Vida",{
             Q.state.set("armaArthur","cruz");
             Q("Door").first().unlock();
             this.destroy();
-        }
+        }else if(collision.tile === 91)
+            this.destroy();
     },
     show:function(){
         this.p.hidden=false;
@@ -1568,7 +1602,7 @@ Q.UI.Button.extend("Arma",{
 Q.UI.Text.extend("Lives",{
     init:function(p) {
         this._super({
-            label: "vidas\n 4",    
+            label: "vidas\n 3",    
             x: 400,
             y: 0,
             color:"#ffffff"
@@ -1693,7 +1727,6 @@ Q.scene("L1",function(stage) {
   var levelAssets = [
       ["Zombie",{x:(25*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(30*32)+16,y:(21*32)+16}],
-      ["Zombie",{x:(35*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(38*32)+16,y:(21*32)+16}],
       ["Crow",{x:(39*32)+16,y:(16*32)+16}],
       ["Zombie",{x:(40*32)+16,y:(21*32)+16}],
@@ -1711,11 +1744,18 @@ Q.scene("L1",function(stage) {
       ["Crow",{x:(123*32)+16,y:(16*32)+16}],
  
       ["Crow",{x:(133*32)+16,y:(16*32)+16}],
-      ["Zombie",{x:(136*32)+16,y:(21*32)+16}],
-      ["Zombie",{x:(139*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(142*32)+16,y:(21*32)+16}],
       ["Plant",{x:(145*32)+16,y:(21*32)+16}],
-      ["Devil",{x:(268*32)+16,y:(16*32)+16}]
+      ["Zombie",{x:(160*32)+16,y:(21*32)+16}],
+      ["Zombie",{x:(162*32)+16,y:(21*32)+16}],
+      ["Crow",{x:(170*32)+16,y:(15*32)+16}],
+      ["Crow",{x:(172*32)+16,y:(12*32)+16}],
+      ["Zombie",{x:(200*32)+16,y:(21*32)+16}],
+      ["Zombie",{x:(205*32)+16,y:(21*32)+16}],
+      ["Crow",{x:(222*32)+16,y:(11*32)+16}],
+      ["Crow",{x:(227*32)+16,y:(15*32)+16}],
+      ["Crow",{x:(230*32)+16,y:(16*32)+16}],
+      ["Devil",{x:(268*32)+16,y:(15*32)+16}]
     ];
   Q.stageTMX("level2.tmx",stage);
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
