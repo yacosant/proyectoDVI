@@ -39,6 +39,8 @@ Q.preload(["level_1-2_theme.ogg","level_1-2_theme_boss.ogg",//back music
        ]);
 //Funcion de inicio
 Q.preload(function(){
+    //var element = document.getElementById("loading_progress");
+    //element.style.display = "none";
     //Compilacion del las sheets
     Q.compileSheets("ArthurV2.png","ArthurV2.json");
     //Enemigos
@@ -63,6 +65,112 @@ Q.preload(function(){
     Q.compileSheets("items.png","items.json");
     Q.compileSheets("cross.png","cross.json");
     Q.compileSheets("door.png","door.json");
+/*-----------------------------ANIMACIONES------------------------------------*/
+    //Animacion de Arthur
+    Q.animations('Arthur', {
+        //Movimiento basico
+        run_right: { frames: [0,1,2,3], rate: 1/5}, 
+        run_left: { frames: [4,5,6,7], rate:1/5 },
+        stand_right:{ frames: [2], rate:1 },
+        stand_left:{ frames: [6], rate:1 },
+        //Salto
+        jump_right:{ frames: [8,9], rate:1/3,loop:false},
+        jump_left:{ frames: [15,14], rate:1/3,loop:false},
+        jump_site_right:{ frames: [11], rate:1 },
+        jump_site_left:{ frames: [12], rate:1 },
+        //Agachado
+        duck_right:{frames: [0], rate:1},
+        duck_left:{frames: [1], rate:1},
+        //Disparo
+        shoot_right:{frames: [16,17], rate:1/5,loop:false},
+        shoot_left:{frames: [23,22], rate:1/5,loop:false},
+        shoot_duck_right:{frames: [2,3], rate:1/5,loop:false},
+        shoot_duck_left:{frames: [5,4], rate:1/5,loop:false},
+        //Muerte
+        dieArthurRight:{frames:[1,2,3,8,9,10],rate:1/3,next: '',trigger:"dead",loop:false},
+        dieArthurLeft:{frames:[6,5,4,8,9,10],rate:1/3,next: '',trigger:"dead",loop:false},
+        //Trepar
+        arthurClimb:{frames:[24,27],rate:1/3,loop:true},
+        arthurClimbEnd:{frames:[25,26],rate:1/2,next: 'stand_right',loop:false},
+        //Aux
+        arthurVago:{frames:[12],rate:1},
+        arthurWinner:{frames:[11],rate:1},
+        //Rana
+        arthurFrogRight:{frames:[0,1,2,3],rate:1/5},
+        arthurFrogLeft:{frames:[7,6,5,4],rate:1/5},
+        arthurFrogStandRight:{frames:[3],rate:1},
+        arthurFrogStandLeft:{frames:[4],rate:1},
+        //Destruccion de la armadura
+        destroyArmoRight:{frames:[0,1,2,3],rate:1/3,next: '',trigger:"nude",loop:false},
+        destroyArmoLeft:{frames:[7,6,5,4],rate:1/3,next: '',trigger:"nude",loop:false}
+    });
+    //Animacion del Crow
+    Q.animations('Crow', {
+        crow: { frames: [0,1,2,3], next: 'crowFly', rate: 1/8},
+        crowFly: { frames: [4,5,6,7], rate: 1/4}
+    });
+    //Animacion del zombie  
+    Q.animations('Zombie', {
+        zombie: { frames: [7,8,9], rate: 1/3},
+        zombieBorn: { frames: [0,1,2,3,4,5,6,7,8], next: 'zombie', trigger:"camina", rate: 1/5},
+        zombieBye: { frames: [6,5,4,3,2,1,0],   next: 'zombie', trigger:"bye", rate: 1/3}
+    });
+    //Animacion de la bullet
+    Q.animations('Bullet', {
+        bullet: { frames: [0,1,2,3], rate: 1/5}
+    });
+    //Animacion de Devil
+    Q.animations('Devil', {
+      devil: { frames: [0,1,2], rate: 1/8}, 
+      devilHide: { frames: [4], rate:1/4 },
+      devilFly: { frames: [3], rate:1/2 },
+      devilPrincess:{ frames: [6], rate:1/2 }
+    });
+    //Animacion de la planta
+    Q.animations('Plant', {
+        plant: { frames: [0,1,2], rate: 1/5},
+        plantL: { frames: [3,4], rate: 1/5}
+    });
+    //Animacion de la sangre
+    Q.animations('Burst', {
+      burst: { frames: [0,1,2,3], next: 'burst', trigger:"muerte", rate: 1/5} 
+    });
+    //Animacion del fuego
+    Q.animations('Fire', {
+      burning: { frames: [0,1,2,3], rate: 1/5,loop:true} 
+    });
+    //Animacion de las chispas
+    Q.animations('Spark', {
+        spark: { frames: [0,1,2], next: 'spark', trigger:"muerte", rate: 1/5} 
+    });
+    //Animacion de a princesa
+    Q.animations('Princess', {
+        princess: { frames: [0,1,2,3], rate: 1/5} 
+    });
+    //Animacion giro antorcha
+    Q.animations('Torch', {
+      girar: { frames: [0,1,2,3,4,5,6,7], rate: 1/5, loop:true} 
+    });
+    //Animacion de los objetos de tipo arma
+    Q.animations('WeaponObj', {
+      shine: { frames: [0,1,2,3],rate: 1/2,loop:true} 
+    });
+    //Animacion de los objetos de tipo arma
+    Q.animations('Shuriken', {
+        shuriken: { frames: [0,1],rate: 1/5,loop:true} 
+    });
+    //Animacion de los premios
+    Q.animations('Premio', {
+        shine: { frames: [0,1],rate: 1/5,loop:true} 
+    });
+    //Animacion de la cruz
+    Q.animations('Cross', {
+        shine: { frames: [0,1,2,3],rate: 1/5,loop:true} 
+    });
+    //Animacion de la puerta
+    Q.animations('Door', {
+        open: { frames: [0,1,2],rate: 1/2,next: '',trigger:"opened",loop:false} 
+    });
     //Estado global de juego
     Q.state.set({ score: 0, lives: 3,maxLives:5, //Puntuaciones
                   armaArthur: "lanza",
@@ -74,7 +182,17 @@ Q.preload(function(){
     //Carga del menu principal
     Q.loadTMX("mainMenu.tmx", function() {
         Q.stageScene("initScreen");
-    });
+    },{
+    progressCallback: function(loaded,total) {
+        var element = document.getElementById("loading_progress");
+        var canvas = document.getElementById("quintus");
+        element.style.width = Math.floor(loaded/total*100) + "%";
+        if (loaded === total) {
+            document.getElementById("loading").remove();
+            canvas.style.display="block";
+        }
+    }
+  });
 });
 /*-----------------------------COMPONENTES------------------------------------*/
 //Asignacion de teclas
@@ -306,112 +424,6 @@ Q.component("GeneradorPremios", {
             }
         }
     }
-});
-/*-----------------------------ANIMACIONES------------------------------------*/
-//Animacion de Arthur
-Q.animations('Arthur', {
-    //Movimiento basico
-    run_right: { frames: [0,1,2,3], rate: 1/5}, 
-    run_left: { frames: [4,5,6,7], rate:1/5 },
-    stand_right:{ frames: [2], rate:1 },
-    stand_left:{ frames: [6], rate:1 },
-    //Salto
-    jump_right:{ frames: [8,9], rate:1/3,loop:false},
-    jump_left:{ frames: [15,14], rate:1/3,loop:false},
-    jump_site_right:{ frames: [11], rate:1 },
-    jump_site_left:{ frames: [12], rate:1 },
-    //Agachado
-    duck_right:{frames: [0], rate:1},
-    duck_left:{frames: [1], rate:1},
-    //Disparo
-    shoot_right:{frames: [16,17], rate:1/5,loop:false},
-    shoot_left:{frames: [23,22], rate:1/5,loop:false},
-    shoot_duck_right:{frames: [2,3], rate:1/5,loop:false},
-    shoot_duck_left:{frames: [5,4], rate:1/5,loop:false},
-    //Muerte
-    dieArthurRight:{frames:[1,2,3,8,9,10],rate:1/3,next: '',trigger:"dead",loop:false},
-    dieArthurLeft:{frames:[6,5,4,8,9,10],rate:1/3,next: '',trigger:"dead",loop:false},
-    //Trepar
-    arthurClimb:{frames:[24,27],rate:1/3,loop:true},
-    arthurClimbEnd:{frames:[25,26],rate:1/2,next: 'stand_right',loop:false},
-    //Aux
-    arthurVago:{frames:[12],rate:1},
-    arthurWinner:{frames:[11],rate:1},
-    //Rana
-    arthurFrogRight:{frames:[0,1,2,3],rate:1/5},
-    arthurFrogLeft:{frames:[7,6,5,4],rate:1/5},
-    arthurFrogStandRight:{frames:[3],rate:1},
-    arthurFrogStandLeft:{frames:[4],rate:1},
-    //Destruccion de la armadura
-    destroyArmoRight:{frames:[0,1,2,3],rate:1/3,next: '',trigger:"nude",loop:false},
-    destroyArmoLeft:{frames:[7,6,5,4],rate:1/3,next: '',trigger:"nude",loop:false}
-});
-//Animacion del Crow
-Q.animations('Crow', {
-    crow: { frames: [0,1,2,3], next: 'crowFly', rate: 1/8},
-    crowFly: { frames: [4,5,6,7], rate: 1/4}
-});
-//Animacion del zombie  
-Q.animations('Zombie', {
-    zombie: { frames: [7,8,9], rate: 1/3},
-    zombieBorn: { frames: [0,1,2,3,4,5,6,7,8], next: 'zombie', trigger:"camina", rate: 1/5},
-    zombieBye: { frames: [6,5,4,3,2,1,0],   next: 'zombie', trigger:"bye", rate: 1/3}
-});
-//Animacion de la bullet
-Q.animations('Bullet', {
-    bullet: { frames: [0,1,2,3], rate: 1/5}
-});
-//Animacion de Devil
-Q.animations('Devil', {
-  devil: { frames: [0,1,2], rate: 1/8}, 
-  devilHide: { frames: [4], rate:1/4 },
-  devilFly: { frames: [3], rate:1/2 },
-  devilPrincess:{ frames: [6], rate:1/2 }
-});
-//Animacion de la planta
-Q.animations('Plant', {
-    plant: { frames: [0,1,2], rate: 1/5},
-    plantL: { frames: [3,4], rate: 1/5}
-});
-//Animacion de la sangre
-Q.animations('Burst', {
-  burst: { frames: [0,1,2,3], next: 'burst', trigger:"muerte", rate: 1/5} 
-});
-//Animacion del fuego
-Q.animations('Fire', {
-  burning: { frames: [0,1,2,3], rate: 1/5,loop:true} 
-});
-//Animacion de las chispas
-Q.animations('Spark', {
-    spark: { frames: [0,1,2], next: 'spark', trigger:"muerte", rate: 1/5} 
-});
-//Animacion de a princesa
-Q.animations('Princess', {
-    princess: { frames: [0,1,2,3], rate: 1/5} 
-});
-//Animacion giro antorcha
-Q.animations('Torch', {
-  girar: { frames: [0,1,2,3,4,5,6,7], rate: 1/5, loop:true} 
-});
-//Animacion de los objetos de tipo arma
-Q.animations('WeaponObj', {
-  shine: { frames: [0,1,2,3],rate: 1/2,loop:true} 
-});
-//Animacion de los objetos de tipo arma
-Q.animations('Shuriken', {
-    shuriken: { frames: [0,1],rate: 1/5,loop:true} 
-});
-//Animacion de los premios
-Q.animations('Premio', {
-    shine: { frames: [0,1],rate: 1/5,loop:true} 
-});
-//Animacion de la cruz
-Q.animations('Cross', {
-    shine: { frames: [0,1,2,3],rate: 1/5,loop:true} 
-});
-//Animacion de la puerta
-Q.animations('Door', {
-    open: { frames: [0,1,2],rate: 1/2,next: '',trigger:"opened",loop:false} 
 });
 /*-------------------------------JUGADOR--------------------------------------*/
 Q.Sprite.extend("Player",{
