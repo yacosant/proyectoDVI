@@ -1,5 +1,25 @@
-/* global Quintus */
+/* global Quintus, WebFont */
 window.addEventListener("load",function() {
+    WebFontConfig = {
+        custom: {
+           families: ['ghost','upheavtt']
+        },
+        loading: function() {
+            console.log("Cargando fuentes...");
+
+        },
+        active:function(){
+            console.log("Fuentes cargadas");
+            loadGame();
+        }
+    };
+    (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+        wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+        wf.async = false;
+        s.parentNode.insertBefore(wf, s);
+    })(document);
+var loadGame=function (){
 /*---------------------------CARGA DE QUINTUS---------------------------------*/
 var backMusic;
 // global Quintus
@@ -1673,7 +1693,7 @@ Q.scene('HUD2',function(stage) {
 Q.scene("initScreen",function(stage){
     Q.state.set("enJuego",false);
     Q.stageTMX("mainMenu.tmx",stage);
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:32,color: "#ffffff",label: "Pulsa enter para empezar" }));
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:32,color: "#ffffff",label: "Pulsa enter para empezar", family: "upheavtt" }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
     Q.state.set({ score:0, lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
     //Musica principal del juego
@@ -1775,4 +1795,5 @@ Q.scene("L1",function(stage) {
   backMusic.playMusic(false);
   stage.loadAssets(levelAssets);
 });
+};
 });
