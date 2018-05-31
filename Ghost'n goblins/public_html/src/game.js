@@ -1664,6 +1664,13 @@ Q.scene('HUD',function(stage) {
   var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
   container.insert(new Q.Score());
   container.insert(new Q.Lives());
+  var vidas = Q.state.get("lives");
+  var x = 150;
+  for(var i = 0; i < vidas; i++){
+    container.insert(new Q.LivesPNG({x: x,y: 150}));
+    x += 10;
+  }
+  container.insert(new Q.LivesPNG());
   container.insert(new Q.Timer());
   container.fit(5,200);
   stage.show= function(state){
