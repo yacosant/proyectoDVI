@@ -1,19 +1,23 @@
-/*
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
-*/
-/* 
-    Created on : 05-abr-2018, 15:04:21
-    Author     : usuario_local
-*/
+/*Fuentes*/
+@font-face {
+    font-family: 'upheavtt';
+    src: url('../fonts/upheavtt.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'ghost';
+    src: url('../fonts/ghouls.ghosts.and.goblins-[fontvir.us].ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
 body{
     background-color: darkgrey;
     height: 100%;
     width: 100%;
     top: 25%;
     display: block;
-    font-family: sans-serif; 
+    font-family: 'Press Start 2P'; 
 }
 canvas { 
     background-color:black;
@@ -75,7 +79,7 @@ body #loading #loading_container span {
           position: absolute;
           color: white;
           display: block;
-          font-family: sans-serif; 
+          font-family: 'Press Start 2P'; 
           font-size: 30px;
           left: 0;
           height: 100%;

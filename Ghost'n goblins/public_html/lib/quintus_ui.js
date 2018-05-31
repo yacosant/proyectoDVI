@@ -394,7 +394,7 @@ Quintus.UI = function(Q) {
     */
     setFont: function(ctx) {
       ctx.textBaseline = "top";
-      ctx.font= this.font();
+      ctx.font= this.p.size+'px "'+ this.p.family+'"';
       ctx.fillStyle = this.p.color || "black";
       ctx.textAlign = this.p.align || "left";
       ctx.strokeStyle = this.p.outlineColor || "black";
