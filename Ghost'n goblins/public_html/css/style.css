@@ -1,13 +1,13 @@
 /*Fuentes*/
 @font-face {
     font-family: 'upheavtt';
-    src: url('../fonts/upheavtt.ttf')format("ttf");
+    src: url('../fonts/upheavtt.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 @font-face {
     font-family: 'ghost';
-    src: url('../fonts/ghouls.ghosts.and.goblins-[fontvir.us].ttf') format("ttf");
+    src: url('../fonts/ghouls.ghosts.and.goblins-[fontvir.us].ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -17,7 +17,7 @@ body{
     width: 100%;
     top: 25%;
     display: block;
-    font-family: sans-serif; 
+    font-family: 'Press Start 2P'; 
 }
 canvas { 
     background-color:black;
@@ -79,7 +79,7 @@ body #loading #loading_container span {
           position: absolute;
           color: white;
           display: block;
-          font-family: sans-serif; 
+          font-family: 'Press Start 2P'; 
           font-size: 30px;
           left: 0;
           height: 100%;

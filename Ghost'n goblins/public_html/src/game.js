@@ -1,25 +1,5 @@
 /* global Quintus, WebFont */
 window.addEventListener("load",function() {
-    WebFontConfig = {
-        custom: {
-           families: ['ghost','upheavtt']
-        },
-        loading: function() {
-            console.log("Cargando fuentes...");
-
-        },
-        active:function(){
-            console.log("Fuentes cargadas");
-            loadGame();
-        }
-    };
-    (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-        wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-        wf.async = false;
-        s.parentNode.insertBefore(wf, s);
-    })(document);
-var loadGame=function (){
 /*---------------------------CARGA DE QUINTUS---------------------------------*/
 var backMusic;
 // global Quintus
@@ -1590,7 +1570,8 @@ Q.UI.Text.extend("Score",{
             label: "Puntos\n 0",    
             x: 200,
             y: 0,
-            color:"#ffffff"
+            color:"#ffffff",
+            family: "Press Start 2P"
             });
         Q.state.on("change.score",this,"score");
     },
@@ -1637,7 +1618,8 @@ Q.UI.Text.extend("Lives",{
             label: "vidas\n 3",    
             x: 400,
             y: 0,
-            color:"#ffffff"
+            color:"#ffffff",
+            family: "Press Start 2P"
             });
         Q.state.on("change.lives",this,"lives");
     },
@@ -1652,7 +1634,8 @@ Q.UI.Text.extend("Timer",{
             label: "Tiempo\n 2:30",    
             x: 600,
             y: 0,                              
-            color:"#ffffff"
+            color:"#ffffff",
+            family: "Press Start 2P"
             });
         Q.state.on("change.timer",this,"timer");
     },
@@ -1693,7 +1676,7 @@ Q.scene('HUD2',function(stage) {
 Q.scene("initScreen",function(stage){
     Q.state.set("enJuego",false);
     Q.stageTMX("mainMenu.tmx",stage);
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:32,color: "#ffffff",label: "Pulsa enter para empezar", family: "upheavtt" }));
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:24,color: "#ffffff",label: "Pulsa enter para empezar", family: "Press Start 2P" }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
     Q.state.set({ score:0, lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
     //Musica principal del juego
@@ -1714,7 +1697,7 @@ Q.scene("loseScreen",function(stage){
     Q.audio.stop();
     Q.audio.play("gameover.ogg");
     Q.stageTMX("loseScreen.tmx",stage);
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-100,size:32,color: "#ffffff",label: stage.options.label }));
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-100,size:32,color: "#ffffff",label: stage.options.label, family: "Press Start 2P" }));
     Q.input.on("confirm",this,function(){
         Q.loadTMX("mainMenu.tmx", function() {
             Q.stageScene("initScreen");
@@ -1728,11 +1711,11 @@ Q.scene("winScreen",function(stage){
     Q.audio.stop();
     Q.audio.play("gngEndTheme.ogg");
     var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/5, fill: "rgba(66,66,66,0.8)"}));        
-    container.insert(new Q.UI.Text({x:0, y: 10,color:"#ffffff",label:"Has ganado!"}));
-    container.insert(new Q.UI.Text({x:0, y: 50,color:"#ffffff",label:"Autores"}));
-    container.insert(new Q.UI.Text({x:0, y: 80,color:"#ffffff",label:"Jose Luis Sánchez Gárcia"}));
-    container.insert(new Q.UI.Text({x:0, y: 110,color:"#ffffff",label:"Yaco Alejandro Santiago Pérez"}));
-    container.insert(new Q.UI.Text({x:0, y: 140,color:"#ffffff",label:"Andrea Martín Arias"}));
+    container.insert(new Q.UI.Text({x:0, y: 10,color:"#ffffff",label:"Has ganado!", family: "Press Start 2P"}));
+    container.insert(new Q.UI.Text({x:0, y: 50,color:"#ffffff",label:"Autores", family: "Press Start 2P"}));
+    container.insert(new Q.UI.Text({x:0, y: 80,color:"#ffffff",label:"Jose Luis Sánchez Gárcia", family: "Press Start 2P"}));
+    container.insert(new Q.UI.Text({x:0, y: 110,color:"#ffffff",label:"Yaco Alejandro Santiago Pérez", family: "Press Start 2P"}));
+    container.insert(new Q.UI.Text({x:0, y: 140,color:"#ffffff",label:"Andrea Martín Arias", family: "Press Start 2P"}));
     container.fit(20);
 });
 //Pantalla de siguiente nivel
@@ -1747,7 +1730,7 @@ Q.scene("mapScreen",function(stage){
 //Mensaje de juego pausado
 Q.scene('pauseMessage',function(stage) {
   var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/2, fill: "rgba(66,66,66,0.5)"}));        
-  container.insert(new Q.UI.Text({x:0, y: 10,color:"#ffffff",label:"Juego pausado"}));
+  container.insert(new Q.UI.Text({x:0, y: 10,color:"#ffffff",label:"Juego pausado", family: "Press Start 2P"}));
   // Expand the container to visibily fit it's contents
   // (with a padding of 20 pixels)
   container.fit(20);
@@ -1795,5 +1778,4 @@ Q.scene("L1",function(stage) {
   backMusic.playMusic(false);
   stage.loadAssets(levelAssets);
 });
-};
 });
