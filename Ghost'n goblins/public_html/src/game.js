@@ -1627,6 +1627,7 @@ Q.UI.Text.extend("Lives",{
         this.p.label = "vidas\n " + lives;
     }
 });
+
 //Temporizador
 Q.UI.Text.extend("Timer",{
     init:function(p) {
@@ -1655,6 +1656,12 @@ Q.scene('HUD',function(stage) {
   var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
   container.insert(new Q.Score());
   container.insert(new Q.Lives());
+  
+  var x = 150;
+  for(var i = 0; i < 3; i++){
+    container.insert(new Q.LivesPNG({x: x,y: 500}));
+    x = x + 30;
+  }
   container.insert(new Q.Timer());
   container.fit(5,200);
   stage.show= function(state){
