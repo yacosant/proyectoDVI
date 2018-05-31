@@ -1625,6 +1625,18 @@ Q.UI.Text.extend("Lives",{
         this.p.label = "vidas\n " + lives;
     }
 });
+
+Q.UI.Button.extend("LivesPNG",{
+    init:function(p) {
+        this._super({
+            asset: "1up.png",     
+            x: 150,
+            y: 150
+            });
+        
+    }
+});
+
 //Temporizador
 Q.UI.Text.extend("Timer",{
     init:function(p) {
