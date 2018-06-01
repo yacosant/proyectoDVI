@@ -25,9 +25,9 @@ Q.SPRITE_PUERTA=2048;
 Q.SPRITE_HACHA=4096;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png"]);
+Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json","cross.json","door.json"]);
+Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json","cross.json","door.json","ghost.json","armorGhost.json"]);
 //Musica
 Q.preload(["level_1-2_theme.ogg","level_1-2_theme_boss.ogg",//back music
            "level_3-4_theme.ogg","level_3-4_theme_boss.ogg",
@@ -49,6 +49,8 @@ Q.preload(function(){
     Q.compileSheets("crow.png", "crow.json");
     Q.compileSheets("devil.png", "devil.json");
     Q.compileSheets("plant.png", "plant.json");
+    Q.compileSheets("ghost.png", "ghost.json");
+    Q.compileSheets("armorGhost.png", "armorGhost.json");
     //PNJ
     Q.compileSheets("princess.png", "princess.json");
     //Efectos
@@ -171,6 +173,16 @@ Q.preload(function(){
     //Animacion de la puerta
     Q.animations('Door', {
         open: { frames: [0,1,2],rate: 1/2,next: '',trigger:"opened",loop:false} 
+    });
+    //Animacion de ghost
+    Q.animations('Ghost', {
+        ghost: { frames: [0,1], rate:1/3}, 
+        ghostAtack: { frames: [2], next: 'ghost', rate:1/2},
+        ghostHide: { frames: [4,6,7,8], next: 'ghost',rate:1/5}
+    });
+    //Animacion de ghost con armadura
+    Q.animations('ArmorGhost', {
+        armorGhost: { frames: [0,1,2,3], rate:1/3, loop: true}
     });
     //Estado global de juego
     Q.state.set({ score: 0, lives: 3,maxLives:5, //Puntuaciones
@@ -774,7 +786,7 @@ Q.Sprite.extend("Zombie",{
             this.destroy();
     },
     hit: function(damage){
-        this.p.life=-damage;
+        this.p.life-=damage;
         if(this.p.life<=0) this.muerte();
     },
     muerte:function() {
@@ -832,7 +844,7 @@ Q.Sprite.extend("Crow",{
             collision.obj.hit(collision);
     },
     hit: function(damage){
-        this.p.life=-damage;
+        this.p.life-=damage;
         if(this.p.life<=0) this.muerte();
     },
     muerte:function() {
@@ -899,7 +911,7 @@ Q.Sprite.extend("Plant",{
             collision.obj.hit(collision);
     },
     hit: function(damage){
-        this.p.life=-damage;
+        this.p.life-=damage;
         this.play("plantL");
         this.p.lengua=true;
         this.p.reload=0;
@@ -1027,6 +1039,147 @@ Q.Sprite.extend("Devil",{
            if(this.p.oculto) this.p.type=Q.SPRITE_DEFAULT;
            else this.p.type=Q.SPRITE_ENEMY;
         }
+    }
+}); 
+//Ghost
+Q.Sprite.extend("Ghost",{ 
+    init: function(p) { 
+        this._super(p, { 
+            xo:0,
+            yo:0,
+            vx:0,
+            vy:0,
+            gravity: 0,
+            reload:0,
+            shoot:0,
+            shootReload:1,
+            shootRange:500,
+            timeReload:5,
+            sheet: "ghost",
+            sprite: "Ghost",
+            activo: false,
+            frame: 0,
+            flip: "x",
+            life:80,
+            type: Q.SPRITE_ENEMY,
+            collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
+        }); 
+        this.add("2d,animation,GeneradorPremios");  
+        this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
+        this.play("ghostHide");
+    },
+    matar:function(collision){
+        if(collision.obj.p.type===Q.SPRITE_PLAYER) 
+            collision.obj.hit(collision);
+    },
+    hit: function(damage){
+        this.p.life-=damage;
+        if(this.p.life<=0) this.muerte();
+    },
+    muerte:function() {
+        this.generar(this.p.x,this.p.y); 
+      //  Q.audio.play("xxx.ogg");
+        this.destroy();
+    },
+    step:function(dt){
+        var art = Q("Player").first();
+        if(!this.p.activo && art!==undefined && art.p.x+(12*32)>this.p.x){
+            this.p.activo=true;
+            this.add("aiBounce, aiBounce2");
+            this.play("ghost");
+            this.p.vx=-50;
+            this.p.vy=-65;
+        }
+        if(this.p.activo  && art!==undefined){
+            this.p.reload+=dt;
+            this.p.shoot+=dt;
+            this.p.xo=art.p.x-this.p.x;
+            this.p.yo=art.p.y-this.p.y;
+
+            var rnd= Math.floor((Math.random() * 100) + 1);
+
+            if(this.p.y <= (18*32)) this.p.vy*=-1;
+
+            if(this.p.reload>this.p.timeReload){
+                this.p.reload=0;
+                if(art.p.vx !=0 && ((this.p.vx < 0 && this.p.x < art.p.x) || (this.p.vx > 0 && this.p.x > art.p.x))){ //Giro 
+                    this.play("ghostHide");
+                    this.p.vx*=-1;
+                }
+                
+            }
+
+            if(0<rnd && rnd<2){ //Ataca
+                if(this.p.shoot>this.p.shootReload){
+                    this.play("ghostAtack");
+                    Q.stage().insert(new Q.GhostLance({x:this.p.x,y:this.p.y,d: this.p.vx,distance:this.p.shootRange+this.p.x}));
+                    this.p.shoot=0;
+                }
+            }
+    
+           if(this.p.vx<0)
+               this.p.flip=false;
+           else 
+               this.p.flip='x';  
+    }
+    }
+});
+//Ghost con armadura
+Q.Sprite.extend("ArmorGhost",{ 
+    init: function(p) { 
+        this._super(p, { 
+            vx:0,
+            vy:0,
+            gravity: 0,
+            reload:0,
+            timeReload:5,
+            sheet: "armorGhost",
+            sprite: "ArmorGhost",
+            activo: false,
+            frame: 0,
+            distanceMax:500,
+            life:80,
+            type: Q.SPRITE_ENEMY,
+            collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
+        }); 
+        this.add("2d,animation,GeneradorPremios");  
+        this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
+
+    },
+    matar:function(collision){
+        if(collision.obj.p.type===Q.SPRITE_PLAYER) 
+            collision.obj.hit(collision);
+        else if(collision.obj.p.x>this.p.x){
+            this.p.life-=collision.obj.p.damage;
+            if(this.p.life<=0) this.muerte();
+        }
+    },
+    hit: function(damage){
+       // this.p.life-=damage;
+       // if(this.p.life<=0) this.muerte();
+    },
+    muerte:function() {
+        this.generar(this.p.x,this.p.y); 
+        this.destroy();
+    },
+    step:function(dt){
+        var art = Q("Player").first();
+        if(!this.p.activo && art!==undefined && art.p.x+(12*32)>this.p.x){
+            this.p.activo=true;
+            this.play("armorGhost");
+            this.p.vx=-50;
+            this.p.vy=-15;
+        }
+        if(this.p.activo && art!==undefined){
+            this.p.vx=-50;
+            this.p.vy=-15;
+
+            this.p.reload+=dt;
+            if(this.p.reload>this.p.timeReload){
+                this.p.reload=0;
+            }
+            if(art.p.x - this.p.x > this.p.distanceMax) this.destroy();
+        }   
     }
 }); 
 /*--------------------------------ARMAS---------------------------------------*/
@@ -1336,6 +1489,37 @@ Q.Sprite.extend("movingPlataform",{
       if(collision.obj.p.type===Q.SPRITE_PLAYER) collision.obj.p.x=this.p.x;
   }
 });
+//Lanza del Ghost
+Q.Sprite.extend("GhostLance",{
+    init: function(p) {
+        this._super(p, {
+            asset: "ghostLance.png", 
+            gravity: 0,
+            type: Q.SPRITE_ENEMY,
+            vx:-150,
+            x:0,
+            d:0,
+           collisionMask: Q.SPRITE_DEFAULT | Q.SPRITE_PLAYER
+        }); 
+        this.add('2d');      
+        this.on("bump.top,bump.bottom,bump.left,bump.right","kill"); 
+        if(this.p.d > 0){
+            this.p.flip = "x";
+            this.p.vx=150;
+        }
+    },
+    kill: function(collision){
+        this.destroy();
+        if(collision.obj.p.type===Q.SPRITE_PLAYER){
+            Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+            collision.obj.hit(collision);
+        } else if(collision.obj.p.type===Q.SPRITE_DEFAULT) 
+            Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+    },
+    hit: function(damage){
+        this.destroy();
+    }
+  });
  /*------------------------------EFECTOS--------------------------------------*/
 //Burst
 Q.Sprite.extend("Burst",{ 
@@ -1837,12 +2021,12 @@ Q.scene("L1",function(stage) {
       ["Zombie",{x:(30*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(38*32)+16,y:(21*32)+16}],
       ["Crow",{x:(39*32)+16,y:(16*32)+16}],
-      ["Zombie",{x:(40*32)+16,y:(21*32)+16}],
+      ["ArmorGhost",{x:(40*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(54*32)+16,y:(11*32)+16}],
       ["Zombie",{x:(60*32)+16,y:(11*32)+16}],
       ["Zombie",{x:(64*32)+16,y:(11*32)+16}],
       ["Crow",{x:(61*32)+16,y:(11*32)+16}],
-      ["Crow",{x:(62*32)+16,y:(16*32)+16}],
+      ["Ghost",{x:(62*32)+16,y:(16*32)+16}],
       ["Zombie",{x:(66*32)+16,y:(11*32)+16}],
       ["Crow",{x:(69*32)+16,y:(16*32)+16}],
       ["Zombie",{x:(70*32)+16,y:(11*32)+16}],
