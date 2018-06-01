@@ -174,7 +174,7 @@ Q.preload(function(){
     });
     //Estado global de juego
     Q.state.set({ score: 0, lives: 3,maxLives:5, //Puntuaciones
-                  armaArthur: "hacha",
+                  armaArthur: "lanza",
                   level:1,maxLevel:2, //Nivel
                   pause:false,enJuego:false
                 });
@@ -1163,9 +1163,7 @@ Q.MovingSprite.extend ( "Hacha" , {
 
     kill: function(collision){
          if(collision.obj.p.type===Q.SPRITE_ENEMY){
-            if(collision.obj.p.activo){
-                this.p.numEnemiesDead++;
-                if(this.p.direction === "right"){
+            if(this.p.direction === "right"){
                     this.p.vx = 300;
                     this.p.vy = -50;
                     this.p.ax = 0;
@@ -1176,7 +1174,8 @@ Q.MovingSprite.extend ( "Hacha" , {
                     this.p.ax = 0;
                     this.p.ay = 70;
                 }
-
+            if(collision.obj.p.activo){
+                this.p.numEnemiesDead++;
                 Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
                 collision.obj.hit(this.p.damage);
                 Q.audio.play("enemyHit.ogg");
@@ -1184,7 +1183,7 @@ Q.MovingSprite.extend ( "Hacha" , {
                  Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
             }
 
-            if(this.p.numEnemiesDead >= 2){
+            if(this.p.numEnemiesDead > 2){
                 this.destroy();
             }
         } else if(collision.obj.p.type===Q.SPRITE_TUMBA){ 
