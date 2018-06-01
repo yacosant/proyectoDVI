@@ -656,7 +656,7 @@ Q.Sprite.extend("Player",{
             var vel=300;
             var mano=this.p.h/2;
             var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,vy:-50,ax:0,ay:70}:{x:this.p.x+mano,y:this.p.y,vy:-50,vx:-vel,ax:0,ay:70};
-            Q.stage().insert(new Q.Antorcha(conf));
+            Q.stage().insert(new Q.Hacha(conf));
         }
     },
     hit:function(col){
