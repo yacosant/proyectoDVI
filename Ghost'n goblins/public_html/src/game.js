@@ -967,6 +967,7 @@ Q.Sprite.extend("Devil",{
             frame: 0,
             flip: "x",
             life:120,
+            puntos: 1000,
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_PLAYER
         }); 
@@ -986,6 +987,7 @@ Q.Sprite.extend("Devil",{
         Q.audio.play("bossDeath.ogg");
         Q("Cross").first().show();
         this.destroy();
+        Q.state.inc("score",this.p.puntos);
     },
     step:function(dt){
         var art = Q("Player").first();
