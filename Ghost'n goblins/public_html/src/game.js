@@ -22,6 +22,7 @@ Q.SPRITE_DAGA = 256;
 Q.SPRITE_EXPLOSION = 512;
 Q.SPRITE_CRUZ=1024;
 Q.SPRITE_PUERTA=2048;
+Q.SPRITE_HACHA=4096;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
 Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png"]);
@@ -173,7 +174,7 @@ Q.preload(function(){
     });
     //Estado global de juego
     Q.state.set({ score: 0, lives: 3,maxLives:5, //Puntuaciones
-                  armaArthur: "lanza",
+                  armaArthur: "hacha",
                   level:1,maxLevel:2, //Nivel
                   pause:false,enJuego:false
                 });
@@ -395,7 +396,7 @@ Q.component("GeneradorPremios", {
         generar: function(x,y){
             var listaPremios = [{sheet: "busto", puntos: 200}, {sheet: "busto2", puntos: 400}];
             var maxPremios = listaPremios.length - 1;
-            var randomNumber = Math.floor(Math.random() * (20 - 0) + 0);
+            var randomNumber = Math.floor(Math.random() * (40 - 0) + 0);
             if(randomNumber <= 5){
                 var randomPremio = Math.floor(Math.random() * (2 - 0) + 0);
                 Q.stage().insert(new Q.Premio({x: x, y: y, sheet: listaPremios[randomPremio].sheet, puntos: listaPremios[randomPremio].puntos}));
@@ -655,7 +656,7 @@ Q.Sprite.extend("Player",{
             this.p.shoot=0;
             var vel=300;
             var mano=this.p.h/2;
-            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,vy:-50,ax:0,ay:70}:{x:this.p.x+mano,y:this.p.y,vy:-50,vx:-vel,ax:0,ay:70};
+            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,vy:-50,ax:0,ay:70,direction:"right"}:{x:this.p.x+mano,y:this.p.y,vy:-50,vx:-vel,ax:0,ay:70,direction:"left"};
             Q.stage().insert(new Q.Hacha(conf));
         }
     },
@@ -1141,16 +1142,17 @@ Q.MovingSprite.extend ( "Antorcha" , {
     }
 });
 
-//Antorchas
+//Hachas
 Q.MovingSprite.extend ( "Hacha" , {
     init: function(p) {
         this._super(p, {
             sheet: "antorcha",
             sprite: "Torch",
+            direction: "right",
             gravity:0, 
             damage: 60,        
             numEnemiesDead: 0,
-            type: Q.SPRITE_ANTORCHA,
+            type: Q.SPRITE_HACHA,
             collisionMask: Q.SPRITE_TUMBA | Q.SPRITE_ENEMY | Q.SPRITE_DEFAULT
         }); 
         this.add('2d, animation');
@@ -1163,6 +1165,18 @@ Q.MovingSprite.extend ( "Hacha" , {
          if(collision.obj.p.type===Q.SPRITE_ENEMY){
             if(collision.obj.p.activo){
                 this.p.numEnemiesDead++;
+                if(this.p.direction === "right"){
+                    this.p.vx = 300;
+                    this.p.vy = -50;
+                    this.p.ax = 0;
+                    this.p.ay = 70;
+                }else if(this.p.direction === "left"){
+                    this.p.vx = -300;
+                    this.p.vy = -50;
+                    this.p.ax = 0;
+                    this.p.ay = 70;
+                }
+
                 Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
                 collision.obj.hit(this.p.damage);
                 Q.audio.play("enemyHit.ogg");
@@ -1176,6 +1190,8 @@ Q.MovingSprite.extend ( "Hacha" , {
         } else if(collision.obj.p.type===Q.SPRITE_TUMBA){ 
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
             Q.audio.play("hitGrave.ogg");
+            this.destroy();
+        }else{
             this.destroy();
         }
     }
