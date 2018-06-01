@@ -412,8 +412,7 @@ Q.component("GeneradorPremios", {
                 if(Q.state.get("armaArthur") !== "daga"){
                       Q.stage().insert(new Q.ObjDaga({x: x, y: y}));
                 }
-            }
-            else if(randomNumber === 11){
+            }else if(randomNumber === 11){
                
                 Q.stage().insert(new Q.ObjArmadura({x: x, y: y}));
                 
@@ -421,6 +420,10 @@ Q.component("GeneradorPremios", {
                
                 Q.stage().insert(new Q.Vida({x: x, y: y}));
                 
+            }else if(randomNumber === 13){
+                if(Q.state.get("armaArthur") !== "hacha"){
+                      Q.stage().insert(new Q.ObjHacha({x: x, y: y}));
+                }
             }
         }
     }
@@ -648,6 +651,12 @@ Q.Sprite.extend("Player",{
             var mano=this.p.h/2;
             var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,distance:this.p.shootRange+this.p.x}:{x:this.p.x+mano,y:this.p.y,vx:-vel,distance:this.p.shootRange+this.p.x};
             Q.stage().insert(new Q.Daga(conf));
+        }else if(Q.state.get("armaArthur") === "hacha"){    
+            this.p.shoot=0;
+            var vel=300;
+            var mano=this.p.h/2;
+            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,vy:-50,ax:0,ay:70}:{x:this.p.x+mano,y:this.p.y,vy:-50,vx:-vel,ax:0,ay:70};
+            Q.stage().insert(new Q.Antorcha(conf));
         }
     },
     hit:function(col){
@@ -1131,6 +1140,46 @@ Q.MovingSprite.extend ( "Antorcha" , {
         this.destroy();
     }
 });
+
+//Antorchas
+Q.MovingSprite.extend ( "Hacha" , {
+    init: function(p) {
+        this._super(p, {
+            sheet: "antorcha",
+            sprite: "Torch",
+            gravity:0, 
+            damage: 60,        
+            numEnemiesDead: 0,
+            type: Q.SPRITE_ANTORCHA,
+            collisionMask: Q.SPRITE_TUMBA | Q.SPRITE_ENEMY | Q.SPRITE_DEFAULT
+        }); 
+        this.add('2d, animation');
+        this.on("bump.top,bump.bottom,bump.left,bump.right","kill");
+        Q.audio.play("torch.ogg");
+        this.play('girar');
+    },
+
+    kill: function(collision){
+         if(collision.obj.p.type===Q.SPRITE_ENEMY){
+            if(collision.obj.p.activo){
+                this.p.numEnemiesDead++;
+                Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
+                collision.obj.hit(this.p.damage);
+                Q.audio.play("enemyHit.ogg");
+            }else{
+                 Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+            }
+
+            if(this.p.numEnemiesDead >= 2){
+                this.destroy();
+            }
+        } else if(collision.obj.p.type===Q.SPRITE_TUMBA){ 
+            Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+            Q.audio.play("hitGrave.ogg");
+            this.destroy();
+        }
+    }
+});
 /*------------------------------ELEMENTOS-------------------------------------*/
 //Tumbas saltables
 Q.Sprite.extend("Tumba",{
@@ -1397,6 +1446,32 @@ Q.Sprite.extend("ObjAntorcha",{
             this.destroy();
     }
  });
+
+//Arma hacha
+Q.Sprite.extend("ObjHacha",{
+    init: function(p) {
+        this._super(p, {
+            sheet: "antorchaMov", 
+            sprite: "WeaponObj",
+            puntos: 100,    
+            type: Q.SPRITE_PREMIO,
+            collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
+        }); 
+        this.add('2d,animation'); 
+        this.play("shine");
+        this.on("bump.top,bump.bottom,bump.left,bump.right","take");                   
+    },
+    take: function(collision){
+        if(collision.obj.p.type === Q.SPRITE_PLAYER){
+            Q.audio.play("weaponPickUp.ogg");
+            Q.state.set("armaArthur","hacha");
+            Q.state.inc("score",this.p.puntos);
+            this.destroy();
+        }else if(collision.tile === 91)
+            this.destroy();
+    }
+ });
+
 //Arma Daga
 Q.Sprite.extend("ObjDaga",{
     init: function(p) {
@@ -1608,6 +1683,8 @@ Q.UI.Button.extend("Arma",{
             this.p.asset = "cuchilloHUD.png";
         }else if(armaEquipada === "antorcha"){
             this.p.asset = "antorchaHUD.png";
+        }else if(armaEquipada === "hacha"){
+            this.p.asset = "jar.png";
         }     
     }
 });
