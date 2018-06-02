@@ -23,6 +23,7 @@ Q.SPRITE_EXPLOSION = 512;
 Q.SPRITE_CRUZ=1024;
 Q.SPRITE_PUERTA=2048;
 Q.SPRITE_HACHA=4096;
+Q.SPRITE_SPARKMAGO=8192;
 //Colores Interfaz
 Q.COLOR_RED="#ff0066";
 Q.COLOR_BLUE="#88ffff";
@@ -31,7 +32,7 @@ Q.COLOR_WHITE="#eeeedd";
 Q.COLOR_LIGHT_RED="#ff8888";
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png"]);
+Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png","mago.png"]);
 //JSON'S 
 Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json","cross.json","door.json","ghost.json","armorGhost.json"]);
 //Musica
@@ -162,7 +163,8 @@ Q.preload(function(){
     });
     //Animacion de las chispas
     Q.animations('Spark', {
-        spark: { frames: [0,1,2], next: 'spark', trigger:"muerte", rate: 1/5} 
+        spark: { frames: [0,1,2], next: 'spark', trigger:"muerte", rate: 1/5},
+        sparkMago: { frames: [0,1,2],rate: 1/5} 
     });
     //Animacion de a princesa
     Q.animations('Princess', {
@@ -1200,6 +1202,48 @@ Q.Sprite.extend("ArmorGhost",{
         }   
     }
 }); 
+//Mago
+Q.Sprite.extend("Magician",{
+    init: function(p) {
+        this._super(p, {
+            asset: "mago.png", 
+            gravity: 0,
+            type: Q.SPRITE_ENEMY,
+            vx:0,
+            x:0, 
+            reload:0,
+            timeReload:2,
+            life:60,
+            activo: false,
+            shootRange: 200,
+            flip: 'x',
+           collisionMask: Q.SPRITE_DEFAULT || Q.SPRITE_PLAYER
+        }); 
+        this.add('2d');          
+    },
+    hit: function(damage){
+        this.p.life-=damage;
+        if(this.p.life<=0) this.muerte();
+    },
+    muerte:function() {
+        this.generar(this.p.x,this.p.y); 
+        this.destroy();
+    },
+    step:function(dt){
+        this.p.reload+=dt;
+        var art = Q("Player").first();
+        if(!this.p.activo && art!==undefined && art.p.x+(12*32)>this.p.x){
+            this.p.activo=true;   
+        }
+        if(this.p.activo && this.p.reload>this.p.timeReload  && art!==undefined){
+            if(this.p.x < art.p.x)  this.p.flip=false;
+            else this.p.flip='x';
+           if(!art.p.frog) Q.stage().insert(new Q.MagicSpark({x: this.p.x-20, y: this.p.y-10, flip: this.p.flip, distance:this.p.shootRange+this.p.x}));
+            this.p.reload=0;             
+        }
+    }
+  
+  });
 /*--------------------------------ARMAS---------------------------------------*/
 //Lanza de Arthur
 Q.Sprite.extend("Lanza",{
@@ -1537,6 +1581,36 @@ Q.Sprite.extend("GhostLance",{
     hit: function(damage){
         this.destroy();
     }
+  });
+  //Lanza del Ghost
+Q.Sprite.extend("MagicSpark",{
+    init: function(p) {
+        this._super(p, {
+            sheet: "spark",
+            sprite: "Spark",
+            frame: 0,
+            gravity: 0,
+            type: Q.SPRITE_SPARKMAGO,
+            vx:100,
+            x:0,
+            y:0,
+            distance:0,
+           collisionMask:  Q.SPRITE_PLAYER
+        }); 
+        this.add('2d, animation');      
+        this.on("bump.top,bump.bottom,bump.left,bump.right","kill"); 
+        this.play("spark");    
+       if(this.p.flip==='x') this.p.vx=-100;
+    },
+    kill: function(collision){
+        if(collision.obj.p.type===Q.SPRITE_PLAYER){
+            var art = Q("Player").first();
+            art.itsAFrog();
+        }
+        this.destroy();
+    },
+    hit: function(damage){},
+    step: function(dt){},
   });
  /*------------------------------EFECTOS--------------------------------------*/
 //Burst
@@ -2042,7 +2116,7 @@ Q.scene('pauseMessage',function(stage) {
 Q.scene("L1",function(stage) {
   Q.state.set("enJuego",true);
   var levelAssets = [
-      ["Zombie",{x:(25*32)+16,y:(21*32)+16}],
+      ["Magician",{x:(25*32)+16,y:(21*32)+16}],
       ["ArmorGhost",{x:(30*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(38*32)+16,y:(21*32)+16}],
       ["Crow",{x:(39*32)+16,y:(16*32)+16}],
