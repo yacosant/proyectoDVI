@@ -1,7 +1,6 @@
 /* global Quintus, WebFont */
 window.addEventListener("load",function() {
 /*---------------------------CARGA DE QUINTUS---------------------------------*/
-var backMusic;
 // global Quintus
 var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 .include("Sprites, Scenes, Input, 2D, Anim,UI,TMX,Audio")//Librerias del quintus cargadas
@@ -11,6 +10,7 @@ var Q = window.Q = Quintus({ development:true,audioSupported: ['ogg','mp3'] })
                 })
                 .controls()//Controles para PC
                 .enableSound();//Habilita el uso de audio
+//Mascaras de colision
 Q.SPRITE_NONE=0;
 Q.SPRITE_ENEMY = 4;
 Q.SPRITE_PLAYER = 8;
@@ -23,6 +23,12 @@ Q.SPRITE_EXPLOSION = 512;
 Q.SPRITE_CRUZ=1024;
 Q.SPRITE_PUERTA=2048;
 Q.SPRITE_HACHA=4096;
+//Colores Interfaz
+Q.COLOR_RED="#ff0066";
+Q.COLOR_BLUE="#88ffff";
+Q.COLOR_YELLOW="#eecc00";
+Q.COLOR_WHITE="#eeeedd";
+Q.COLOR_LIGHT_RED="#ff8888";
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
 Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png"]);
@@ -58,13 +64,15 @@ Q.preload(function(){
     Q.compileSheets("spark.png", "spark.json");
     Q.compileSheets("fire.png", "fire.json");
     //Proyectiles
-    Q.compileSheets("bullet.png", "bullet.json");
     Q.compileSheets("antorcha.png", "antorcha.json");
+    Q.compileSheets("axe.png", "axe.json");
+    Q.compileSheets("bullet.png", "bullet.json");
     Q.compileSheets("shuriken.png", "shuriken.json");
     //Objetos
     Q.compileSheets("antorchaMov.png", "antorchaMov.json");
     Q.compileSheets("lanzaMov.png", "lanzaMov.json");
     Q.compileSheets("cuchilloMov.png", "cuchilloMov.json");
+    Q.compileSheets("axeMov.png", "axeMov.json");
     Q.compileSheets("items.png","items.json");
     Q.compileSheets("cross.png","cross.json");
     Q.compileSheets("door.png","door.json");
@@ -134,6 +142,16 @@ Q.preload(function(){
         plant: { frames: [0,1,2], rate: 1/5},
         plantL: { frames: [3,4], rate: 1/5}
     });
+    //Animacion de ghost
+    Q.animations('Ghost', {
+        ghost: { frames: [0,1], rate:1/3}, 
+        ghostAtack: { frames: [2], next: 'ghost', rate:1/2},
+        ghostHide: { frames: [4,6,7,8], next: 'ghost',rate:1/5}
+    });
+    //Animacion de ghost con armadura
+    Q.animations('ArmorGhost', {
+        armorGhost: { frames: [0,1,2,3], rate:1/3, loop: true}
+    });
     //Animacion de la sangre
     Q.animations('Burst', {
       burst: { frames: [0,1,2,3], next: 'burst', trigger:"muerte", rate: 1/5} 
@@ -152,6 +170,10 @@ Q.preload(function(){
     });
     //Animacion giro antorcha
     Q.animations('Torch', {
+      girar: { frames: [0,1,2,3,4,5,6,7], rate: 1/5, loop:true} 
+    });
+    //Animacion giro antorcha
+    Q.animations('Axe', {
       girar: { frames: [0,1,2,3,4,5,6,7], rate: 1/5, loop:true} 
     });
     //Animacion de los objetos de tipo arma
@@ -174,16 +196,7 @@ Q.preload(function(){
     Q.animations('Door', {
         open: { frames: [0,1,2],rate: 1/2,next: '',trigger:"opened",loop:false} 
     });
-    //Animacion de ghost
-    Q.animations('Ghost', {
-        ghost: { frames: [0,1], rate:1/3}, 
-        ghostAtack: { frames: [2], next: 'ghost', rate:1/2},
-        ghostHide: { frames: [4,6,7,8], next: 'ghost',rate:1/5}
-    });
-    //Animacion de ghost con armadura
-    Q.animations('ArmorGhost', {
-        armorGhost: { frames: [0,1,2,3], rate:1/3, loop: true}
-    });
+    /*------------------------------------------------------------------------*/
     //Estado global de juego
     Q.state.set({ score: 0, lives: 3,maxLives:5, //Puntuaciones
                   armaArthur: "lanza",
@@ -336,7 +349,7 @@ Q.component("levelManager",{
             Q.stage(2).show(true);
             Q.stage(3).show(true);
             Q.loadTMX("loseScreen.tmx", function() {
-                Q.stageScene("loseScreen",{label:"Game Over! \n Pulsa enter para volver al menu principal"});
+                Q.stageScene("loseScreen");
             });
         },
         mapScreen:function(){
@@ -1846,16 +1859,17 @@ Q.Sprite.extend("Vida",{
 Q.UI.Text.extend("Score",{
     init:function(p) {
         this._super({
-            label: "Puntos\n 0",    
+            label: "0",    
             x: 200,
-            y: 0,
-            color:"#ffffff",
+            y: 30,
+            color: Q.COLOR_WHITE,
+            size:"20",
             family: "Press Start 2P"
             });
         Q.state.on("change.score",this,"score");
     },
     score:function(score) {
-        this.p.label = "Puntos\n " + score;
+        this.p.label = score.toString();
     }
 });
 //cuadro
@@ -1896,16 +1910,17 @@ Q.UI.Button.extend("Arma",{
 Q.UI.Text.extend("Lives",{
     init:function(p) {
         this._super({
-            label: "vidas\n 3",    
+            label: "3",    
             x: 400,
-            y: 0,
-            color:"#ffffff",
+            y: 30,
+            color:Q.COLOR_WHITE,
+            size:"20",
             family: "Press Start 2P"
             });
         Q.state.on("change.lives",this,"lives");
     },
     lives:function(lives) {
-        this.p.label = "vidas\n " + lives;
+        this.p.label = lives.toString();
     }
 });
 
@@ -1913,10 +1928,11 @@ Q.UI.Text.extend("Lives",{
 Q.UI.Text.extend("Timer",{
     init:function(p) {
         this._super({
-            label: "Tiempo\n 2:30",    
+            label: "2:30",    
             x: 600,
-            y: 0,                              
-            color:"#ffffff",
+            y: 30,                              
+            color:Q.COLOR_WHITE,
+            size:"20",
             family: "Press Start 2P"
             });
         Q.state.on("change.timer",this,"timer");
@@ -1928,15 +1944,18 @@ Q.UI.Text.extend("Timer",{
         }else{
             segd = time;
         }
-        this.p.label = "Tiempo\n "+ minutes + ":" + segd;
+        this.p.label = minutes + ":" + segd;
     }
 });
 
 //HUD superior
 Q.scene('HUD',function(stage) {
   var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
+  container.insert(new Q.UI.Text({x:200, y:0 ,size:20,color: Q.COLOR_YELLOW,label: "Player", family: "Press Start 2P" }));
   container.insert(new Q.Score());
+  container.insert(new Q.UI.Text({x:400, y:0,size:20,color: Q.COLOR_RED,label: "Lives", family: "Press Start 2P" }));
   container.insert(new Q.Lives());
+  container.insert(new Q.UI.Text({x:600, y:0 ,size:20,color: Q.COLOR_LIGHT_RED,label: "Time", family: "Press Start 2P" }));
   container.insert(new Q.Timer());
   container.fit(5,200);
   stage.show= function(state){
@@ -1958,7 +1977,7 @@ Q.scene('HUD2',function(stage) {
 Q.scene("initScreen",function(stage){
     Q.state.set("enJuego",false);
     Q.stageTMX("mainMenu.tmx",stage);
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:24,color: "#ffffff",label: "Pulsa enter para empezar", family: "Press Start 2P" }));
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:24,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: "Press Start 2P" }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
     Q.state.set({ score:0, lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
     //Musica principal del juego
@@ -1979,7 +1998,8 @@ Q.scene("loseScreen",function(stage){
     Q.audio.stop();
     Q.audio.play("gameover.ogg");
     Q.stageTMX("loseScreen.tmx",stage);
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-100,size:32,color: "#ffffff",label: stage.options.label, family: "Press Start 2P" }));
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-100,size:32,color: Q.COLOR_RED,label: "Game over", family: "Press Start 2P" }));
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-50,size:18,color: Q.COLOR_LIGHT_RED,label: "Pulsa enter para volver al menu principal", family: "Press Start 2P" }));
     Q.input.on("confirm",this,function(){
         Q.loadTMX("mainMenu.tmx", function() {
             Q.stageScene("initScreen");
@@ -1993,11 +2013,11 @@ Q.scene("winScreen",function(stage){
     Q.audio.stop();
     Q.audio.play("gngEndTheme.ogg");
     var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/5, fill: "rgba(66,66,66,0.8)"}));        
-    container.insert(new Q.UI.Text({x:0, y: 10,color:"#ffffff",label:"Has ganado!", family: "Press Start 2P"}));
-    container.insert(new Q.UI.Text({x:0, y: 50,color:"#ffffff",label:"Autores", family: "Press Start 2P"}));
-    container.insert(new Q.UI.Text({x:0, y: 80,color:"#ffffff",label:"Jose Luis Sánchez Gárcia", family: "Press Start 2P"}));
-    container.insert(new Q.UI.Text({x:0, y: 110,color:"#ffffff",label:"Yaco Alejandro Santiago Pérez", family: "Press Start 2P"}));
-    container.insert(new Q.UI.Text({x:0, y: 140,color:"#ffffff",label:"Andrea Martín Arias", family: "Press Start 2P"}));
+    container.insert(new Q.UI.Text({x:0, y: 10,color:Q.COLOR_YELLOW,label:"Has ganado!", family: "Press Start 2P"}));
+    container.insert(new Q.UI.Text({x:0, y: 50,color:Q.COLOR_LIGHT_RED,label:"Autores", family: "Press Start 2P"}));
+    container.insert(new Q.UI.Text({x:0, y: 80,color:Q.COLOR_BLUE,label:"Jose Luis Sánchez Gárcia", family: "Press Start 2P"}));
+    container.insert(new Q.UI.Text({x:0, y: 110,color:Q.COLOR_BLUE,label:"Yaco Alejandro Santiago Pérez", family: "Press Start 2P"}));
+    container.insert(new Q.UI.Text({x:0, y: 140,color:Q.COLOR_BLUE,label:"Andrea Martín Arias", family: "Press Start 2P"}));
     container.fit(20);
 });
 //Pantalla de siguiente nivel
@@ -2011,8 +2031,8 @@ Q.scene("mapScreen",function(stage){
 });
 //Mensaje de juego pausado
 Q.scene('pauseMessage',function(stage) {
-  var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/2, fill: "rgba(66,66,66,0.5)"}));        
-  container.insert(new Q.UI.Text({x:0, y: 10,color:"#ffffff",label:"Juego pausado", family: "Press Start 2P"}));
+  var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/2, fill: "rgba(255,136,136,0.5)"}));        
+  container.insert(new Q.UI.Text({x:0, y: 10,color:Q.COLOR_BLUE,label:"Juego pausado", family: "Press Start 2P"}));
   // Expand the container to visibily fit it's contents
   // (with a padding of 20 pixels)
   container.fit(20);
