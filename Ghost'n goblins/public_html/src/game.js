@@ -1132,6 +1132,7 @@ Q.Sprite.extend("ArmorGhost",{
         this._super(p, { 
             vx:0,
             vy:0,
+            t:0,
             gravity: 0,
             reload:0,
             timeReload:5,
@@ -1139,19 +1140,19 @@ Q.Sprite.extend("ArmorGhost",{
             sprite: "ArmorGhost",
             activo: false,
             frame: 0,
-            distanceMax:500,
+            distanceMax:400,
             life:80,
+            A: -25, B: 0, C: 0, D:0, E: 0, F: 70, G: 3, H: 0,
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
         this.add("2d,animation,GeneradorPremios");  
         this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
-
     },
     matar:function(collision){
         if(collision.obj.p.type===Q.SPRITE_PLAYER) 
             collision.obj.hit(collision);
-        else if(collision.obj.p.x>this.p.x){
+        else if(collision.obj.p.type!==Q.SPRITE_DEFAULT && collision.obj.p.x>this.p.x){
             this.p.life-=collision.obj.p.damage;
             if(this.p.life<=0) this.muerte();
         }
@@ -1173,9 +1174,11 @@ Q.Sprite.extend("ArmorGhost",{
             this.p.vy=-15;
         }
         if(this.p.activo && art!==undefined){
-            this.p.vx=-50;
-            this.p.vy=-15;
-
+            this.p.t += dt;
+            this.p.vx = this.p.A + this.p.B * Math.sin(this.p.C * this.p.t + this.p.D);
+            this.p.vy = this.p.E + this.p.F * Math.sin(this.p.G * this.p.t + this.p.H);
+            this.p.x += this.p.vx * dt;
+            this.p.y += this.p.vy * dt;
             this.p.reload+=dt;
             if(this.p.reload>this.p.timeReload){
                 this.p.reload=0;
@@ -2020,7 +2023,7 @@ Q.scene("L1",function(stage) {
   Q.state.set("enJuego",true);
   var levelAssets = [
       ["Zombie",{x:(25*32)+16,y:(21*32)+16}],
-      ["Zombie",{x:(30*32)+16,y:(21*32)+16}],
+      ["ArmorGhost",{x:(30*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(38*32)+16,y:(21*32)+16}],
       ["Crow",{x:(39*32)+16,y:(16*32)+16}],
       ["ArmorGhost",{x:(40*32)+16,y:(21*32)+16}],
