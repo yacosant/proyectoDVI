@@ -32,9 +32,9 @@ Q.COLOR_WHITE="#eeeedd";
 Q.COLOR_LIGHT_RED="#ff8888";
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png","mago.png"]);
+Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png","mago.png", "axe.png", "axeHUD.png", "axeMov.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json","cross.json","door.json","ghost.json","armorGhost.json"]);
+Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json","cross.json","door.json","ghost.json","armorGhost.json", "axeMov.json", "axe.json"]);
 //Musica
 Q.preload(["level_1-2_theme.ogg","level_1-2_theme_boss.ogg",//back music
            "level_3-4_theme.ogg","level_3-4_theme_boss.ogg",
@@ -1223,7 +1223,7 @@ Q.Sprite.extend("Magician",{
             flip: 'x',
            collisionMask: Q.SPRITE_DEFAULT || Q.SPRITE_PLAYER
         }); 
-        this.add('2d');          
+        this.add('2d, GeneradorPremios');          
     },
     hit: function(damage){
         this.p.life-=damage;
@@ -1365,8 +1365,8 @@ Q.MovingSprite.extend ( "Antorcha" , {
 Q.MovingSprite.extend ( "Hacha" , {
     init: function(p) {
         this._super(p, {
-            sheet: "antorcha",
-            sprite: "Torch",
+            sheet: "axe",
+            sprite: "Axe",
             direction: "right",
             gravity:0, 
             damage: 60,        
@@ -1400,6 +1400,7 @@ Q.MovingSprite.extend ( "Hacha" , {
                 Q.audio.play("enemyHit.ogg");
             }else{
                  Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+                 this.destroy();
             }
 
             if(this.p.numEnemiesDead > 2){
@@ -1746,7 +1747,7 @@ Q.Sprite.extend("ObjAntorcha",{
 Q.Sprite.extend("ObjHacha",{
     init: function(p) {
         this._super(p, {
-            sheet: "antorchaMov", 
+            sheet: "axeMov", 
             sprite: "WeaponObj",
             puntos: 100,    
             type: Q.SPRITE_PREMIO,
@@ -1980,7 +1981,7 @@ Q.UI.Button.extend("Arma",{
         }else if(armaEquipada === "antorcha"){
             this.p.asset = "antorchaHUD.png";
         }else if(armaEquipada === "hacha"){
-            this.p.asset = "jar.png";
+            this.p.asset = "axeHUD.png";
         }     
     }
 });
