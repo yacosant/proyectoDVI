@@ -1396,6 +1396,7 @@ Q.MovingSprite.extend ( "Hacha" , {
                 Q.audio.play("enemyHit.ogg");
             }else{
                  Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
+                 this.destroy();
             }
 
             if(this.p.numEnemiesDead > 2){
@@ -1976,7 +1977,7 @@ Q.UI.Button.extend("Arma",{
         }else if(armaEquipada === "antorcha"){
             this.p.asset = "antorchaHUD.png";
         }else if(armaEquipada === "hacha"){
-            this.p.asset = "jar.png";
+            this.p.asset = "axeHUD.png";
         }     
     }
 });
