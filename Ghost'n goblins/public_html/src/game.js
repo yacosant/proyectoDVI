@@ -1142,7 +1142,7 @@ Q.Sprite.extend("ArmorGhost",{
             frame: 0,
             distanceMax:400,
             life:80,
-            A: -25, B: 0, C: 0, D:0, E: 0, F: 70, G: 3, H: 0,
+            A: -50, B: 0, C: 0, D:0, E: 0, F: -150, G: 3, H: 0,
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
