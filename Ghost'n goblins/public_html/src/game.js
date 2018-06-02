@@ -42,7 +42,7 @@ Q.preload(["level_1-2_theme.ogg","level_1-2_theme_boss.ogg",//back music
            "level_7_theme.ogg",
            "gngEndTheme.ogg","gameover.ogg","timer.ogg","insertCoin.ogg","endLevel.ogg",//General
            "arthurRow.ogg","die.ogg","jumpEnd.ogg","jumpStart.ogg","putArmour.ogg","removeArmour.ogg",//Arthur
-           "burst.ogg","hitGrave.ogg","doorOpen.ogg","lance.ogg","torch.ogg","treasurePickUp.ogg","weaponPickUp.ogg","extraLife.ogg",//Efectos sonoros
+           "burst.ogg","hitGrave.ogg","doorOpen.ogg","lance.ogg","torch.ogg","treasurePickUp.ogg","weaponPickUp.ogg","extraLife.ogg","frogerizer.ogg",//Efectos sonoros
            "enemyHit.ogg","bossHit.ogg","bossDeath.ogg","zombieBorn.ogg","crow.ogg","crowDie.ogg"//Enemigos
        ]);
 //Funcion de inicio
@@ -477,6 +477,7 @@ Q.Sprite.extend("Player",{
             shootRange:1500,
             frogTime:0,//Echizado
             frogMaxTime:5,
+            stateFrog:"",
             onLadder: false,//Escaleras
             ladderX:0,
             ladderTile:0,
@@ -731,13 +732,16 @@ Q.Sprite.extend("Player",{
         if(!this.p.frog){
             this.p.frog=true;
             this.p.speed=200;
+            this.p.stateFrog=this.p.sheet;
+            Q.audio.play("frogerizer.ogg");
         }
     },
     frogerizado:function(dt){
         if(this.p.frogTime>=this.p.frogMaxTime){
             this.p.frog=false;
-            this.sheet("arthurNude",true);
+            this.sheet(this.p.stateFrog,true);
             this.p.frogTime=0;
+            Q.audio.play("frogerizer.ogg");
         }else{
             this.p.frogTime+=dt;
             this.animFrog();
