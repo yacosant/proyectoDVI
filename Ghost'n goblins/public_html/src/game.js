@@ -1219,7 +1219,7 @@ Q.Sprite.extend("Magician",{
             flip: 'x',
            collisionMask: Q.SPRITE_DEFAULT || Q.SPRITE_PLAYER
         }); 
-        this.add('2d');          
+        this.add('2d, GeneradorPremios');          
     },
     hit: function(damage){
         this.p.life-=damage;
