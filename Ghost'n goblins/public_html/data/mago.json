@@ -1,0 +1,4 @@
+{
+	"mago":{"sx":0,"sy":0,"tileW":27,"tileH":44,"frames":1},
+	"magoOpen":{"sx":30,"sy":0,"tileW":88,"tileH":44,"frames":1}
+}

@@ -34,7 +34,7 @@ Q.COLOR_LIGHT_RED="#ff8888";
 //Imagenes
 Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png","mago.png", "axe.png", "axeHUD.png", "axeMov.png"]);
 //JSON'S 
-Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json","cross.json","door.json","ghost.json","armorGhost.json", "axeMov.json", "axe.json"]);
+Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json","cross.json","door.json","ghost.json","armorGhost.json", "axeMov.json", "axe.json","mago.json"]);
 //Musica
 Q.preload(["level_1-2_theme.ogg","level_1-2_theme_boss.ogg",//back music
            "level_3-4_theme.ogg","level_3-4_theme_boss.ogg",
@@ -58,6 +58,7 @@ Q.preload(function(){
     Q.compileSheets("plant.png", "plant.json");
     Q.compileSheets("ghost.png", "ghost.json");
     Q.compileSheets("armorGhost.png", "armorGhost.json");
+    Q.compileSheets("mago.png", "mago.json");
     //PNJ
     Q.compileSheets("princess.png", "princess.json");
     //Efectos
@@ -197,6 +198,11 @@ Q.preload(function(){
     //Animacion de la puerta
     Q.animations('Door', {
         open: { frames: [0,1,2],rate: 1/2,next: '',trigger:"opened",loop:false} 
+    });
+    //Animacion mago
+    Q.animations('Mago',{
+        "mago":{frames: [0],rate: 1},
+        "magoOpen":{frames: [0],trigger:"return", next:'mago',rate: 1}
     });
     /*------------------------------------------------------------------------*/
     //Estado global de juego
@@ -1161,7 +1167,7 @@ Q.Sprite.extend("ArmorGhost",{
             frame: 0,
             distanceMax:400,
             life:80,
-            A: -50, B: 0, C: 0, D:0, E: 0, F: -150, G: 3, H: 0,
+            A: -50, B: 0, C: 0, D:0, E: -7, F: -150, G: 3, H: 0,
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT
         }); 
@@ -1210,7 +1216,9 @@ Q.Sprite.extend("ArmorGhost",{
 Q.Sprite.extend("Magician",{
     init: function(p) {
         this._super(p, {
-            asset: "mago.png", 
+            sheet: "mago",
+            sprite: "Mago",
+            frame: 0,
             gravity: 0,
             type: Q.SPRITE_ENEMY,
             vx:0,
@@ -1223,7 +1231,9 @@ Q.Sprite.extend("Magician",{
             flip: 'x',
            collisionMask: Q.SPRITE_DEFAULT || Q.SPRITE_PLAYER
         }); 
-        this.add('2d, GeneradorPremios');          
+        this.add('2d, GeneradorPremios,animation'); 
+        this.on("return","return");
+        this.play("mago");         
     },
     hit: function(damage){
         this.p.life-=damage;
@@ -1242,11 +1252,18 @@ Q.Sprite.extend("Magician",{
         if(this.p.activo && this.p.reload>this.p.timeReload  && art!==undefined){
             if(this.p.x < art.p.x)  this.p.flip=false;
             else this.p.flip='x';
-           if(!art.p.frog) Q.stage().insert(new Q.MagicSpark({x: this.p.x-20, y: this.p.y-10, flip: this.p.flip, distance:this.p.shootRange+this.p.x}));
+           if(!art.p.frog){
+               this.p.sheet="magoOpen";
+               this.play("magoOpen");
+                Q.stage().insert(new Q.MagicSpark({x: this.p.x-20, y: this.p.y-10, flip: this.p.flip, distance:this.p.shootRange+this.p.x}));
+           }
             this.p.reload=0;             
         }
+    },
+    return: function() {
+        this.p.sheet="mago";
+        this.play("mago");
     }
-  
   });
 /*--------------------------------ARMAS---------------------------------------*/
 //Lanza de Arthur
