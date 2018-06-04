@@ -113,6 +113,8 @@ Q.preload(function(){
         arthurFrogLeft:{frames:[7,6,5,4],rate:1/5},
         arthurFrogStandRight:{frames:[3],rate:1},
         arthurFrogStandLeft:{frames:[4],rate:1},
+        arthurFrogJumpRight:{frames:[1],rate:1/5},
+        arthurFrogJumpLeft:{frames:[6],rate:1/5},
         //Destruccion de la armadura
         destroyArmoRight:{frames:[0,1,2,3],rate:1/3,next: '',trigger:"nude",loop:false},
         destroyArmoLeft:{frames:[7,6,5,4],rate:1/3,next: '',trigger:"nude",loop:false}
@@ -224,6 +226,7 @@ Q.preload(function(){
         if (loaded === total) {
             document.getElementById("loading").remove();
             canvas.style.display="block";
+            canvas.focus();
         }
     }
   });
@@ -617,8 +620,14 @@ Q.Sprite.extend("Player",{
         if(this.p.sheet!=="arthurFrog")
             this.sheet("arthurFrog",true);
         if(this.p.vx>0)
+            if(this.p.vy!==0)
+                this.play("arthurFrogJumpRight");
+            else
                 this.play("arthurFrogRight");
-        else if(this.p.vx<0) 
+        else if(this.p.vx<0)
+            if(this.p.vy!==0)
+                this.play("arthurFrogJumpLeft");
+            else
                 this.play("arthurFrogLeft");
         else{
             if(this.p.direction==="right")
@@ -1011,6 +1020,7 @@ Q.Sprite.extend("Devil",{
     muerte:function() {
         Q.audio.play("bossDeath.ogg");
         Q("Cross").first().show();
+        Q.stageScene("keyMessage",5);
         this.destroy();
         Q.state.inc("score",this.p.puntos);
     },
@@ -1905,6 +1915,7 @@ Q.Sprite.extend("Vida",{
             Q.audio.play("weaponPickUp.ogg");
             Q.state.inc("score",this.p.puntos);
             Q.state.set("armaArthur","cruz");
+            Q.clearStage(5);
             Q("Door").first().unlock();
             this.destroy();
         }else if(collision.tile === 91)
@@ -2073,7 +2084,7 @@ Q.scene('HUD2',function(stage) {
 Q.scene("initScreen",function(stage){
     Q.state.set("enJuego",false);
     Q.stageTMX("mainMenu.tmx",stage);
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:24,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: "Press Start 2P" }));
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:24,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: "ghost" }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
     Q.state.set({ score:0, lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
     //Musica principal del juego
@@ -2133,16 +2144,24 @@ Q.scene('pauseMessage',function(stage) {
   // (with a padding of 20 pixels)
   container.fit(20);
 });
+//Mensaje de juego pausado
+Q.scene('keyMessage',function(stage) {
+  var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/3}));        
+  container.insert(new Q.UI.Text({x:0, y: 10,size:18,color:Q.COLOR_LIGHT_RED,label:"Coje la llave para abrir la puerta", family: "Press Start 2P"}));
+  // Expand the container to visibily fit it's contents
+  // (with a padding of 20 pixels)
+  container.fit(20);
+});
 /*----------------------------------NIVELES-----------------------------------*/ 
 // Nivel 1
 Q.scene("L1",function(stage) {
   Q.state.set("enJuego",true);
   var levelAssets = [
       ["Magician",{x:(25*32)+16,y:(21*32)+16}],
-      ["ArmorGhost",{x:(30*32)+16,y:(21*32)+16}],
+      //["ArmorGhost",{x:(30*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(38*32)+16,y:(21*32)+16}],
       ["Crow",{x:(39*32)+16,y:(16*32)+16}],
-      ["ArmorGhost",{x:(40*32)+16,y:(21*32)+16}],
+      //["ArmorGhost",{x:(40*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(54*32)+16,y:(11*32)+16}],
       ["Zombie",{x:(60*32)+16,y:(11*32)+16}],
       ["Zombie",{x:(64*32)+16,y:(11*32)+16}],

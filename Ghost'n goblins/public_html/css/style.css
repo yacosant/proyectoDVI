@@ -12,14 +12,25 @@
     font-style: normal;
 }
 body{
-    background-color: darkgrey;
+    background-color: #131313;
+    background-image: url("images/backIndex.jpg");
     height: 100%;
     width: 100%;
     top: 25%;
     display: block;
     font-family: 'Press Start 2P'; 
 }
+·
+#left{
+    display: inline-block;
+}
+#quintus_container{
+    
+    
+    
+}
 canvas { 
+    position: absolute;
     background-color:black;
     border: outset 3px black;
     display:none;
