@@ -394,6 +394,8 @@ Quintus.UI = function(Q) {
     */
     setFont: function(ctx) {
       ctx.textBaseline = "top";
+      this.p.family=(!this.p.family)?"Press Start 2P":this.p.family;
+      this.p.size=(!this.p.size)?18:this.p.size;
       ctx.font= this.p.size+'px "'+ this.p.family+'"';
       ctx.fillStyle = this.p.color || "black";
       ctx.textAlign = this.p.align || "left";
@@ -494,7 +496,9 @@ Quintus.UI = function(Q) {
     */
     setFont: function(ctx) {
       ctx.textBaseline = "middle";
-      ctx.font = ctx.font= this.p.size+'px "'+ this.p.family+'"';;
+      this.p.family=(!this.p.family)?"Press Start 2P":this.p.family;
+      this.p.size=(!this.p.size)?18:this.p.size;
+      ctx.font= this.p.size+'px "'+ this.p.family+'"';
       ctx.fillStyle = this.p.fontColor || "black";
       ctx.textAlign = "center";
     }
