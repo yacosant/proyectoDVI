@@ -1,7 +1,7 @@
 /*Fuentes*/
 @font-face {
     font-family: 'upheavtt';
-    src: url('../fonts/upheavtt.ttf');
+    src: url('../fonts/upheavtt.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
