@@ -1966,16 +1966,16 @@ Q.Sprite.extend("Vida",{
         this.mapScreen();
     }
  });
-/*----------------------------------HUD---------------------------------------*/
+/*------------------------------HUD SUPERIOR----------------------------------*/
 //Puntuacion
 Q.UI.Text.extend("Score",{
     init:function(p) {
         this._super({
             label: "0",    
             x: 200,
-            y: 30,
+            y: 25,
             color: Q.COLOR_WHITE,
-            size:"20",
+            size:Q.FONT_SIZE_MEDIUM,
             family: Q.FONT_FAMILY 
             });
         Q.state.on("change.score",this,"score");
@@ -1984,6 +1984,62 @@ Q.UI.Text.extend("Score",{
         this.p.label = score.toString();
     }
 });
+//vidas
+Q.UI.Text.extend("Lives",{
+    init:function(p) {
+        this._super({
+            label: "3",    
+            x: 400,
+            y: 25,
+            color:Q.COLOR_WHITE,
+            size:Q.FONT_SIZE_MEDIUM,
+            family: Q.FONT_FAMILY 
+            });
+        Q.state.on("change.lives",this,"lives");
+    },
+    lives:function(lives) {
+        this.p.label = lives.toString();
+    }
+});
+
+//Temporizador
+Q.UI.Text.extend("Timer",{
+    init:function(p) {
+        this._super({
+            label: "2:30",    
+            x: 600,
+            y: 25,                              
+            color:Q.COLOR_WHITE,
+            size:Q.FONT_SIZE_MEDIUM,
+            family: Q.FONT_FAMILY 
+            });
+        Q.state.on("change.timer",this,"timer");
+    },
+    timer:function(time) {
+        var minutes = Q.state.get("timerM");
+        if(time < 10){
+            segd = "0" + time;
+        }else{
+            segd = time;
+        }
+        this.p.label = minutes + ":" + segd;
+    }
+});
+//HUD superior
+Q.scene('HUD',function(stage) {
+  var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
+  container.insert(new Q.UI.Text({x:200, y:0 ,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_YELLOW,label: "Player", family: Q.FONT_FAMILY  }));
+  container.insert(new Q.Score());
+  container.insert(new Q.UI.Text({x:400, y:0,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_RED,label: "Lives", family: Q.FONT_FAMILY  }));
+  container.insert(new Q.Lives());
+  container.insert(new Q.UI.Text({x:600, y:0 ,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_LIGHT_RED,label: "Time", family: Q.FONT_FAMILY  }));
+  container.insert(new Q.Timer());
+  container.fit(5,200);
+  stage.show= function(state){
+          this.hidden=state;
+  };
+});
+/*-----------------------------HUD INFERIOR-----------------------------------*/
 //cuadro
 Q.UI.Button.extend("Cuadro",{
     init:function(p) {
@@ -1991,8 +2047,7 @@ Q.UI.Button.extend("Cuadro",{
             asset: "cuadro.png",    
             x: 400,
             y: 150
-            });
-        
+            });      
     }
 });
 //arma que Arthur tiene equipada
@@ -2018,62 +2073,6 @@ Q.UI.Button.extend("Arma",{
         }     
     }
 });
-//vidas
-Q.UI.Text.extend("Lives",{
-    init:function(p) {
-        this._super({
-            label: "3",    
-            x: 400,
-            y: 30,
-            color:Q.COLOR_WHITE,
-            size:"20",
-            family: Q.FONT_FAMILY 
-            });
-        Q.state.on("change.lives",this,"lives");
-    },
-    lives:function(lives) {
-        this.p.label = lives.toString();
-    }
-});
-
-//Temporizador
-Q.UI.Text.extend("Timer",{
-    init:function(p) {
-        this._super({
-            label: "2:30",    
-            x: 600,
-            y: 30,                              
-            color:Q.COLOR_WHITE,
-            size:"24",
-            family: Q.FONT_FAMILY 
-            });
-        Q.state.on("change.timer",this,"timer");
-    },
-    timer:function(time) {
-        var minutes = Q.state.get("timerM");
-        if(time < 10){
-            segd = "0" + time;
-        }else{
-            segd = time;
-        }
-        this.p.label = minutes + ":" + segd;
-    }
-});
-
-//HUD superior
-Q.scene('HUD',function(stage) {
-  var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
-  container.insert(new Q.UI.Text({x:200, y:0 ,size:20,color: Q.COLOR_YELLOW,label: "Player", family: Q.FONT_FAMILY  }));
-  container.insert(new Q.Score());
-  container.insert(new Q.UI.Text({x:400, y:0,size:20,color: Q.COLOR_RED,label: "Lives", family: Q.FONT_FAMILY  }));
-  container.insert(new Q.Lives());
-  container.insert(new Q.UI.Text({x:600, y:0 ,size:20,color: Q.COLOR_LIGHT_RED,label: "Time", family: Q.FONT_FAMILY  }));
-  container.insert(new Q.Timer());
-  container.fit(5,200);
-  stage.show= function(state){
-          this.hidden=state;
-  };
-});
 //HUD inferior
 Q.scene('HUD2',function(stage) {
   var container = stage.insert(new Q.UI.Container({x:0, y: Q.height-180}));
@@ -2089,7 +2088,8 @@ Q.scene('HUD2',function(stage) {
 Q.scene("initScreen",function(stage){
     Q.state.set("enJuego",false);
     Q.stageTMX("mainMenu.tmx",stage);
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:24,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: Q.FONT_FAMILY }));
+    
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: Q.FONT_FAMILY }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
     Q.state.set({ score:0, lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
     //Musica principal del juego
@@ -2110,8 +2110,8 @@ Q.scene("loseScreen",function(stage){
     Q.audio.stop();
     Q.audio.play("gameover.ogg");
     Q.stageTMX("loseScreen.tmx",stage);
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-100,size:32,color: Q.COLOR_RED,label: "Game over", family: Q.FONT_FAMILY  }));
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-50,size:18,color: Q.COLOR_LIGHT_RED,label: "Pulsa enter para volver al menu principal", family: Q.FONT_FAMILY  }));
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-100,size:Q.FONT_SIZE_LARGE,color: Q.COLOR_RED,label: "Game over", family: Q.FONT_FAMILY  }));
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-50,size:Q.FONT_SIZE_SMALL,color: Q.COLOR_LIGHT_RED,label: "Pulsa enter para volver al menu principal", family: Q.FONT_FAMILY  }));
     Q.input.on("confirm",this,function(){
         Q.loadTMX("mainMenu.tmx", function() {
             Q.stageScene("initScreen");
@@ -2124,12 +2124,12 @@ Q.scene("winScreen",function(stage){
     Q.stageTMX("finalScreen.tmx",stage);
     Q.audio.stop();
     Q.audio.play("gngEndTheme.ogg");
-    var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/5, fill: "rgba(66,66,66,0.8)"}));        
-    container.insert(new Q.UI.Text({x:0, y: 10,color:Q.COLOR_YELLOW,label:"Has ganado!", family: Q.FONT_FAMILY }));
-    container.insert(new Q.UI.Text({x:0, y: 50,color:Q.COLOR_LIGHT_RED,label:"Autores", family: Q.FONT_FAMILY }));
-    container.insert(new Q.UI.Text({x:0, y: 80,color:Q.COLOR_BLUE,label:"Jose Luis Sánchez Gárcia", family: Q.FONT_FAMILY }));
-    container.insert(new Q.UI.Text({x:0, y: 110,color:Q.COLOR_BLUE,label:"Yaco Alejandro Santiago Pérez", family: Q.FONT_FAMILY }));
-    container.insert(new Q.UI.Text({x:0, y: 140,color:Q.COLOR_BLUE,label:"Andrea Martín Arias", family: Q.FONT_FAMILY }));
+    var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/5, fill: "rgba(255,136,136,0.2)"}));        
+    container.insert(new Q.UI.Text({x:0, y: 10,size:Q.FONT_SIZE_LARGE,color:Q.COLOR_YELLOW,label:"Has ganado!", family: Q.FONT_FAMILY }));
+    container.insert(new Q.UI.Text({x:0, y: 50,size:Q.FONT_SIZE_MEDIUM,color:Q.COLOR_LIGHT_RED,label:"Autores", family: Q.FONT_FAMILY }));
+    container.insert(new Q.UI.Text({x:0, y: 80,size:Q.FONT_SIZE_MEDIUM,color:Q.COLOR_BLUE,label:"Jose Luis Sánchez Gárcia", family: Q.FONT_FAMILY }));
+    container.insert(new Q.UI.Text({x:0, y: 110,size:Q.FONT_SIZE_MEDIUM,color:Q.COLOR_BLUE,label:"Yaco Alejandro Santiago Pérez", family: Q.FONT_FAMILY }));
+    container.insert(new Q.UI.Text({x:0, y: 140,size:Q.FONT_SIZE_MEDIUM,color:Q.COLOR_BLUE,label:"Andrea Martín Arias", family: Q.FONT_FAMILY }));
     container.fit(20);
 });
 //Pantalla de siguiente nivel
@@ -2143,8 +2143,8 @@ Q.scene("mapScreen",function(stage){
 });
 //Mensaje de juego pausado
 Q.scene('pauseMessage',function(stage) {
-  var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/2, fill: "rgba(255,136,136,0.5)"}));        
-  container.insert(new Q.UI.Text({x:0, y: 10,color:Q.COLOR_BLUE,label:"Juego pausado", family: Q.FONT_FAMILY }));
+  var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/2, fill: "rgba(255,136,136,0.2)"}));        
+  container.insert(new Q.UI.Text({x:0, y: 10,size:Q.FONT_SIZE_MEDIUM,color:Q.COLOR_BLUE,label:"Juego pausado", family: Q.FONT_FAMILY }));
   // Expand the container to visibily fit it's contents
   // (with a padding of 20 pixels)
   container.fit(20);
@@ -2152,7 +2152,7 @@ Q.scene('pauseMessage',function(stage) {
 //Mensaje de juego pausado
 Q.scene('keyMessage',function(stage) {
   var container = stage.insert(new Q.UI.Container({x: Q.width/2, y: Q.height/3}));        
-  container.insert(new Q.UI.Text({x:0, y: 10,size:18,color:Q.COLOR_LIGHT_RED,label:"Coje la llave para abrir la puerta", family: Q.FONT_FAMILY }));
+  container.insert(new Q.UI.Text({x:0, y: 10,size:Q.FONT_SIZE_LARGE,color:Q.COLOR_LIGHT_RED,label:"Coje la llave para abrir la puerta", family: Q.FONT_FAMILY }));
   // Expand the container to visibily fit it's contents
   // (with a padding of 20 pixels)
   container.fit(20);
