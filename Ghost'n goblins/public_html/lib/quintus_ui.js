@@ -494,7 +494,7 @@ Quintus.UI = function(Q) {
     */
     setFont: function(ctx) {
       ctx.textBaseline = "middle";
-      ctx.font = this.p.font || "400 24px arial";
+      ctx.font = ctx.font= this.p.size+'px "'+ this.p.family+'"';;
       ctx.fillStyle = this.p.fontColor || "black";
       ctx.textAlign = "center";
     }
