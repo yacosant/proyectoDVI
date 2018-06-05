@@ -1139,7 +1139,7 @@ Q.Sprite.extend("Ghost",{
 
             if(this.p.reload>this.p.timeReload){
                 this.p.reload=0;
-                if(art.p.vx !=0 && ((this.p.vx < 0 && this.p.x < art.p.x) || (this.p.vx > 0 && this.p.x > art.p.x))){ //Giro 
+                if(art.p.vx !==0 && ((this.p.vx < 0 && this.p.x < art.p.x) || (this.p.vx > 0 && this.p.x > art.p.x))){ //Giro 
                     this.play("ghostHide");
                     this.p.vx*=-1;
                 }
@@ -1642,7 +1642,7 @@ Q.Sprite.extend("MagicSpark",{
         this.destroy();
     },
     hit: function(damage){},
-    step: function(dt){},
+    step: function(dt){}
   });
  /*------------------------------EFECTOS--------------------------------------*/
 //Burst
@@ -2084,7 +2084,7 @@ Q.scene('HUD2',function(stage) {
 Q.scene("initScreen",function(stage){
     Q.state.set("enJuego",false);
     Q.stageTMX("mainMenu.tmx",stage);
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:24,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: "upheavtt" }));
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:24,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: "ghost" }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
     Q.state.set({ score:0, lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
     //Musica principal del juego

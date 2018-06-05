@@ -1,13 +1,7 @@
 /*Fuentes*/
 @font-face {
-    font-family: 'upheavtt';
-    src: url('../fonts/upheavtt.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
     font-family: 'ghost';
-    src: url('../fonts/ghosts.ttf') format('truetype');
+    src: url('../font/ghosts.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -18,7 +12,7 @@ body{
     width: 100%;
     top: 25%;
     display: block;
-    font-family: 'Press Start 2P'; 
+    font-family: 'ghost'; 
 }
 ·
 #left{
@@ -90,7 +84,7 @@ body #loading #loading_container span {
           position: absolute;
           color: white;
           display: block;
-          font-family: 'Press Start 2P'; 
+          font-family: 'ghost'; 
           font-size: 30px;
           left: 0;
           height: 100%;
