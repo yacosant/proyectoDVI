@@ -1,19 +1,19 @@
 /*Fuentes*/
 @font-face {
     font-family: 'upheavtt';
-    src: '../fonts/upheavtt.ttf';
+    src: url('../fonts/upheavtt.ttf');
     font-weight: normal;
     font-style: normal;
 }
 @font-face {
     font-family: 'ghost';
-    src: '../fonts/ghosts.ttf';
+    src: url('../fonts/ghosts.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 body{
     background-color: #131313;
-    background-image: '../images/backIndex.jpg';
+    background-image: url('../images/backIndex.jpg');
     height: 100%;
     width: 100%;
     top: 25%;
