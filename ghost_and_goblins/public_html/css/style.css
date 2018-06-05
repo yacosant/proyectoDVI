@@ -1,13 +1,13 @@
 /*Fuentes*/
 @font-face {
     font-family: 'upheavtt';
-    src: url('./fonts/upheavtt.ttf');
+    src: url('./font/upheavtt.ttf');
     font-weight: normal;
     font-style: normal;
 }
 @font-face {
     font-family: 'ghost';
-    src: url('../fonts/ghosts.ttf') format('truetype');
+    src: url('../font/ghosts.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
