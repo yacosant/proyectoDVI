@@ -807,6 +807,7 @@ Q.Sprite.extend("Zombie",{
             activo:false,
             timeReload:3,
             life:30,
+            hidden:true,
             type: Q.SPRITE_ENEMY,
             collisionMask: Q.SPRITE_PLAYER | Q.SPRITE_DEFAULT 
         }); 
@@ -835,6 +836,7 @@ Q.Sprite.extend("Zombie",{
     step:function(dt){
         var art = Q("Player").first();
         if(!this.p.activo && art!==undefined && art.p.x+(10*32)>this.p.x){
+            this.p.hidden=false;
             this.p.activo=true;
             this.add("aiBounce");
             this.play("zombieBorn");
@@ -963,7 +965,7 @@ Q.Sprite.extend("Plant",{
     step:function(dt){
         this.p.reload+=dt;
         var art = Q("Player").first();
-        if(!this.p.activo && art!==undefined && art.p.x+(12*32)>this.p.x){
+        if(!this.p.activo && art!==undefined && art.p.x+(16*32)>this.p.x){
             this.p.activo=true;     
         }
         if(this.p.activo && this.p.reload>this.p.timeReload  && art!==undefined){
@@ -1244,7 +1246,8 @@ Q.Sprite.extend("Magician",{
             activo: false,
             shootRange: 200,
             flip: 'x',
-           collisionMask: Q.SPRITE_DEFAULT || Q.SPRITE_PLAYER
+            hidden:true,
+            collisionMask: Q.SPRITE_DEFAULT || Q.SPRITE_PLAYER
         }); 
         this.add('2d, GeneradorPremios,animation'); 
         this.on("return","return");
@@ -1261,14 +1264,15 @@ Q.Sprite.extend("Magician",{
     step:function(dt){
         this.p.reload+=dt;
         var art = Q("Player").first();
-        if(!this.p.activo && art!==undefined && art.p.x+(12*32)>this.p.x){
+        if(!this.p.activo && art!==undefined && art.p.x+(7*32)>this.p.x){
+            this.p.hidden=false;
             this.p.activo=true;   
         }
         if(this.p.activo && this.p.reload>this.p.timeReload  && art!==undefined){
             if(this.p.x < art.p.x)  this.p.flip=false;
             else this.p.flip='x';
            if(!art.p.frog){
-               this.p.sheet="magoOpen";
+               this.sheet("magoOpen",true);
                this.play("magoOpen");
                 Q.stage().insert(new Q.MagicSpark({x: this.p.x-20, y: this.p.y-10, flip: this.p.flip, distance:this.p.shootRange+this.p.x}));
            }
@@ -1276,7 +1280,7 @@ Q.Sprite.extend("Magician",{
         }
     },
     return: function() {
-        this.p.sheet="mago";
+        this.sheet("mago",true);
         this.play("mago");
     }
   });
@@ -1312,9 +1316,10 @@ Q.Sprite.extend("Lanza",{
                 Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
                 collision.obj.hit(this.p.damage);
                 Q.audio.play("enemyHit.ogg");
-            }else
-                 Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
-            this.destroy();
+                this.destroy();
+            }else{
+                this.destroy();
+            }     
         } else if(collision.obj.p.type===Q.SPRITE_TUMBA){
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
             Q.audio.play("hitGrave.ogg");
@@ -1353,9 +1358,10 @@ Q.Sprite.extend("Daga",{
                 Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
                 collision.obj.hit(this.p.damage);
                 Q.audio.play("enemyHit.ogg");
-            }else
-                 Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
-            this.destroy();
+                this.destroy();
+            }else{
+                this.destroy();
+            }  
         } else if(collision.obj.p.type===Q.SPRITE_TUMBA){ 
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
             Q.audio.play("hitGrave.ogg");
@@ -2162,16 +2168,14 @@ Q.scene('keyMessage',function(stage) {
 Q.scene("L1",function(stage) {
   Q.state.set("enJuego",true);
   var levelAssets = [
-      ["Magician",{x:(25*32)+16,y:(21*32)+16}],
-      //["ArmorGhost",{x:(30*32)+16,y:(21*32)+16}],
-      ["Zombie",{x:(38*32)+16,y:(21*32)+16}],
-      ["Crow",{x:(39*32)+16,y:(16*32)+16}],
-      //["ArmorGhost",{x:(40*32)+16,y:(21*32)+16}],
+      ["Zombie",{x:(32*32)+16,y:(21*32)+16}],
+      ["Zombie",{x:(34*32)+16,y:(21*32)+16}],
+      ["Crow",{x:(39*32)+16,y:(18*32)+16}],
+      ["Magician",{x:(40*32)+20,y:(20*32)-6}],
       ["Zombie",{x:(54*32)+16,y:(11*32)+16}],
       ["Zombie",{x:(60*32)+16,y:(11*32)+16}],
       ["Zombie",{x:(64*32)+16,y:(11*32)+16}],
       ["Crow",{x:(61*32)+16,y:(11*32)+16}],
-      ["Ghost",{x:(62*32)+16,y:(16*32)+16}],
       ["Zombie",{x:(66*32)+16,y:(11*32)+16}],
       ["Crow",{x:(69*32)+16,y:(16*32)+16}],
       ["Zombie",{x:(70*32)+16,y:(11*32)+16}],
@@ -2179,12 +2183,9 @@ Q.scene("L1",function(stage) {
       ["Zombie",{x:(100*32)+16,y:(21*32)+16}],
       ["Crow",{x:(123*32)+16,y:(11*32)+16}],
       ["Crow",{x:(123*32)+16,y:(16*32)+16}],
- 
-      ["Crow",{x:(133*32)+16,y:(16*32)+16}],
-      ["Zombie",{x:(142*32)+16,y:(21*32)+16}],
+
       ["Plant",{x:(145*32)+16,y:(21*32)+16}],
-      ["Zombie",{x:(160*32)+16,y:(21*32)+16}],
-      ["Zombie",{x:(162*32)+16,y:(21*32)+16}],
+      ["ArmorGhost",{x:(140*32)+16,y:(21*32)+16}],
       ["Crow",{x:(170*32)+16,y:(15*32)+16}],
       ["Crow",{x:(172*32)+16,y:(12*32)+16}],
       ["Zombie",{x:(200*32)+16,y:(21*32)+16}],

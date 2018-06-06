@@ -463,7 +463,10 @@ Quintus["2D"] = function(Q) {
           p.y -= col.separate[1];
         }else{
             if(col.obj.p.vy!==0)
-              col.obj.p.y=p.y-(p.h+10);
+                if(col.obj.p.sheet==="arthurArmo" ||col.obj.p.sheet==="arthurNude")
+                    col.obj.p.y=p.y-(p.h+10);
+                else
+                    col.obj.p.y=p.y-(p.h+3);
         }
         // Top collision
         if(col.normalY < -0.3) {

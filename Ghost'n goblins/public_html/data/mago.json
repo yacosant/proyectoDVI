@@ -1,4 +1,4 @@
 {
-	"mago":{"sx":0,"sy":0,"tileW":27,"tileH":44,"frames":1},
-	"magoOpen":{"sx":30,"sy":0,"tileW":88,"tileH":44,"frames":1}
+	"mago":{"sx":0,"sy":0,"tileW":48,"tileH":64,"frames":1},
+	"magoOpen":{"sx":48,"sy":0,"tileW":96,"tileH":64,"frames":1}
 }
