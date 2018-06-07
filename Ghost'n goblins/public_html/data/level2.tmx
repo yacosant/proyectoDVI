@@ -4,7 +4,6 @@
   <image source="../images/tiles.png" width="352" height="448"/>
   <tile id="8">
    <properties>
-    <property name="ladder" value="true"/>
     <property name="sensor" value="true"/>
    </properties>
   </tile>
@@ -16,7 +15,6 @@
   </tile>
   <tile id="19">
    <properties>
-    <property name="ladder" value="true"/>
     <property name="sensor" value="true"/>
    </properties>
   </tile>
@@ -28,7 +26,6 @@
   </tile>
   <tile id="30">
    <properties>
-    <property name="ladder" value="true"/>
     <property name="sensor" value="true"/>
    </properties>
   </tile>
@@ -40,7 +37,6 @@
   </tile>
   <tile id="41">
    <properties>
-    <property name="ladder" value="true"/>
     <property name="sensor" value="true"/>
    </properties>
   </tile>
@@ -52,7 +48,6 @@
   </tile>
   <tile id="52">
    <properties>
-    <property name="ladder" value="true"/>
     <property name="sensor" value="true"/>
    </properties>
   </tile>
@@ -8645,15 +8640,15 @@
    <tile gid="4"/>
    <tile gid="48"/>
    <tile gid="44"/>
+   <tile gid="4"/>
+   <tile gid="4"/>
+   <tile gid="4"/>
+   <tile gid="4"/>
+   <tile gid="4"/>
+   <tile gid="4"/>
+   <tile gid="4"/>
    <tile gid="69"/>
    <tile gid="70"/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
    <tile/>
    <tile/>
    <tile/>
@@ -9445,14 +9440,14 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
+   <tile/>
    <tile gid="91"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
    <tile gid="92"/>
    <tile gid="92"/>
    <tile gid="92"/>
@@ -19052,14 +19047,14 @@
    <tile gid="3"/>
    <tile gid="3"/>
    <tile gid="3"/>
+   <tile gid="3"/>
+   <tile gid="3"/>
+   <tile gid="3"/>
+   <tile gid="45"/>
+   <tile gid="3"/>
+   <tile gid="3"/>
+   <tile gid="3"/>
    <tile gid="80"/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
    <tile/>
    <tile/>
    <tile/>
@@ -19452,13 +19447,13 @@
    <tile gid="2"/>
    <tile gid="2"/>
    <tile gid="2"/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
+   <tile gid="2"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
    <tile/>
    <tile/>
    <tile/>
@@ -19852,14 +19847,14 @@
    <tile gid="2"/>
    <tile gid="2"/>
    <tile gid="2"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
    <tile gid="91"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
-   <tile gid="92"/>
    <tile gid="92"/>
    <tile gid="92"/>
    <tile gid="92"/>
@@ -20150,7 +20145,7 @@
  </objectgroup>
  <objectgroup name="sprites">
   <object id="1" gid="155" x="480" y="704" width="64" height="64"/>
-  <object id="2" gid="379" x="3616" y="736" width="64" height="26"/>
+  <object id="2" gid="379" x="3808" y="736" width="64" height="26"/>
   <object id="3" gid="382" x="736" y="704" width="36" height="40">
    <properties>
     <property name="tipo" value="grave2.png"/>
