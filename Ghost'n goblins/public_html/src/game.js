@@ -240,8 +240,58 @@ Q.preload(function(){
 //Asignacion de teclas
 Q.input.keyboardControls({
     P: "pausa",
-    X:"frog",
-    SPACE:"fire"
+    SPACE:"fire",
+    //Trucos:Activar solo en caso de corbardia
+    //ONE:"arma1",
+    //TWO:"arma2",
+    //THREE:"arma3",
+    //FOUR:"arma4",
+    //FIVE:"armor",
+    //SIX:"vida",
+    //X:"frog"
+});
+//Trucos
+Q.input.on("arma1",function() {
+    if(Q.state.get("enJuego")){
+        var art = Q("Player").first();
+        Q.stage().insert(new Q.ObjLanza({x:art.p.x+32,y:art.p.y-32}));
+    }
+});
+Q.input.on("arma2",function() {
+    if(Q.state.get("enJuego")){
+        var art = Q("Player").first();
+        Q.stage().insert(new Q.ObjDaga({x:art.p.x+32,y:art.p.y-32}));
+    }
+});
+Q.input.on("arma3",function() {
+    if(Q.state.get("enJuego")){
+        var art = Q("Player").first();
+        Q.stage().insert(new Q.ObjAntorcha({x:art.p.x+32,y:art.p.y-32}));
+    }
+});
+Q.input.on("arma4",function() {
+    if(Q.state.get("enJuego")){
+        var art = Q("Player").first();
+        Q.stage().insert(new Q.ObjHacha({x:art.p.x+32,y:art.p.y-32}));
+    }
+});
+Q.input.on("armor",function() {
+    if(Q.state.get("enJuego")){
+        var art = Q("Player").first();
+        Q.stage().insert(new Q.ObjArmadura({x:art.p.x+32,y:art.p.y-32}));
+    }
+});
+Q.input.on("vida",function() {
+    if(Q.state.get("enJuego")){
+        var art = Q("Player").first();
+        Q.stage().insert(new Q.Vida({x:art.p.x+32,y:art.p.y-32}));
+    }
+});
+Q.input.on("frog",function() {
+    if(Q.state.get("enJuego")){
+        var art = Q("Player").first();
+        art.itsAFrog();
+    }
 });
 //Modo de pausa del juego
 Q.input.on("pausa",function() {
@@ -709,16 +759,18 @@ Q.Sprite.extend("Player",{
         }
     },
     hit:function(col){
-        var ac=(this.p.vy>0)? {x: this.p.x-70,y:this.p.y-50}:{x: this.p.x-50};
-        this.del("platformerControls");
-        if(this.p.sheet==="arthurArmo" || this.p.sheet==="arthurArmoDuck"){
-            this.p.hit=true;
-            Q.audio.play("removeArmour.ogg");
-            this.p.x -= col.separate[0];
-            this.p.y -= col.separate[1];
-            this.animate(ac,0.3);  
-        }else if(this.p.sheet==="arthurNude" || this.p.sheet==="arthurNudeDuck" ||this.p.sheet==="arthurFrog")
-            this.muerto();
+        if(!this.p.hit){
+            var ac=(this.p.vy>0)? {x: this.p.x-70,y:this.p.y-50}:{x: this.p.x-50};
+            this.del("platformerControls");
+            if(this.p.sheet==="arthurArmo" || this.p.sheet==="arthurArmoDuck"){
+                this.p.hit=true;
+                Q.audio.play("removeArmour.ogg");
+                this.p.x -= col.separate[0];
+                this.p.y -= col.separate[1];
+                this.animate(ac,0.3);  
+            }else if(this.p.sheet==="arthurNude" || this.p.sheet==="arthurNudeDuck" ||this.p.sheet==="arthurFrog")
+                this.muerto();
+        }
     },
     muerto:function(){
         this.p.muerto=true;
@@ -749,7 +801,7 @@ Q.Sprite.extend("Player",{
         this.p.prisa=true;
     },
     itsAFrog:function(){
-        if(!this.p.frog){
+        if(!this.p.frog && !this.p.muerto && !this.p.hit){
             this.p.frog=true;
             this.p.speed=200;
             this.p.stateFrog=this.p.sheet;
@@ -1311,7 +1363,7 @@ Q.Sprite.extend("Lanza",{
             this.destroy();
     },
     kill: function(collision){
-        if(collision.obj.p.type===Q.SPRITE_ENEMY){ 
+        if(collision.obj.p.type===Q.SPRITE_ENEMY ){ 
             if(collision.obj.p.activo){
                 Q.stage().insert(new Q.Burst({x:collision.obj.p.x,y:collision.obj.p.y}));
                 collision.obj.hit(this.p.damage);
@@ -1398,7 +1450,6 @@ Q.MovingSprite.extend ( "Antorcha" , {
         this.destroy();
     }
 });
-
 //Hachas
 Q.MovingSprite.extend ( "Hacha" , {
     init: function(p) {
@@ -2193,7 +2244,7 @@ Q.scene("L1",function(stage) {
       ["Crow",{x:(222*32)+16,y:(11*32)+16}],
       ["Crow",{x:(227*32)+16,y:(15*32)+16}],
       ["Crow",{x:(230*32)+16,y:(16*32)+16}],
-      ["Devil",{x:(268*32)+16,y:(15*32)+16}]
+      ["Devil",{x:(371*32)+16,y:(15*32)+16}]
     ];
   Q.stageTMX("level2.tmx",stage);
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
