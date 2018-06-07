@@ -180,11 +180,13 @@ Q.preload(function(){
     });
     //Animacion giro antorcha
     Q.animations('Torch', {
-      girar: { frames: [0,1,2,3,4,5,6,7], rate: 1/5, loop:true} 
+      girarIzq: { frames: [0,1,2,3,4,5,6,7], rate: 1/10, loop:true},
+      girarDer: { frames: [7,6,5,4,3,2,1,0], rate: 1/10, loop:true} 
     });
     //Animacion giro antorcha
     Q.animations('Axe', {
-      girar: { frames: [0,1,2,3,4,5,6,7], rate: 1/5, loop:true} 
+      girarIzq: { frames: [0,1,2,3,4,5,6,7], rate: 1/8, loop:true},
+      girarDer: { frames: [7,6,5,4,3,2,1,0], rate: 1/8, loop:true} 
     });
     //Animacion de los objetos de tipo arma
     Q.animations('WeaponObj', {
@@ -242,13 +244,13 @@ Q.input.keyboardControls({
     P: "pausa",
     SPACE:"fire",
     //Trucos:Activar solo en caso de corbardia
-    //ONE:"arma1",
-    //TWO:"arma2",
-    //THREE:"arma3",
-    //FOUR:"arma4",
-    //FIVE:"armor",
-    //SIX:"vida",
-    //X:"frog"
+    ONE:"arma1",
+    TWO:"arma2",
+    THREE:"arma3",
+    FOUR:"arma4",
+    FIVE:"armor",
+    SIX:"vida",
+    X:"frog"
 });
 //Trucos
 Q.input.on("arma1",function() {
@@ -742,7 +744,7 @@ Q.Sprite.extend("Player",{
             this.p.shoot=0;
             var vel=200;
             var mano=this.p.h/2;
-            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,vy:-50,ax:0,ay:70}:{x:this.p.x+mano,y:this.p.y,vy:-50,vx:-vel,ax:0,ay:70};
+            var conf=(this.p.direction ==="right")?{x:this.p.x+mano,y:this.p.y,vx:vel,vy:-50,ax:0,ay:70,direction:this.p.direction}:{x:this.p.x+mano,y:this.p.y,vy:-50,vx:-vel,ax:0,ay:70,direction:this.p.direction};
             Q.stage().insert(new Q.Antorcha(conf));
         }else if(Q.state.get("armaArthur") === "daga"){    
             this.p.shoot=0;
@@ -822,7 +824,6 @@ Q.Sprite.extend("Player",{
     armoDestroyed:function(){
         this.sheet("arthurNude",true);
         this.add("platformerControls");
-        this.p.type=Q.SPRITE_PLAYER;
         this.p.hit=false;
     },
     win:function(){
@@ -1425,7 +1426,7 @@ Q.Sprite.extend("Daga",{
 Q.MovingSprite.extend ( "Antorcha" , {
     init: function(p) {
         this._super(p, {
-            sheet: "antorcha",
+            sheet: "antorchaDer",
             sprite: "Torch",
             gravity:0, 
             damage: 50,        
@@ -1435,7 +1436,13 @@ Q.MovingSprite.extend ( "Antorcha" , {
         this.add('2d, animation');
         this.on("bump.top,bump.bottom,bump.left,bump.right","kill");
         Q.audio.play("torch.ogg");
-        this.play('girar');
+        if(this.p.direction==="right"){
+            this.sheet("antorchaDer",true);
+            this.play('girarIzq');
+        }else{
+            this.sheet("antorchaIzq",true);
+            this.play('girarDer');
+        }   
     },
 
     kill: function(collision){
@@ -1454,7 +1461,7 @@ Q.MovingSprite.extend ( "Antorcha" , {
 Q.MovingSprite.extend ( "Hacha" , {
     init: function(p) {
         this._super(p, {
-            sheet: "axe",
+            sheet: "axeDer",
             sprite: "Axe",
             direction: "right",
             gravity:0, 
@@ -1466,7 +1473,13 @@ Q.MovingSprite.extend ( "Hacha" , {
         this.add('2d, animation');
         this.on("bump.top,bump.bottom,bump.left,bump.right","kill");
         Q.audio.play("torch.ogg");
-        this.play('girar');
+        if(this.p.direction==="right"){
+            this.sheet("axeDer",true);
+            this.play('girarIzq');
+        }else{
+            this.sheet("axeIzq",true);
+            this.play('girarDer');
+        }   
     },
 
     kill: function(collision){
@@ -1921,7 +1934,8 @@ Q.Sprite.extend("ObjArmadura",{
         if(collision.obj.p.type === Q.SPRITE_PLAYER){
             if(collision.obj.p.sheet==="arthurNude"){
             Q.audio.play("putArmour.ogg");
-            collision.obj.p.sheet = "arthurArmo";
+            collision.obj.p.ArmoDestroy=false;
+            collision.obj.sheet("arthurArmo",true);
             }else
                 Q.audio.play("treasurePickUp.ogg");
             Q.state.inc("score",this.p.puntos);

@@ -1,3 +1,4 @@
 {
-    "axe":{"sx":0,"sy":0,"tileW":32,"tileH":32,"frames":8}
+    "axeDer":{"sx":0,"sy":0,"tileW":32,"tileH":32,"frames":8},
+    "axeIzq":{"sx":0,"sy":32,"tileW":32,"tileH":32,"frames":8}
 }
