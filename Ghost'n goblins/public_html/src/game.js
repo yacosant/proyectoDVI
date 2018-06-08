@@ -2102,7 +2102,7 @@ Q.scene('HUD',function(stage) {
   container.insert(new Q.UI.Text({x:200, y:0 ,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_YELLOW,label: "Player", family: Q.FONT_FAMILY  }));
   container.insert(new Q.Score());
   container.insert(new Q.UI.Text({x:400, y:0,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_RED,label: "Lives", family: Q.FONT_FAMILY  }));
-  container.insert(new Q.Lives());
+  //container.insert(new Q.Lives());
   container.insert(new Q.UI.Text({x:600, y:0 ,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_LIGHT_RED,label: "Time", family: Q.FONT_FAMILY  }));
   container.insert(new Q.Timer());
   container.fit(5,200);
@@ -2126,7 +2126,7 @@ Q.UI.Button.extend("LivesTwo",{
     init:function(p) {
         this._super({
             asset: "1up.png",    
-            x: 35,
+            x: 50,
             y: 150
             });
     }
@@ -2136,7 +2136,7 @@ Q.UI.Button.extend("LivesThree",{
     init:function(p) {
         this._super({
             asset: "1up.png",    
-            x: 60,
+            x: 100,
             y: 150
             });
     }
@@ -2146,7 +2146,7 @@ Q.UI.Button.extend("LivesFour",{
     init:function(p) {
         this._super({
             asset: "1up.png",    
-            x: 85,
+            x: 150,
             y: 150
             });
     }
@@ -2156,7 +2156,7 @@ Q.UI.Button.extend("LivesFive",{
     init:function(p) {
         this._super({
             asset: "1up.png",    
-            x: 100,
+            x: 200,
             y: 150
             });
     }
@@ -2211,6 +2211,11 @@ Q.scene('HUD2',function(stage) {
   container.insert(vida3);
   container.insert(vida4);
   container.insert(vida5);
+  vida1.p.opacity = 1;
+  vida2.p.opacity = 1;
+  vida3.p.opacity = 1;
+  vida4.p.opacity = 0;
+  vida5.p.opacity = 0;
 
   Q.state.on("change.lives",function(){
     var lives = Q.state.get("lives");
