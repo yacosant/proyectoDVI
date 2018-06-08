@@ -35,6 +35,8 @@ Q.FONT_FAMILY="ghost";
 Q.FONT_SIZE_SMALL=18;
 Q.FONT_SIZE_MEDIUM=24;
 Q.FONT_SIZE_LARGE=32;
+//Top score
+Q.TOPSCORE=0;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
 Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png","mago.png", "axe.png", "axeHUD.png", "axeMov.png"]);
@@ -214,8 +216,14 @@ Q.preload(function(){
         "magoOpen":{frames: [0],trigger:"return", next:'mago',rate: 1}
     });
     /*------------------------------------------------------------------------*/
+    //Cojer topScore del localStorage
+    if( window.localStorage.getItem("GnGTopScore"))
+        Q.TOPSCORE=window.localStorage.getItem("GnGTopScore");
+    else{
+        window.localStorage.setItem("GnGTopScore",0);
+    }
     //Estado global de juego
-    Q.state.set({ score: 0, lives: 3,maxLives:5, //Puntuaciones
+    Q.state.set({ score: 0, topScore:Number(Q.TOPSCORE), lives: 3,maxLives:5, //Puntuaciones
                   armaArthur: "lanza",
                   level:1,maxLevel:2, //Nivel
                   pause:false,enJuego:false
@@ -436,8 +444,15 @@ Q.component("levelManager",{
             if(lvl%2===0)
                 lvl-=1;
             Q.loadTMX("level"+lvl+".tmx", function() {
-               Q.stage(2).show();
-               Q.stage(3).show();
+                if(Q.stageScene("HUD",2))
+                   Q.stage(2).show();
+                else
+                   Q.stageScene("HUD",2);
+               
+                if(Q.stageScene("HUD2",3))
+                   Q.stage(3).show();
+                else
+                   Q.stageScene("HUD2",3);
                Q.stageScene("L"+lvl,Q("Player").first());
             });
         }
@@ -2037,13 +2052,39 @@ Q.Sprite.extend("Vida",{
         this.mapScreen();
     }
  });
+ //temporizador
+ Q.Sprite.extend("TimeSensor",{
+     init: function(p) {
+        this._super(p, {
+            x:0,y:0,
+            gravity:0,
+            wait:0,
+            time:0,
+            action:""
+        });
+        this.add("levelManager");
+    },
+    step:function(dt){
+        if(this.p.time<this.p.wait)
+            this.p.time+=dt;
+        else
+           this.fin(); 
+    },
+    fin:function(){
+            switch (this.p.action){
+                case "loadLevel":
+                    this.loadLevel();
+                    break;
+            }
+    }
+ });
 /*------------------------------HUD SUPERIOR----------------------------------*/
 //Puntuacion
 Q.UI.Text.extend("Score",{
     init:function(p) {
         this._super({
             label: "0",    
-            x: 200,
+            x: 110,
             y: 25,
             color: Q.COLOR_WHITE,
             size:Q.FONT_SIZE_MEDIUM,
@@ -2053,33 +2094,35 @@ Q.UI.Text.extend("Score",{
     },
     score:function(score) {
         this.p.label = score.toString();
+        if(score>Q.state.get("topScore")){
+            Q.state.set("topScore",score);
+        }
     }
 });
 //vidas
-Q.UI.Text.extend("Lives",{
+Q.UI.Text.extend("TopScore",{
     init:function(p) {
         this._super({
-            label: "3",    
-            x: 400,
+            label: "0",    
+            x: 300,
             y: 25,
             color:Q.COLOR_WHITE,
             size:Q.FONT_SIZE_MEDIUM,
             family: Q.FONT_FAMILY 
             });
-        Q.state.on("change.lives",this,"lives");
+        Q.state.on("change.topScore",this,"topScore");
     },
-    lives:function(lives) {
-        this.p.label = lives.toString();
+    topScore:function(topScore) {
+        this.p.label = topScore.toString();
     }
 });
-
 //Temporizador
 Q.UI.Text.extend("Timer",{
     init:function(p) {
         this._super({
             label: "2:30",    
-            x: 600,
-            y: 25,                              
+            x: 70,
+            y: 75,                              
             color:Q.COLOR_WHITE,
             size:Q.FONT_SIZE_MEDIUM,
             family: Q.FONT_FAMILY 
@@ -2099,11 +2142,13 @@ Q.UI.Text.extend("Timer",{
 //HUD superior
 Q.scene('HUD',function(stage) {
   var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
-  container.insert(new Q.UI.Text({x:200, y:0 ,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_YELLOW,label: "Player", family: Q.FONT_FAMILY  }));
+  container.insert(new Q.UI.Text({x:70, y:0 ,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_YELLOW,label: "Player", family: Q.FONT_FAMILY  }));
   container.insert(new Q.Score());
-  container.insert(new Q.UI.Text({x:400, y:0,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_RED,label: "Lives", family: Q.FONT_FAMILY  }));
-  //container.insert(new Q.Lives());
-  container.insert(new Q.UI.Text({x:600, y:0 ,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_LIGHT_RED,label: "Time", family: Q.FONT_FAMILY  }));
+  container.insert(new Q.UI.Text({x:250, y:0,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_RED,label: "Top score", family: Q.FONT_FAMILY  }));
+  container.insert(new Q.TopScore());
+  Q.state.inc("topScore",1);
+  Q.state.dec("topScore",1);
+  container.insert(new Q.UI.Text({x:70, y:50 ,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_LIGHT_RED,label: "Time", family: Q.FONT_FAMILY  }));
   container.insert(new Q.Timer());
   container.fit(5,200);
   stage.show= function(state){
@@ -2161,7 +2206,6 @@ Q.UI.Button.extend("LivesFive",{
             });
     }
 });
-
 
 //cuadro
 Q.UI.Button.extend("Cuadro",{
@@ -2270,21 +2314,20 @@ Q.scene('HUD2',function(stage) {
           this.hidden=state;
   };
 });
+
 /*------------------------------ESCENAS BASE----------------------------------*/
 //Pantalla de inicio
 Q.scene("initScreen",function(stage){
     Q.state.set("enJuego",false);
     Q.stageTMX("mainMenu.tmx",stage);
-    
     stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: Q.FONT_FAMILY }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
-    Q.state.set({ score:0, lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
+    Q.state.set({ score:0,topScore:Number(Q.TOPSCORE), lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
     //Musica principal del juego
    Q.input.on("confirm",this,function(){
         Q.loadTMX("level2.tmx", function() {
-            Q.stageScene("L1",Q("Player").first());
-            Q.stageScene("HUD",2);
-            Q.stageScene("HUD2",3);
+            Q.audio.play("insertCoin.ogg");
+            Q.stageScene("controlScreen");
             Q.input.off("confirm");
         });
     });
@@ -2299,6 +2342,10 @@ Q.scene("loseScreen",function(stage){
     Q.stageTMX("loseScreen.tmx",stage);
     stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-100,size:Q.FONT_SIZE_LARGE,color: Q.COLOR_RED,label: "Game over", family: Q.FONT_FAMILY  }));
     stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/2-50,size:Q.FONT_SIZE_SMALL,color: Q.COLOR_LIGHT_RED,label: "Pulsa enter para volver al menu principal", family: Q.FONT_FAMILY  }));
+    if(Q.state.get("topScore")>Q.TOPSCORE){
+        Q.TOPSCORE=Q.state.get("topScore");
+        window.localStorage.setItem("GnGTopScore",Q.TOPSCORE);
+    }
     Q.input.on("confirm",this,function(){
         Q.loadTMX("mainMenu.tmx", function() {
             Q.stageScene("initScreen");
@@ -2326,6 +2373,7 @@ Q.scene("mapScreen",function(stage){
     Q.stage(3).show(false);
     Q.state.set("enJuego",false);
     Q.stageTMX("mapScreen.tmx",stage);
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/3,size:Q.FONT_SIZE_LARGE,color:Q.COLOR_BLUE,label:"Player  one  ready!", family: Q.FONT_FAMILY }))
     stage.insert(new Q.Marker(markerPos[Q.state.get("level")]));
 });
 //Mensaje de juego pausado
@@ -2343,6 +2391,17 @@ Q.scene('keyMessage',function(stage) {
   // Expand the container to visibily fit it's contents
   // (with a padding of 20 pixels)
   container.fit(20);
+});
+//Pantalla de controles
+Q.scene('controlScreen',function(stage) {   
+  stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: 50}));
+  stage.insert(new Q.UI.Text({x:Q.width/2, y: 120,size:Q.FONT_SIZE_LARGE,color:Q.COLOR_LIGHT_RED,label:"Controles", family: Q.FONT_FAMILY }));
+  stage.insert(new Q.UI.Text({x:Q.width/2, y: 170,size:Q.FONT_SIZE_MEDIUM,color:Q.COLOR_BLUE,label:"Usa las teclas de cursor izquierda y derecha \n para mover a Arthur", family: Q.FONT_FAMILY }));
+  stage.insert(new Q.UI.Text({x:Q.width/2, y: 250,size:Q.FONT_SIZE_MEDIUM,color:Q.COLOR_BLUE,label:"Usa la tecla de cursor superior para saltar \n y la inferior para agacharte", family: Q.FONT_FAMILY }));
+  stage.insert(new Q.UI.Text({x:Q.width/2, y: 330,size:Q.FONT_SIZE_MEDIUM,color:Q.COLOR_BLUE,label:"Pulsa la barra espaciadora para disparar", family: Q.FONT_FAMILY }));
+  stage.insert(new Q.UI.Text({x:Q.width/2, y: 380,size:Q.FONT_SIZE_MEDIUM,color:Q.COLOR_BLUE,label:'Pulsa la tecla "P"  para pausar la partida', family: Q.FONT_FAMILY }));
+  stage.insert(new Q.UI.Text({x:Q.width/2, y: 480,size:Q.FONT_SIZE_LARGE,color:Q.COLOR_YELLOW,label:'Ready player One!', family: Q.FONT_FAMILY }));
+  stage.insert(new Q.TimeSensor({wait:5,action:"loadLevel"}));
 });
 /*----------------------------------NIVELES-----------------------------------*/ 
 // Nivel 1

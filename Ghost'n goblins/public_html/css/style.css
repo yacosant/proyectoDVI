@@ -2,7 +2,7 @@
 @font-face {
     font-family: 'ghost';
     src: url('../font/ghosts.ttf') format('truetype');
-    font-weight: normal;
+    font-weight: lighter;
     font-style: normal;
 }
 body{
