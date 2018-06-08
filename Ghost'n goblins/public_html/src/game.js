@@ -2212,7 +2212,7 @@ Q.scene('HUD2',function(stage) {
   container.insert(vida4);
   container.insert(vida5);
 
-  Q.state.on("change.timer",function(){
+  Q.state.on("change.lives",function(){
     var lives = Q.state.get("lives");
     switch(lives){
         case 0:
