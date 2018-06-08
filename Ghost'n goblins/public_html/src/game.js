@@ -2111,6 +2111,58 @@ Q.scene('HUD',function(stage) {
   };
 });
 /*-----------------------------HUD INFERIOR-----------------------------------*/
+
+Q.UI.Button.extend("LivesOne",{
+    init:function(p) {
+        this._super({
+            asset: "1up.png",    
+            x: 10,
+            y: 150
+            });
+    }
+});
+
+Q.UI.Button.extend("LivesTwo",{
+    init:function(p) {
+        this._super({
+            asset: "1up.png",    
+            x: 35,
+            y: 150
+            });
+    }
+});
+
+Q.UI.Button.extend("LivesThree",{
+    init:function(p) {
+        this._super({
+            asset: "1up.png",    
+            x: 60,
+            y: 150
+            });
+    }
+});
+
+Q.UI.Button.extend("LivesFour",{
+    init:function(p) {
+        this._super({
+            asset: "1up.png",    
+            x: 85,
+            y: 150
+            });
+    }
+});
+
+Q.UI.Button.extend("LivesFive",{
+    init:function(p) {
+        this._super({
+            asset: "1up.png",    
+            x: 100,
+            y: 150
+            });
+    }
+});
+
+
 //cuadro
 Q.UI.Button.extend("Cuadro",{
     init:function(p) {
@@ -2149,6 +2201,65 @@ Q.scene('HUD2',function(stage) {
   var container = stage.insert(new Q.UI.Container({x:0, y: Q.height-180}));
   container.insert(new Q.Cuadro());
   container.insert(new Q.Arma());
+  var vida1 = new Q.LivesOne();
+  var vida2 = new Q.LivesTwo();
+  var vida3 = new Q.LivesThree();
+  var vida4 = new Q.LivesFour();
+  var vida5 = new Q.LivesFive();
+  container.insert(vida1);
+  container.insert(vida2);
+  container.insert(vida3);
+  container.insert(vida4);
+  container.insert(vida5);
+
+  Q.state.on("change.timer",function(){
+    var lives = Q.state.get("lives");
+    switch(lives){
+        case 0:
+            vida1.p.opacity = 0;
+            vida2.p.opacity = 0;
+            vida3.p.opacity = 0;
+            vida4.p.opacity = 0;
+            vida5.p.opacity = 0;
+        break;
+        case 1:
+            vida1.p.opacity = 1;
+            vida2.p.opacity = 0;
+            vida3.p.opacity = 0;
+            vida4.p.opacity = 0;
+            vida5.p.opacity = 0;
+        break;
+        case 2:
+            vida1.p.opacity = 1;
+            vida2.p.opacity = 1;
+            vida3.p.opacity = 0;
+            vida4.p.opacity = 0;
+            vida5.p.opacity = 0;
+        break;
+        case 3:
+            vida1.p.opacity = 1;
+            vida2.p.opacity = 1;
+            vida3.p.opacity = 1;
+            vida4.p.opacity = 0;
+            vida5.p.opacity = 0;
+        break;
+        case 4:
+            vida1.p.opacity = 1;
+            vida2.p.opacity = 1;
+            vida3.p.opacity = 1;
+            vida4.p.opacity = 1;
+            vida5.p.opacity = 0;
+        break;
+        case 5:
+            vida1.p.opacity = 1;
+            vida2.p.opacity = 1;
+            vida3.p.opacity = 1;
+            vida4.p.opacity = 1;
+            vida5.p.opacity = 1;
+        break;
+    }
+  });
+
   container.fit(5,200);
   stage.show= function(state){
           this.hidden=state;
