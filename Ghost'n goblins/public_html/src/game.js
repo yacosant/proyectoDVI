@@ -1315,15 +1315,20 @@ Q.Sprite.extend("Magician",{
             shootRange: 200,
             flip: 'x',
             hidden:true,
-            collisionMask: Q.SPRITE_DEFAULT || Q.SPRITE_PLAYER
+            collisionMask: Q.SPRITE_DEFAULT | Q.SPRITE_PLAYER
         }); 
-        this.add('2d, GeneradorPremios,animation'); 
-        this.on("return","return");
+        this.add('2d,GeneradorPremios,animation');
+        this.on("bump.top,bump.bottom,bump.left,bump.right",this,"matar"); 
+        this.on("return",this,"return");
         this.play("mago");         
     },
     hit: function(damage){
         this.p.life-=damage;
         if(this.p.life<=0) this.muerte();
+    },
+    matar:function(collision){
+        if(collision.obj.p.type===Q.SPRITE_PLAYER) 
+            collision.obj.hit(collision);
     },
     muerte:function() {
         this.generar(this.p.x,this.p.y); 
@@ -1683,6 +1688,7 @@ Q.Sprite.extend("GhostLance",{
             vx:-150,
             x:0,
             d:0,
+            distance:1500,
            collisionMask: Q.SPRITE_DEFAULT | Q.SPRITE_PLAYER
         }); 
         this.add('2d');      
@@ -1691,6 +1697,10 @@ Q.Sprite.extend("GhostLance",{
             this.p.flip = "x";
             this.p.vx=150;
         }
+    },
+    step:function(){
+        if(this.p.x>this.p.distance)
+            this.destroy();
     },
     kill: function(collision){
         this.destroy();
@@ -1732,7 +1742,10 @@ Q.Sprite.extend("MagicSpark",{
         this.destroy();
     },
     hit: function(damage){},
-    step: function(dt){}
+    step:function(){
+        if(this.p.x>this.p.distance)
+            this.destroy();
+    }
   });
  /*------------------------------EFECTOS--------------------------------------*/
 //Burst
@@ -1859,7 +1872,6 @@ Q.Sprite.extend("ObjAntorcha",{
             this.destroy();
     }
  });
-
 //Arma hacha
 Q.Sprite.extend("ObjHacha",{
     init: function(p) {
@@ -1884,7 +1896,6 @@ Q.Sprite.extend("ObjHacha",{
             this.destroy();
     }
  });
-
 //Arma Daga
 Q.Sprite.extend("ObjDaga",{
     init: function(p) {
