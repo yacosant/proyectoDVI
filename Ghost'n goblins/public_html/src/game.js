@@ -39,7 +39,7 @@ Q.FONT_SIZE_LARGE=32;
 Q.TOPSCORE=0;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png","mago.png", "axe.png", "axeHUD.png", "axeMov.png"]);
+Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png","mago.png", "axe.png", "axeHUD.png", "axeMov.png", "live.png"]);
 //JSON'S 
 Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json","cross.json","door.json","ghost.json","armorGhost.json", "axeMov.json", "axe.json","mago.json"]);
 //Musica
@@ -2171,8 +2171,8 @@ Q.scene('HUD',function(stage) {
 Q.UI.Button.extend("LivesOne",{
     init:function(p) {
         this._super({
-            asset: "1up.png",    
-            x: 10,
+            asset: "live.png",    
+            x: 30,
             y: 150
             });
     }
@@ -2181,8 +2181,8 @@ Q.UI.Button.extend("LivesOne",{
 Q.UI.Button.extend("LivesTwo",{
     init:function(p) {
         this._super({
-            asset: "1up.png",    
-            x: 50,
+            asset: "live.png",    
+            x: 80,
             y: 150
             });
     }
@@ -2191,8 +2191,8 @@ Q.UI.Button.extend("LivesTwo",{
 Q.UI.Button.extend("LivesThree",{
     init:function(p) {
         this._super({
-            asset: "1up.png",    
-            x: 100,
+            asset: "live.png",    
+            x: 130,
             y: 150
             });
     }
@@ -2201,8 +2201,8 @@ Q.UI.Button.extend("LivesThree",{
 Q.UI.Button.extend("LivesFour",{
     init:function(p) {
         this._super({
-            asset: "1up.png",    
-            x: 150,
+            asset: "live.png",    
+            x: 180,
             y: 150
             });
     }
@@ -2212,7 +2212,7 @@ Q.UI.Button.extend("LivesFive",{
     init:function(p) {
         this._super({
             asset: "1up.png",    
-            x: 200,
+            x: 230,
             y: 150
             });
     }
@@ -2266,11 +2266,11 @@ Q.scene('HUD2',function(stage) {
   container.insert(vida3);
   container.insert(vida4);
   container.insert(vida5);
-  vida1.p.opacity = 1;
+  /*vida1.p.opacity = 1;
   vida2.p.opacity = 1;
   vida3.p.opacity = 1;
   vida4.p.opacity = 0;
-  vida5.p.opacity = 0;
+  vida5.p.opacity = 0;*/
 
   Q.state.on("change.lives",function(){
     var lives = Q.state.get("lives");
