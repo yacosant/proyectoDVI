@@ -50,6 +50,7 @@ El objetivo del juego consiste en superar los niveles y rescatar a la princesa.
 
 ### NIVELES 
 ![niveles](/md/niveles.gif)
+
 Nuestro juego se desarrolla en uno de los siete niveles que dispone el juego original,  el cementerio y el bosque.
  
 **El cementerio y el bosque**
@@ -67,8 +68,8 @@ Sigue el siguiente *flujo*:
 2. Si no le quedan vidas: Carga la pantalla de fin de partida dando la posibilidad de volver al menú principal
 3. Si el jugador llega al final de nivel: Se carga la pantalla del victoria
 
-###ELEMENTOS PRINCIPALES
-	1.* *Arthur**
+### ELEMENTOS PRINCIPALES
+	1. * *Arthur**
 	
 	2. *Enemigos** explicados previamente
 	
@@ -91,7 +92,7 @@ Sigue el siguiente *flujo*:
 	* Vida extra
 	* Armadura
 	
-###MEJORAS LLEVADAS A CABO DESDE LA PRESENTACION
+### MEJORAS LLEVADAS A CABO DESDE LA PRESENTACION
 1. Añadir nuevos enemigos:
 * Caballero con armadura
 * Fantasma
@@ -109,7 +110,7 @@ Sigue el siguiente *flujo*:
 
 7. Mejora de mecanicas existentes
 
-###TRUCOS
+### TRUCOS
 	* 1-4:armas
 	* 5:armadura
 	* 6:vida
