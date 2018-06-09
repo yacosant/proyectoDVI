@@ -2173,7 +2173,8 @@ Q.UI.Button.extend("LivesOne",{
         this._super({
             asset: "live.png",    
             x: 30,
-            y: 150
+            y: 150,
+            opacity: 1
             });
     }
 });
@@ -2183,7 +2184,8 @@ Q.UI.Button.extend("LivesTwo",{
         this._super({
             asset: "live.png",    
             x: 80,
-            y: 150
+            y: 150,
+            opacity: 1
             });
     }
 });
@@ -2193,7 +2195,8 @@ Q.UI.Button.extend("LivesThree",{
         this._super({
             asset: "live.png",    
             x: 130,
-            y: 150
+            y: 150,
+            opacity: 1
             });
     }
 });
@@ -2203,7 +2206,8 @@ Q.UI.Button.extend("LivesFour",{
         this._super({
             asset: "live.png",    
             x: 180,
-            y: 150
+            y: 150,
+            opacity: 0
             });
     }
 });
@@ -2211,9 +2215,10 @@ Q.UI.Button.extend("LivesFour",{
 Q.UI.Button.extend("LivesFive",{
     init:function(p) {
         this._super({
-            asset: "1up.png",    
+            asset: "live.png",    
             x: 230,
-            y: 150
+            y: 150,
+            opacity: 0
             });
     }
 });
