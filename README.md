@@ -94,7 +94,7 @@ Sigue el siguiente *flujo*:
 	
 ### MEJORAS LLEVADAS A CABO DESDE LA PRESENTACION
 1. Añadir nuevos enemigos:
-* Caballero con armadura
+	* Caballero con armadura
 * Fantasma
 * Mago que nos convierte en rana
 
