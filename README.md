@@ -112,11 +112,12 @@ Sigue el siguiente *flujo*:
 
 ## TRUCOS
 Teclas para activarlos:
-	* 1-4:armas
-	* 5:armadura
-	* 6:vida
-	* X:modo rana
-
+```	
+		1-4:armas
+		5:armadura
+		6:vida
+		X:modo rana
+```
 ## DESARROLLADORES
 * Andrea Martin
 * Jose Luis Sánchez Gárcia 
