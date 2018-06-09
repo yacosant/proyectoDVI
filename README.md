@@ -47,7 +47,6 @@ El objetivo del juego consiste en superar los niveles y rescatar a la princesa.
 **Demonio rojo:** Es quien secuestra a nuestra amada princesa. Es fuerte, rápido y nos lanzará shurikens voladores. Debes seguir de cerca su vuelo para poder atacar en el momento preciso.
 
 
-
 ### NIVELES 
 ![niveles](/md/niveles.gif)
 
@@ -74,29 +73,29 @@ Sigue el siguiente *flujo*:
 2. **Enemigos** explicados previamente
 
 3. **Armas:** 
-* Lanza
-* Daga 
-* Antorcha
-* Hacha
+	* Lanza
+	* Daga 
+	* Antorcha
+	* Hacha
 	
 4. **Otros elementos:**
-* Proyectiles de enemigos
-* Chispas
-* Sangre 
-* Plataforma
-* Tumbas
+	* Proyectiles de enemigos
+	* Chispas
+	* Sangre 
+	* Plataforma
+	* Tumbas
 	
 5. **Elementos generados:**
-* Bustos
-* Items de Armas
-* Vida extra
-* Armadura
+	* Bustos
+	* Items de Armas
+	* Vida extra
+	* Armadura
 	
 ### MEJORAS LLEVADAS A CABO DESDE LA PRESENTACION
 1. Añadir nuevos enemigos:
 	* Caballero con armadura
-* Fantasma
-* Mago que nos convierte en rana
+	* Fantasma
+	* Mago que nos convierte en rana
 
 2. Añadir HUB
 
