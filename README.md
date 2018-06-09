@@ -69,28 +69,28 @@ Sigue el siguiente *flujo*:
 3. Si el jugador llega al final de nivel: Se carga la pantalla del victoria
 
 ### ELEMENTOS PRINCIPALES
-	1. * *Arthur**
+1. * *Arthur**
+
+2. *Enemigos** explicados previamente
+
+3. *Armas:** 
+* Lanza
+* Daga 
+* Antorcha
+* Hacha
 	
-	2. *Enemigos** explicados previamente
+4. *Otros elementos:**
+* Proyectiles de enemigos
+* Chispas
+* Sangre 
+* Plataforma
+* Tumbas
 	
-	3. *Armas:** 
-	* Lanza
-	* Daga 
-	* Antorcha
-	* Hacha
-	
-	4. *Otros elementos:**
-	* Proyectiles de enemigos
-	* Chispas
-	* Sangre 
-	* Plataforma
-	* Tumbas
-	
-	5. *Elementos generados:**
-	* Bustos
-	* Items de Armas
-	* Vida extra
-	* Armadura
+5. *Elementos generados:**
+* Bustos
+* Items de Armas
+* Vida extra
+* Armadura
 	
 ### MEJORAS LLEVADAS A CABO DESDE LA PRESENTACION
 1. Añadir nuevos enemigos:
@@ -111,10 +111,11 @@ Sigue el siguiente *flujo*:
 7. Mejora de mecanicas existentes
 
 ### TRUCOS
-	* 1-4:armas
-	* 5:armadura
-	* 6:vida
-	* X:modo rana
+Teclas para activarlos:
+	1-4:armas
+	5:armadura
+	6:vida
+	X:modo rana
 
 ## DESARROLLADORES
 * Andrea Martin
