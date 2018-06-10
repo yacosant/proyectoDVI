@@ -39,7 +39,7 @@ Q.FONT_SIZE_LARGE=32;
 Q.TOPSCORE=0;
 //*-------------------------CARGA DE CONTENIDO--------------------------------*/
 //Imagenes
-Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png","mago.png", "axe.png", "axeHUD.png", "axeMov.png", "live.png"]);
+Q.preload(["main_title.png","ArthurV2.png","cuchilloMov.png","lanzaMov.png","antorchaMov.png","armour.png","zombie.png","crow.png","princess.png","burst.png", "spark.png","lance.png","plant.png", "grave0.png", "grave1.png", "grave2.png", "jar.png","marker.png","devil.png","bullet.png","shuriken.png","antorcha.png","movingPlatform.png","antorcha.png","cuchillo.png","fire.png","1up.png","items.png","cross.png","door.png", "lanceHUD.png", "cuadro.png", "cuchilloHUD.png", "antorchaHUD.png", "ghost.png", "ghostLance.png", "armorGhost.png","mago.png", "axe.png", "axeHUD.png", "axeMov.png", "live.png","movPlatUpDown.png"]);
 //JSON'S 
 Q.preload(["ArthurV2.json", "cuchilloMov.json", "lanzaMov.json","antorchaMov.json", "zombie.json","crow.json", "princess.json","burst.json", "spark.json","plant.json","devil.json","fire.json","bullet.json","shuriken.json","antorcha.json", "items.json","cross.json","door.json","ghost.json","armorGhost.json", "axeMov.json", "axe.json","mago.json"]);
 //Musica
@@ -339,6 +339,30 @@ Q.component('aiBounce2', {
       this.entity.p.vy =-20;
     }
   });
+//IA plataforma UpDown
+Q.component('aiPlatUpDown', {
+  added: function() {
+    Q._defaults(this.entity.p,{
+      top:0
+    });
+    this.entity.on("bump.bottom",this,"goUp");
+    this.entity.on("step",this,"moving");
+  },
+  setOptions:function(top){
+        this.entity.p.top=top;
+  },
+  goUp: function(col) {
+    this.entity.p.vy =-100;
+    this.entity.p.dir="up";
+  },
+  moving:function(){
+    var y=this.entity.p.y +(this.entity.p.h/2);
+    if(this.entity.p.top>0 && y-this.entity.p.h<this.entity.p.top){
+        this.entity.p.vy = 100;
+        this.entity.p.dir="down";
+    }
+  }
+});
 Q.component("aiBounceDevil",{
     added: function() {
       Q._defaults(this.entity.p,{
@@ -565,8 +589,8 @@ Q.Sprite.extend("Player",{
             respawnPoints:[{x:0,y:0},//respawn
                            {x:(16*32)+16,y:(21*32)+16},//level1 point 1
                            {x:(132*32)+16,y:(21*32)+16},//level1 point 2 132x
-                           {x:(18*32)+16,y:(94*32)+16},//level1 point 1
-                           {x:(132*32)+16,y:(21*32)+16}//level1 point 2 132x
+                           {x:(267*32)+16,y:(94*32)+16},//level1 point 1 18px
+                           {x:(132*32)+16,y:(21*32)+16}//level1 point 2 
                           ]
             
         });
@@ -1663,27 +1687,7 @@ Q.Sprite.extend("Shuriken",{
         this.destroy();
     }
  });
-//Plataforma agua
-Q.Sprite.extend("movingPlataform",{
-  init: function(p) {
-      this._super(p, {
-          asset: "movingPlatform.png", 
-          gravity: 0,
-          type: Q.SPRITE_DEFAULT,
-          vx:100,
-          x:0,
-          dir:'d',
-         collisionMask: Q.SPRITE_DEFAULT
-      }); 
-      this.add('2d , aiBounce');        
-      this.on("bump.top","col");    
-  },
-
-  col: function(collision){
-      if(collision.obj.p.type===Q.SPRITE_PLAYER) collision.obj.p.x=this.p.x;
-  }
-});
-//Lanza del Ghost
+ //Lanza del Ghost
 Q.Sprite.extend("GhostLance",{
     init: function(p) {
         this._super(p, {
@@ -1719,7 +1723,7 @@ Q.Sprite.extend("GhostLance",{
         this.destroy();
     }
   });
-  //Lanza del Ghost
+//Lanza del Ghost
 Q.Sprite.extend("MagicSpark",{
     init: function(p) {
         this._super(p, {
@@ -1752,6 +1756,54 @@ Q.Sprite.extend("MagicSpark",{
             this.destroy();
     }
   });
+//Plataforma agua
+Q.Sprite.extend("movingPlataform",{
+  init: function(p) {
+      this._super(p, {
+          asset: "movingPlatform.png", 
+          gravity: 0,
+          type: Q.SPRITE_DEFAULT,
+          vx:100,
+          x:0,
+          dir:'d',
+         collisionMask: Q.SPRITE_DEFAULT
+      }); 
+      this.add('2d , aiBounce');        
+      this.on("bump.top","col");    
+  },
+
+  col: function(collision){
+      if(collision.obj.p.type===Q.SPRITE_PLAYER) collision.obj.p.x=this.p.x;
+  }
+});
+//Plataforma stage 2
+Q.Sprite.extend("MovPlatUpDown",{
+  init: function(p) {
+      this._super(p, {
+          asset: "movPlatUpDown.png", 
+          gravity: 0,
+          type: Q.SPRITE_DEFAULT,
+          x:0,
+          collisionMask: Q.SPRITE_DEFAULT
+      }); 
+      this.add('2d , aiPlatUpDown');        
+      this.on("bump.top","col");
+      this.aiPlatUpDown.setOptions((80*32)+16);
+  },
+
+  col: function(collision){
+        if(collision.obj.p.type===Q.SPRITE_PLAYER) {
+            if(this.p.dir==="up"){
+                collision.obj.p.y=this.p.y-47;
+                this.p.vy=-100;
+            }else{
+                collision.obj.p.y=this.p.y-46;
+                this.p.vy=100;
+            }
+        }
+  }
+});
+
  /*------------------------------EFECTOS--------------------------------------*/
 //Burst
 Q.Sprite.extend("Burst",{ 
@@ -2272,7 +2324,7 @@ Q.scene('HUD2',function(stage) {
   container.insert(vida4);
   container.insert(vida5);
   
-  Q.state.on("change.lives",function(){
+  Q.state.on("change.lives",this,function(){
     var lives = Q.state.get("lives");
     switch(lives){
         case 0:
@@ -2333,7 +2385,7 @@ Q.scene("initScreen",function(stage){
     Q.stageTMX("mainMenu.tmx",stage);
     stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: Q.FONT_FAMILY }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
-    Q.state.set({ score:0,topScore:Number(Q.TOPSCORE), lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
+    Q.state.set({ score:0,topScore:Number(Q.TOPSCORE), lives:3,level:3,armaArthur:"lanza",pause:false,enJuego:false });
     //Musica principal del juego
    Q.input.on("confirm",this,function(){
         Q.audio.play("insertCoin.ogg");
@@ -2413,12 +2465,12 @@ Q.scene('controlScreen',function(stage) {
   stage.insert(new Q.TimeSensor({wait:2,action:"loadLevel"}));
 });
 /*----------------------------------NIVELES-----------------------------------*/ 
-// Nivel 1
+// Stage 1
 Q.scene("L1",function(stage) {
   Q.state.set("enJuego",true);
   var levelAssets = [
       //Cementerio P1
-      /*["Zombie",{x:(32*32)+16,y:(21*32)+16}],
+      ["Zombie",{x:(32*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(34*32)+16,y:(21*32)+16}],
       ["Crow",{x:(39*32)+16,y:(18*32)+16}],
       ["Magician",{x:(40*32)+20,y:(20*32)-6}],
@@ -2442,7 +2494,7 @@ Q.scene("L1",function(stage) {
       ["Crow",{x:(100*32)+16,y:(18*32)+16}],
       ["Zombie",{x:(101*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(105*32)+16,y:(21*32)+16}],
-      ["Crow",{x:(107*32)+16,y:(19*32)+16}],*/
+      ["Crow",{x:(107*32)+16,y:(19*32)+16}],
       //entrada bosque
       ["Zombie",{x:(140*32)+16,y:(21*32)+16}],
       ["Plant",{x:(145*32)+16,y:(21*32)+16}],
@@ -2485,7 +2537,7 @@ Q.scene("L1",function(stage) {
   backMusic.playMusic(false);
   stage.loadAssets(levelAssets);
 });
-// Nivel 1
+// Satge 2
 Q.scene("L3",function(stage) {
   Q.state.set("enJuego",true);
   var levelAssets = [];
