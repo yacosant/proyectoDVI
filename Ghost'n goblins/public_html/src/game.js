@@ -2228,57 +2228,27 @@ Q.scene('HUD',function(stage) {
   };
 });
 /*-----------------------------HUD INFERIOR-----------------------------------*/
-
-Q.UI.Button.extend("LivesOne",{
+//vida HUD
+Q.UI.Button.extend("Live",{
     init:function(p) {
         this._super({
-            asset: "live.png",    
-            x: 10,
-            y: 150
+            asset: "live.png",
+            y:Q.height-15
             });
+             Q.state.on("change.lives",this,"lives");
+    },
+    lives:function(){
+        var i=0;
+        var lives= Q.state.get("lives");
+        Q("Live",3).each(function(){
+            if(i<lives)
+                this.p.hidden=false;
+            else
+                this.p.hidden=true;
+            i++;
+        });
     }
 });
-
-Q.UI.Button.extend("LivesTwo",{
-    init:function(p) {
-        this._super({
-            asset: "live.png",    
-            x: 50,
-            y: 150
-            });
-    }
-});
-
-Q.UI.Button.extend("LivesThree",{
-    init:function(p) {
-        this._super({
-            asset: "live.png",    
-            x: 100,
-            y: 150
-            });
-    }
-});
-
-Q.UI.Button.extend("LivesFour",{
-    init:function(p) {
-        this._super({
-            asset: "live.png",    
-            x: 150,
-            y: 150
-            });
-    }
-});
-
-Q.UI.Button.extend("LivesFive",{
-    init:function(p) {
-        this._super({
-            asset: "live.png",    
-            x: 200,
-            y: 150
-            });
-    }
-});
-
 //cuadro
 Q.UI.Button.extend("Cuadro",{
     init:function(p) {
@@ -2299,7 +2269,7 @@ Q.UI.Button.extend("Arma",{
             });
         Q.state.on("change.armaArthur",this,"arma");
     },
-    arma:function(lives) {
+    arma:function() {
         var armaEquipada = Q.state.get("armaArthur");
         if(armaEquipada === "lanza"){
             this.p.asset = "lanceHUD.png";
@@ -2314,68 +2284,23 @@ Q.UI.Button.extend("Arma",{
 });
 //HUD inferior
 Q.scene('HUD2',function(stage) {
-  var container = stage.insert(new Q.UI.Container({x:0, y: Q.height-180}));
-  container.insert(new Q.Cuadro());
-  container.insert(new Q.Arma());
-  var vida1 = new Q.LivesOne();
-  var vida2 = new Q.LivesTwo();
-  var vida3 = new Q.LivesThree();
-  var vida4 = new Q.LivesFour();
-  var vida5 = new Q.LivesFive();
-  container.insert(vida1);
-  container.insert(vida2);
-  container.insert(vida3);
-  container.insert(vida4);
-  container.insert(vida5);
-  
-  Q.state.on("change.lives",this,function(){
-    var lives = Q.state.get("lives");
-    switch(lives){
-        case 0:
-            vida1.p.opacity = 0;
-            vida2.p.opacity = 0;
-            vida3.p.opacity = 0;
-            vida4.p.opacity = 0;
-            vida5.p.opacity = 0;
-        break;
-        case 1:
-            vida1.p.opacity = 1;
-            vida2.p.opacity = 0;
-            vida3.p.opacity = 0;
-            vida4.p.opacity = 0;
-            vida5.p.opacity = 0;
-        break;
-        case 2:
-            vida1.p.opacity = 1;
-            vida2.p.opacity = 1;
-            vida3.p.opacity = 0;
-            vida4.p.opacity = 0;
-            vida5.p.opacity = 0;
-        break;
-        case 3:
-            vida1.p.opacity = 1;
-            vida2.p.opacity = 1;
-            vida3.p.opacity = 1;
-            vida4.p.opacity = 0;
-            vida5.p.opacity = 0;
-        break;
-        case 4:
-            vida1.p.opacity = 1;
-            vida2.p.opacity = 1;
-            vida3.p.opacity = 1;
-            vida4.p.opacity = 1;
-            vida5.p.opacity = 0;
-        break;
-        case 5:
-            vida1.p.opacity = 1;
-            vida2.p.opacity = 1;
-            vida3.p.opacity = 1;
-            vida4.p.opacity = 1;
-            vida5.p.opacity = 1;
-        break;
-    }
-  });
-
+    var container = stage.insert(new Q.UI.Container({x:0, y: Q.height-180}));
+    container.insert(new Q.Cuadro());
+    container.insert(new Q.Arma());
+    const maxLives= Q.state.get("maxLives");
+    const lives= Q.state.get("lives");
+    var i=0;
+    for(i=0;i<maxLives;i++)
+          stage.insert(new Q.Live());
+    i=0;
+    Q("Live",3).each(function(){
+        this.p.x=30+(40*i);
+        if(i<lives)
+            this.p.hidden=false;
+        else
+            this.p.hidden=true;
+        i++;
+    });
   container.fit(5,200);
   stage.show= function(state){
           this.hidden=state;
@@ -2389,7 +2314,7 @@ Q.scene("initScreen",function(stage){
     Q.stageTMX("mainMenu.tmx",stage);
     stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: Q.FONT_FAMILY }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
-    Q.state.set({ score:0,topScore:Number(Q.TOPSCORE), lives:3,level:3,armaArthur:"lanza",pause:false,enJuego:false });
+    Q.state.set({ score:0,topScore:Number(Q.TOPSCORE), lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
     //Musica principal del juego
    Q.input.on("confirm",this,function(){
         Q.audio.play("insertCoin.ogg");
@@ -2438,7 +2363,7 @@ Q.scene("mapScreen",function(stage){
     Q.stage(3).show(false);
     Q.state.set("enJuego",false);
     Q.stageTMX("mapScreen.tmx",stage);
-    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/3,size:Q.FONT_SIZE_LARGE,color:Q.COLOR_BLUE,label:"Player  one  ready!", family: Q.FONT_FAMILY }))
+    stage.insert(new Q.UI.Text({x:Q.width/2, y: Q.height/3,size:Q.FONT_SIZE_LARGE,color:Q.COLOR_BLUE,label:"Player  one  ready!", family: Q.FONT_FAMILY }));
     stage.insert(new Q.Marker(markerPos[Q.state.get("level")]));
 });
 //Mensaje de juego pausado
