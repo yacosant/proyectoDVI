@@ -616,6 +616,9 @@ Q.Sprite.extend("Player",{
         }      
     },
     step:function(dt){
+        var xA = this.p.x;
+        var yA = this.p.y;
+
         this.p.shoot+=dt; //Aumentamos el tiempo sin disparar
         this.Timer.step(dt);
         //Comprobamos el tiempo
@@ -919,7 +922,7 @@ Q.Sprite.extend("Zombie",{
        else if(collision.obj.p.type===Q.SPRITE_TUMBA){
            this.play("zombieBye");
            this.p.vx=0;
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     },
     hit: function(damage){
@@ -1637,7 +1640,7 @@ Q.Sprite.extend("Bullet",{
             collision.obj.hit(collision);
         } else if(collision.obj.p.type===Q.SPRITE_DEFAULT) 
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
-        else if(collision.tile === 91) 
+        else if(collision.tile === 91 || collision.tile === 7) 
             this.destroy();
     },
     hit: function(damage){
@@ -1857,7 +1860,7 @@ Q.Sprite.extend("Fire",{
             collision.obj.hit(collision);
         else if(collision.obj.p.type === Q.SPRITE_ENEMY)
             collision.obj.hit(this.p.damage);
-        else if(collision.tile === 91)
+        else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
 }); 
@@ -1901,7 +1904,7 @@ Q.Sprite.extend("Premio",{
            Q.audio.play("treasurePickUp.ogg");
            Q.state.inc("score",this.p.puntos);
            this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -1925,7 +1928,7 @@ Q.Sprite.extend("ObjAntorcha",{
             Q.state.set("armaArthur","antorcha");
             Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -1949,7 +1952,7 @@ Q.Sprite.extend("ObjHacha",{
             Q.state.set("armaArthur","hacha");
             Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -1973,7 +1976,7 @@ Q.Sprite.extend("ObjDaga",{
            Q.state.set("armaArthur","daga");
            Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -1997,7 +2000,7 @@ Q.Sprite.extend("ObjLanza",{
             Q.state.set("armaArthur","lanza");
             Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -2023,7 +2026,7 @@ Q.Sprite.extend("ObjArmadura",{
                 Q.audio.play("treasurePickUp.ogg");
             Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -2049,7 +2052,7 @@ Q.Sprite.extend("Vida",{
                 Q.state.inc("score",this.p.puntos);
             }
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -2077,7 +2080,7 @@ Q.Sprite.extend("Vida",{
             Q.clearStage(5);
             Q("Door").first().unlock();
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     },
     show:function(){
@@ -2465,7 +2468,42 @@ Q.scene("L1",function(stage) {
 // Satge 2
 Q.scene("L3",function(stage) {
   Q.state.set("enJuego",true);
-  var levelAssets = [];
+  var levelAssets = [
+    ["Zombie",{x:(258*32)+16,y:(86*32)+16}],
+    ["Crow",{x:(252*32)+16,y:(80*32)+16}],
+    ["Crow",{x:(260*32)+16,y:(78*32)+16}],
+    ["Zombie",{x:(250*32)+16,y:(86*32)+16}],
+    ["Zombie",{x:(246*32)+16,y:(93*32)+16}],
+    ["Zombie",{x:(252*32)+16,y:(93*32)+16}],
+    ["Ghost",{x:(260*32)+16,y:(84*32)+16}],
+    ["Zombie",{x:(266*32)+16,y:(93*32)+16}],
+    
+    //Plataformas flotantes
+    ["Zombie",{x:(293*32)+16,y:(93*32)+16}],
+    ["Ghost",{x:(294*32)+16,y:(86*32)+16}],
+    ["Ghost",{x:(299*32)+16,y:(84*32)+16}],
+    ["Zombie",{x:(300*32)+16,y:(93*32)+16}],
+    ["Zombie",{x:(310*32)+16,y:(93*32)+16}],
+    ["Zombie",{x:(293*32)+16,y:(86*32)+16}],
+    ["Zombie",{x:(308*32)+16,y:(86*32)+16}],
+    ["Ghost",{x:(317*32)+16,y:(92*32)+16}]
+
+    
+    ["Premio",{x:(296*32)+16,y:(69*32)+16}],
+    ["Zombie",{x:(291*32)+16,y:(75*32)+16}],
+    ["Crow",{x:(293*32)+16,y:(75*32)+16}],
+    ["Zombie",{x:(301*32)+16,y:(75*32)+16}],
+    ["Crow",{x:(305*32)+16,y:(75*32)+16}],
+    ["Zombie",{x:(293*32)+16,y:(87*32)+16}],
+    ["Zombie",{x:(296*32)+16,y:(87*32)+16}],
+    ["Zombie",{x:(299*32)+16,y:(87*32)+16}],
+    ["Plant",{x:(313*32)+16,y:(93*32)+16}],
+    ["Zombie",{x:(319*32)+16,y:(87*32)+16}],
+    ["Zombie",{x:(308*32)+16,y:(87*32)+16}],
+    ["Zombie",{x:(324*32)+16,y:(87*32)+16}],
+    ["Crow",{x:(320*32)+16,y:(87*32)+16}],
+
+  ];
   Q.stageTMX("stage3.tmx",stage);
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
   stage.viewport.offset(0,120);
