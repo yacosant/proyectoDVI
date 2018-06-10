@@ -123,24 +123,24 @@ Teclas para activarlos:
 ## DESARROLLADORES
 * **Andrea Martin** *(Carga del 32%)*
 
-	Desarrollo de las armas
-	Desarrollo del HUD
-	Creación de mapa
-	Desarrollo del generador de premios y de los respectivos elementos de premio
+	- Desarrollo de las armas
+	- Desarrollo del HUD
+	- Creación de mapa
+	- Desarrollo del generador de premios y de los respectivos elementos de premio
 	
 * **Jose Luis Sánchez Gárcia** *(Carga del 34%)*
 
-	Desarrollo total del personaje Arthur, su hoja de sprites, sus animaciones, y todas sus funcionabilidades.
-	Diseño de las tiles del mapa y su posterior creación
-	Organización general del flujo
-	Parte visual: css y fonts
+	- Desarrollo total del personaje Arthur, su hoja de sprites, sus animaciones, y todas sus funcionabilidades.
+	- Diseño de las tiles del mapa y su posterior creación
+	- Organización general del flujo
+	- Parte visual: css y fonts
 	
 * **Yaco Alejandro Santiago Pérez** *(Carga del 34%)*
 
-	Desarrollo de la totalidad de los enemigos del juego junto con sus respectivos sprites, animaciones, comportamientos y componentes.
-	Desarrollo de todas las armas enemigas y sus respectivos sheets y comportamientos.
-	Desarrollo completo de elemntos adicionales como lanza, brillos, sangre, plataforma movil, proyectiles enemigos.
-	Pequeñas gestiones y planificaciones
+	- Desarrollo de la totalidad de los enemigos del juego junto con sus respectivos sprites, animaciones, comportamientos y componentes.
+	- Desarrollo de todas las armas enemigas y sus respectivos sheets y comportamientos.
+	- Desarrollo completo de elemntos adicionales como lanza, brillos, sangre, plataforma movil, proyectiles enemigos.
+	- Pequeñas gestiones y planificaciones
 	
 	
 
