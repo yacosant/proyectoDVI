@@ -225,7 +225,7 @@ Q.preload(function(){
     //Estado global de juego
     Q.state.set({ score: 0, topScore:Number(Q.TOPSCORE), lives: 3,maxLives:5, //Puntuaciones
                   armaArthur: "lanza",
-                  level:1,maxLevel:2, //Nivel
+                  level:1,maxLevel:4, //Nivel
                   pause:false,enJuego:false
                 });
     //Controlador de la musica de fondo
@@ -377,11 +377,11 @@ Q.component("aiBounceDevil",{
       this.entity.on("bump.right",this,"goRight");
       this.entity.on("step",this,"moving");
     },
-    setLimits:function(ground,top,left,right){
-        this.entity.p.ground=ground;
-        this.entity.p.top=top;
-        this.entity.p.limitLeft=left;
-        this.entity.p.limiRight=right;
+    setLimits:function(limits){
+        this.entity.p.ground=limits.ground;
+        this.entity.p.top=limits.top;
+        this.entity.p.limitLeft=limits.left;
+        this.entity.p.limiRight=limits.right;
     },
     goDown: function(col) {
        this.entity.p.vy = 200;
@@ -587,10 +587,10 @@ Q.Sprite.extend("Player",{
             ladderX:0,
             ladderTile:0,
             respawnPoints:[{x:0,y:0},//respawn
-                           {x:(16*32)+16,y:(21*32)+16},//level1 point 1
-                           {x:(132*32)+16,y:(21*32)+16},//level1 point 2 132x
-                           {x:(267*32)+16,y:(94*32)+16},//level1 point 1 18px
-                           {x:(132*32)+16,y:(21*32)+16}//level1 point 2 
+                           {x:(16*32)+16,y:(21*32)+16},//stage 1 point 1
+                           {x:(132*32)+16,y:(21*32)+16},//stage 1 point 2 132x
+                           {x:(18*32)+16,y:(94*32)+16},//stage 2 point 1 18px
+                           {x:(221*32)+16,y:(94*32)+16}//stage 2 point 2  221px
                           ]
             
         });
@@ -822,20 +822,22 @@ Q.Sprite.extend("Player",{
         }
     },
     muerto:function(){
-        this.p.muerto=true;
-        Q.state.set("armaArthur","lanza");
-        this.p.stopTimer=true;
-        this.p.vx=0;
-        this.p.type= Q.SPRITE_NONE;
-        this.off("bump.bottom");
-        this.del("platformerControls,2d");
-        Q.audio.stop();
-        Q.audio.play("die.ogg");
-        this.p.sheet="arthurDie";
-        if(this.p.direction ==="right")
-                    this.play("dieArthurRight");
-                else
-                    this.play("dieArthurLeft");
+        if(!this.p.muerto){
+            this.p.muerto=true;
+            Q.state.set("armaArthur","lanza");
+            this.p.stopTimer=true;
+            this.p.vx=0;
+            this.p.type= Q.SPRITE_NONE;
+            this.off("bump.bottom");
+            this.del("platformerControls,2d");
+            Q.audio.stop();
+            Q.audio.play("die.ogg");
+            this.p.sheet="arthurDie";
+            if(this.p.direction ==="right")
+                        this.play("dieArthurRight");
+                    else
+                        this.play("dieArthurLeft");
+        }
     },
     respawn:function(){
         this.destroy();
@@ -1050,6 +1052,8 @@ Q.Sprite.extend("Plant",{
     matar:function(collision){
         if(collision.obj.p.type===Q.SPRITE_PLAYER) 
             collision.obj.hit(collision);
+        else if(collision.tile === 91 || collision.tile === 7)
+            this.destroy();
     },
     hit: function(damage){
         this.p.life-=damage;
@@ -1110,7 +1114,10 @@ Q.Sprite.extend("Devil",{
             life:120,
             puntos: 1000,
             type: Q.SPRITE_ENEMY,
-            collisionMask: Q.SPRITE_PLAYER
+            collisionMask: Q.SPRITE_PLAYER,
+            limits:[{top:(14*32)+16,ground:(22*32)+16,left:247*32,right:284*32},//stage 1
+                    {top:(86*32)+16,ground:(94*32)+16,left:354*32,right:382*32} //stage 2
+            ]
         }); 
         this.add("2d,animation");  
         this.on("bump.top,bump.bottom,bump.left,bump.right","matar");
@@ -1140,7 +1147,10 @@ Q.Sprite.extend("Devil",{
             this.p.vx=200;
             this.p.vy=200;
             this.add("aiBounceDevil");
-            this.aiBounceDevil.setLimits((22*32)+16,(14*32)+16,247*32,284*32);
+            var stageLimits=0;
+            if(Q.state.get("level")===1 || Q.state.get("level")===2)stageLimits=0;
+            if(Q.state.get("level")===3 || Q.state.get("level")===4)stageLimits=1;
+            this.aiBounceDevil.setLimits(this.p.limits[stageLimits]);
             this.play("devil");
         }
         if(this.p.activo  && art!==undefined){
@@ -2432,7 +2442,6 @@ Q.scene("L1",function(stage) {
       ["Plant",{x:(169*32)+16,y:(21*32)+16}],
       ["ArmorGhost",{x:(186*32)+16,y:(19*32)+16}],
       ["ArmorGhost",{x:(190*32)+16,y:(19*32)+16}],
-      ["Plant",{x:(192*32)+16,y:(21*32)+16}],
       ["ArmorGhost",{x:(210*32)+16,y:(19*32)+16}],
       ["ArmorGhost",{x:(214*32)+16,y:(19*32)+16}],
       //Bosque linde
@@ -2479,13 +2488,10 @@ Q.scene("L3",function(stage) {
     //Alto lleno de premios
     ["Ghost",{x:(30*32)+16,y:(73*32)+16}],
     ["Plant",{x:(30*32)+16,y:(75*32)+16}],
-    ["Premio",{x:(18*32)+16,y:(75*32)+16}],
+    ["Premio",{x:(17*32)+16,y:(75*32)+16}],
     ["Premio",{x:(19*32)+16,y:(75*32)+16}],
-    ["Premio",{x:(20*32)+16,y:(75*32)+16}],
     ["Premio",{x:(21*32)+16,y:(75*32)+16}],
-    ["Premio",{x:(22*32)+16,y:(75*32)+16}],
     ["Premio",{x:(23*32)+16,y:(75*32)+16}],
-    ["Premio",{x:(24*32)+16,y:(75*32)+16}],
     ["Premio",{x:(25*32)+16,y:(75*32)+16}],
     ["Crow",{x:(19*32)+16,y:(72*32)+16}],
 
@@ -2556,12 +2562,13 @@ Q.scene("L3",function(stage) {
     ["ArmorGhost",{x:(203*32)+16,y:(94*32)+16}],
 
     ["Crow",{x:(222*32)+16,y:(69*32)+16}],
-    ["Premio",{x:(222*32)+16,y:(69*32)+16}],
-    ["Plant",{x:(222*32)+16,y:(94*32)+16}],
+    ["Vida",{x:(219*32)+16,y:(75*32)+16}],
+    ["ObjHacha",{x:(224*32)+16,y:(75*32)+16}],
 
     //Edificio
     ["Crow",{x:(252*32)+16,y:(80*32)+16}],
     ["Crow",{x:(260*32)+16,y:(78*32)+16}],
+    ["ObjArmadura",{x:(250*32)+16,y:(66*32)+16}],
     ["Zombie",{x:(250*32)+16,y:(86*32)+16}],
     ["Zombie",{x:(246*32)+16,y:(93*32)+16}],
     ["Zombie",{x:(252*32)+16,y:(93*32)+16}],
@@ -2591,9 +2598,9 @@ Q.scene("L3",function(stage) {
 
     //Tierra antes del boss
     ["Zombie",{x:(359*32)+16,y:(94*32)+16}],
-    ["Zombie",{x:(369*32)+16,y:(94*32)+16}],
+    ["Zombie",{x:(361*32)+16,y:(94*32)+16}],
      //Boss final
-     ["Devil",{x:(380*32)+16,y:(92*32)+16}]
+    ["Devil",{x:(380*32)+16,y:(92*32)+16}]
   ];
   Q.stageTMX("stage3.tmx",stage);
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
