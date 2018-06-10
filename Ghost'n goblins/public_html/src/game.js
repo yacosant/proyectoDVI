@@ -443,7 +443,7 @@ Q.component("levelManager",{
             var lvl=Q.state.get("level");
             if(lvl%2===0)
                 lvl-=1;
-            Q.loadTMX("level"+lvl+".tmx", function() {
+            Q.loadTMX("stage"+lvl+".tmx", function() {
                 if(Q.stageScene("HUD",2))
                    Q.stage(2).show();
                 else
@@ -551,7 +551,7 @@ Q.Sprite.extend("Player",{
             hit:false,
             jump:false,
             ArmoDestroy:false,
-            jumpSpeed:-400,//Salto
+            jumpSpeed:-450,//Salto
             armaEquipada: "lanza", //Armamento
             shootDelay:0.3,//Disparo
             shoot:0,
@@ -564,6 +564,8 @@ Q.Sprite.extend("Player",{
             ladderTile:0,
             respawnPoints:[{x:0,y:0},//respawn
                            {x:(16*32)+16,y:(21*32)+16},//level1 point 1
+                           {x:(132*32)+16,y:(21*32)+16},//level1 point 2 132x
+                           {x:(18*32)+16,y:(94*32)+16},//level1 point 1
                            {x:(132*32)+16,y:(21*32)+16}//level1 point 2 132x
                           ]
             
@@ -611,13 +613,13 @@ Q.Sprite.extend("Player",{
             if(this.p.hit){
                 this.animArmo();
             }else if(this.p.frog){
-                this.p.jumpSpeed=-500;
+                this.p.jumpSpeed=-550;
                 this.frogerizado(dt);//Animacion  
             }else if(this.p.onLadder){
                 this.animEscalera();
                 this.p.onLadder = false;
             }else{
-                this.p.jumpSpeed=-400;
+                this.p.jumpSpeed=-450;
                 this.animBase();//Animacion
             }
         }
@@ -745,7 +747,10 @@ Q.Sprite.extend("Player",{
             Q.audio.play("jumpEnd.ogg");
             this.p.jump=false;
         }
-        if(collision.tile === 91 && !this.p.muerto)
+        const level=Q.state.get("level");
+        if((level===1 || level===2) && collision.tile === 91 && !this.p.muerto)
+            this.muerto();
+        else if( (level===3 || level===4) && collision.tile === 7 && !this.p.muerto)
             this.muerto();
     },
     fire:function(){
@@ -2152,7 +2157,7 @@ Q.UI.Text.extend("Timer",{
 });
 //HUD superior
 Q.scene('HUD',function(stage) {
-  var container = stage.insert(new Q.UI.Container({x:0, y: 1, fill: "rgba(0,0,0,1)"}));
+  var container = stage.insert(new Q.UI.Container({x:0, y: 1}));
   container.insert(new Q.UI.Text({x:70, y:0 ,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_YELLOW,label: "Player", family: Q.FONT_FAMILY  }));
   container.insert(new Q.Score());
   container.insert(new Q.UI.Text({x:250, y:0,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_RED,label: "Top score", family: Q.FONT_FAMILY  }));
@@ -2172,9 +2177,8 @@ Q.UI.Button.extend("LivesOne",{
     init:function(p) {
         this._super({
             asset: "live.png",    
-            x: 30,
-            y: 150,
-            opacity: 1
+            x: 10,
+            y: 150
             });
     }
 });
@@ -2183,9 +2187,8 @@ Q.UI.Button.extend("LivesTwo",{
     init:function(p) {
         this._super({
             asset: "live.png",    
-            x: 80,
-            y: 150,
-            opacity: 1
+            x: 50,
+            y: 150
             });
     }
 });
@@ -2194,9 +2197,8 @@ Q.UI.Button.extend("LivesThree",{
     init:function(p) {
         this._super({
             asset: "live.png",    
-            x: 130,
-            y: 150,
-            opacity: 1
+            x: 100,
+            y: 150
             });
     }
 });
@@ -2205,9 +2207,8 @@ Q.UI.Button.extend("LivesFour",{
     init:function(p) {
         this._super({
             asset: "live.png",    
-            x: 180,
-            y: 150,
-            opacity: 0
+            x: 150,
+            y: 150
             });
     }
 });
@@ -2216,9 +2217,8 @@ Q.UI.Button.extend("LivesFive",{
     init:function(p) {
         this._super({
             asset: "live.png",    
-            x: 230,
-            y: 150,
-            opacity: 0
+            x: 200,
+            y: 150
             });
     }
 });
@@ -2271,12 +2271,12 @@ Q.scene('HUD2',function(stage) {
   container.insert(vida3);
   container.insert(vida4);
   container.insert(vida5);
-  /*vida1.p.opacity = 1;
+  vida1.p.opacity = 1;
   vida2.p.opacity = 1;
   vida3.p.opacity = 1;
   vida4.p.opacity = 0;
-  vida5.p.opacity = 0;*/
-
+  vida5.p.opacity = 0;
+  
   Q.state.on("change.lives",function(){
     var lives = Q.state.get("lives");
     switch(lives){
@@ -2338,14 +2338,12 @@ Q.scene("initScreen",function(stage){
     Q.stageTMX("mainMenu.tmx",stage);
     stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: Q.FONT_FAMILY }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
-    Q.state.set({ score:0,topScore:Number(Q.TOPSCORE), lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
+    Q.state.set({ score:0,topScore:Number(Q.TOPSCORE), lives:3,level:3,armaArthur:"lanza",pause:false,enJuego:false });
     //Musica principal del juego
    Q.input.on("confirm",this,function(){
-        Q.loadTMX("level2.tmx", function() {
-            Q.audio.play("insertCoin.ogg");
-            Q.stageScene("controlScreen");
-            Q.input.off("confirm");
-        });
+        Q.audio.play("insertCoin.ogg");
+        Q.stageScene("controlScreen");
+        Q.input.off("confirm");
     });
 });
 //Pantalla de perdido
@@ -2417,7 +2415,7 @@ Q.scene('controlScreen',function(stage) {
   stage.insert(new Q.UI.Text({x:Q.width/2, y: 330,size:Q.FONT_SIZE_MEDIUM,color:Q.COLOR_BLUE,label:"Pulsa la barra espaciadora para disparar", family: Q.FONT_FAMILY }));
   stage.insert(new Q.UI.Text({x:Q.width/2, y: 380,size:Q.FONT_SIZE_MEDIUM,color:Q.COLOR_BLUE,label:'Pulsa la tecla "P"  para pausar la partida', family: Q.FONT_FAMILY }));
   stage.insert(new Q.UI.Text({x:Q.width/2, y: 480,size:Q.FONT_SIZE_LARGE,color:Q.COLOR_YELLOW,label:'Ready player One!', family: Q.FONT_FAMILY }));
-  stage.insert(new Q.TimeSensor({wait:5,action:"loadLevel"}));
+  stage.insert(new Q.TimeSensor({wait:2,action:"loadLevel"}));
 });
 /*----------------------------------NIVELES-----------------------------------*/ 
 // Nivel 1
@@ -2425,7 +2423,7 @@ Q.scene("L1",function(stage) {
   Q.state.set("enJuego",true);
   var levelAssets = [
       //Cementerio P1
-      ["Zombie",{x:(32*32)+16,y:(21*32)+16}],
+      /*["Zombie",{x:(32*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(34*32)+16,y:(21*32)+16}],
       ["Crow",{x:(39*32)+16,y:(18*32)+16}],
       ["Magician",{x:(40*32)+20,y:(20*32)-6}],
@@ -2449,7 +2447,7 @@ Q.scene("L1",function(stage) {
       ["Crow",{x:(100*32)+16,y:(18*32)+16}],
       ["Zombie",{x:(101*32)+16,y:(21*32)+16}],
       ["Zombie",{x:(105*32)+16,y:(21*32)+16}],
-      ["Crow",{x:(107*32)+16,y:(19*32)+16}],
+      ["Crow",{x:(107*32)+16,y:(19*32)+16}],*/
       //entrada bosque
       ["Zombie",{x:(140*32)+16,y:(21*32)+16}],
       ["Plant",{x:(145*32)+16,y:(21*32)+16}],
@@ -2486,9 +2484,19 @@ Q.scene("L1",function(stage) {
       //Boss final
       ["Devil",{x:(371*32)+16,y:(15*32)+16}]
     ];
-  Q.stageTMX("level2.tmx",stage);
+  Q.stageTMX("stage1.tmx",stage);
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
   stage.viewport.offset(0,204);
+  backMusic.playMusic(false);
+  stage.loadAssets(levelAssets);
+});
+// Nivel 1
+Q.scene("L3",function(stage) {
+  Q.state.set("enJuego",true);
+  var levelAssets = [];
+  Q.stageTMX("stage3.tmx",stage);
+  stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
+  stage.viewport.offset(0,120);
   backMusic.playMusic(false);
   stage.loadAssets(levelAssets);
 });
