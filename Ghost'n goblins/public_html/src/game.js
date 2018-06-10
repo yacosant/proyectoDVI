@@ -879,6 +879,7 @@ Q.Sprite.extend("Player",{
     win:function(){
         this.p.x-=1;
         this.p.victoria=true;
+        Q.state.set("armaArthur","lanza");
         this.del("platformerControls");
         this.p.vx=0;
     }
@@ -2124,7 +2125,7 @@ Q.Sprite.extend("Vida",{
     open:function(collision){
         this.p.x -= collision.separate[0];
         this.p.y -= collision.separate[1];
-        if(collision.obj.p.type === Q.SPRITE_PLAYER && Q.state.get("armaArthur")==="cruz"){
+        if(collision.obj.p.type === Q.SPRITE_PLAYER && Q.state.get("armaArthur")==="cruz" && !collision.obj.p.victoria){
             collision.obj.win();
             Q.audio.stop();
             Q.audio.play("doorOpen.ogg");
