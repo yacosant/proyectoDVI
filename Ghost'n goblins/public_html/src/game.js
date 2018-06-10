@@ -616,6 +616,9 @@ Q.Sprite.extend("Player",{
         }      
     },
     step:function(dt){
+        var xA = this.p.x;
+        var yA = this.p.y;
+
         this.p.shoot+=dt; //Aumentamos el tiempo sin disparar
         this.Timer.step(dt);
         //Comprobamos el tiempo
