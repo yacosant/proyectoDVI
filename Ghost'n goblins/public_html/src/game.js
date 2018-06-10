@@ -252,13 +252,13 @@ Q.input.keyboardControls({
     P: "pausa",
     SPACE:"fire",
     //Trucos:Activar solo en caso de corbardia
-    ONE:"arma1",
-    TWO:"arma2",
-    THREE:"arma3",
-    FOUR:"arma4",
-    FIVE:"armor",
-    SIX:"vida",
-    X:"frog"
+//    ONE:"arma1",
+//    TWO:"arma2",
+//    THREE:"arma3",
+//    FOUR:"arma4",
+//    FIVE:"armor",
+//    SIX:"vida",
+//    X:"frog"
 });
 //Trucos
 Q.input.on("arma1",function() {
@@ -609,7 +609,7 @@ Q.Sprite.extend("Player",{
         this.on("bump.bottom",this,"colMapa");
     },
     subirEscalera: function(colObj){
-        if(colObj.p.ladder) { 
+        if(colObj.p.ladder && !this.p.muerto) { 
             this.p.onLadder = true;
             this.p.ladderX = colObj.p.x-18;
             this.p.ladderTile=colObj.tile;
