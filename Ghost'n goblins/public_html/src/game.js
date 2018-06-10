@@ -2271,11 +2271,6 @@ Q.scene('HUD2',function(stage) {
   container.insert(vida3);
   container.insert(vida4);
   container.insert(vida5);
-  vida1.p.opacity = 1;
-  vida2.p.opacity = 1;
-  vida3.p.opacity = 1;
-  vida4.p.opacity = 0;
-  vida5.p.opacity = 0;
   
   Q.state.on("change.lives",function(){
     var lives = Q.state.get("lives");
