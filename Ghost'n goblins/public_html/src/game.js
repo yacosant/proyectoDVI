@@ -919,7 +919,7 @@ Q.Sprite.extend("Zombie",{
        else if(collision.obj.p.type===Q.SPRITE_TUMBA){
            this.play("zombieBye");
            this.p.vx=0;
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     },
     hit: function(damage){
@@ -1637,7 +1637,7 @@ Q.Sprite.extend("Bullet",{
             collision.obj.hit(collision);
         } else if(collision.obj.p.type===Q.SPRITE_DEFAULT) 
             Q.stage().insert(new Q.Spark({x:collision.obj.p.x,y:collision.obj.p.y}));
-        else if(collision.tile === 91) 
+        else if(collision.tile === 91 || collision.tile === 7) 
             this.destroy();
     },
     hit: function(damage){
@@ -1857,7 +1857,7 @@ Q.Sprite.extend("Fire",{
             collision.obj.hit(collision);
         else if(collision.obj.p.type === Q.SPRITE_ENEMY)
             collision.obj.hit(this.p.damage);
-        else if(collision.tile === 91)
+        else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
 }); 
@@ -1901,7 +1901,7 @@ Q.Sprite.extend("Premio",{
            Q.audio.play("treasurePickUp.ogg");
            Q.state.inc("score",this.p.puntos);
            this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -1925,7 +1925,7 @@ Q.Sprite.extend("ObjAntorcha",{
             Q.state.set("armaArthur","antorcha");
             Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -1949,7 +1949,7 @@ Q.Sprite.extend("ObjHacha",{
             Q.state.set("armaArthur","hacha");
             Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -1973,7 +1973,7 @@ Q.Sprite.extend("ObjDaga",{
            Q.state.set("armaArthur","daga");
            Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -1997,7 +1997,7 @@ Q.Sprite.extend("ObjLanza",{
             Q.state.set("armaArthur","lanza");
             Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -2023,7 +2023,7 @@ Q.Sprite.extend("ObjArmadura",{
                 Q.audio.play("treasurePickUp.ogg");
             Q.state.inc("score",this.p.puntos);
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -2049,7 +2049,7 @@ Q.Sprite.extend("Vida",{
                 Q.state.inc("score",this.p.puntos);
             }
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     }
  });
@@ -2077,7 +2077,7 @@ Q.Sprite.extend("Vida",{
             Q.clearStage(5);
             Q("Door").first().unlock();
             this.destroy();
-        }else if(collision.tile === 91)
+        }else if(collision.tile === 91 || collision.tile === 7)
             this.destroy();
     },
     show:function(){
