@@ -2338,7 +2338,7 @@ Q.scene("initScreen",function(stage){
     Q.stageTMX("mainMenu.tmx",stage);
     stage.insert(new Q.UI.Text({x:Q.width/2, y: (Q.height/3)*2-80,size:Q.FONT_SIZE_MEDIUM,color: Q.COLOR_BLUE,label: "Pulsa enter para empezar", family: Q.FONT_FAMILY }));
     stage.insert(new Q.UI.Button({asset:"main_title.png",x:Q.width/2, y: (Q.height/3)}));
-    Q.state.set({ score:0,topScore:Number(Q.TOPSCORE), lives:3,level:3,armaArthur:"lanza",pause:false,enJuego:false });
+    Q.state.set({ score:0,topScore:Number(Q.TOPSCORE), lives:3,level:1,armaArthur:"lanza",pause:false,enJuego:false });
     //Musica principal del juego
    Q.input.on("confirm",this,function(){
         Q.audio.play("insertCoin.ogg");
