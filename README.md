@@ -3,14 +3,15 @@
 ## EL JUEGO: Ghosts 'n Goblins
 ![Logo](/md/ghost-and-goblins.jpg)
 
-## Descripcion
+## Descripción
 Fue creado por Capcom.
 El jugador controla a un caballero, llamado **Sir Arthur**, que tiene la habilidad de arrojar lanzas, dagas, antorchas, hachas y otras armas con las que debe derrotar a zombis, demonios y otras criaturas fantasmagóricas para poder salvar a la princesa Prin-Prin.
 
 
 ## Objetivo del juego
 El objetivo del juego consiste en superar los niveles y rescatar a la princesa.
-
+* Se **gana** al llegar al final del mapa y vencer al Boss que ha tiene cautiva a la princesa.
+* Al recibir un toque enemigo se pierde la armadura y su protección, al siguiente toque Arthur **morirá**.
 
 ## Principales mecánicas
 * Utilizar tu arma principal para derrotar enemigos 
@@ -55,7 +56,7 @@ Nuestro juego se desarrolla en uno de los siete niveles que dispone el juego ori
 **El cementerio y el bosque**
 En el cementerio lucharás contra zombies que salen del suelo, contra plantas que te lanzan ojos y contra gárgolas voladoras que te harán las cosas difíciles. Una vez en el bosque, lucharás contra caballeros oscuros, espectros armados con arpones y contra el Cíclope, el malo final que tendrás que vencer para pasar al siguiente nivel.
 
-## IMPLEMENTACION
+## IMPLEMENTACIÓN
 La implementación se ha hecho mediante el motor de videojuegos *Quintus*.
 
 Sigue el siguiente *flujo*:
@@ -91,13 +92,13 @@ Sigue el siguiente *flujo*:
 	* Vida extra
 	* Armadura
 	
-### MEJORAS LLEVADAS A CABO DESDE LA PRESENTACION
+### MEJORAS LLEVADAS A CABO DESDE LA PRESENTACIÓN
 1. Añadir nuevos enemigos:
 	* Caballero con armadura
 	* Fantasma
 	* Mago que nos convierte en rana
 
-2. Añadir HUB
+2. Añadir HUD original
 
 3. Inclusion de Font original
 
@@ -105,7 +106,7 @@ Sigue el siguiente *flujo*:
 
 5. Inclusion de trucos ocultos para facilitar la partida
 
-6. Correccion de bugs
+6. Corrección de bugs
 
 7. Mejora de mecanicas existentes
 
@@ -118,10 +119,25 @@ Teclas para activarlos:
 		X:modo rana
 ```
 ## DESARROLLADORES
-* Andrea Martin
-* Jose Luis Sánchez Gárcia 
-* Yaco Alejandro Santiago Pérez
-
+* **Andrea Martin** *(Carga del 32%)*
+	Desarrollo de las armas
+	Desarrollo del HUD
+	Creación de mapa
+	Desarrollo del generador de premios y de los respectivos elementos de premio
+	
+* **Jose Luis Sánchez Gárcia** *(Carga del 34%)*
+	Desarrollo total del personaje Arthur, su hoja de sprites, sus animaciones, y todas sus funcionabilidades.
+	Diseño de las tiles del mapa y su posterior creación
+	Organización general del flujo
+	Parte visual: css y fonts
+	
+* **Yaco Alejandro Santiago Pérez** *(Carga del 34%)*
+	Desarrollo de la totalidad de los enemigos del juego junto con sus respectivos sprites, animaciones, comportamientos y componentes.
+	Desarrollo de todas las armas enemigas y sus respectivos sheets y comportamientos.
+	Desarrollo completo de elemntos adicionales como lanza, brillos, sangre, plataforma movil, proyectiles enemigos.
+	Pequeñas gestiones y planificaciones
+	
+	
 
 ## RECURSOS Y FUENTES
 Sprites obtenidos de la web www.spriters-resources.com y de screenshots de gameplays y juego original.
