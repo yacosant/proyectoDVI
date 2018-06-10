@@ -571,6 +571,7 @@ Q.Sprite.extend("Player",{
             type:Q.SPRITE_PLAYER,//Colisiones
             collisionMask: Q.SPRITE_DEFAULT,
             muerto:false,//Estados
+            victoria:false,
             frog:false,
             hit:false,
             jump:false,
@@ -628,7 +629,7 @@ Q.Sprite.extend("Player",{
             this.muerto();
         //Controlamos el paso por el punto de respawn
         var level=Q.state.get("level");
-        if(level%2!==0 && this.p.x>this.p.respawnPoints[level+1].x){
+        if(level%2!==0 && this.p.x>this.p.respawnPoints[level+1].x && !this.p.victoria){
             Q.audio.play("insertCoin.ogg");
             Q.state.inc("level",1);
         }
@@ -877,6 +878,7 @@ Q.Sprite.extend("Player",{
     },
     win:function(){
         this.p.x-=1;
+        this.p.victoria=true;
         this.del("platformerControls");
         this.p.vx=0;
     }
