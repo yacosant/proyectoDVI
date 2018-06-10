@@ -2320,8 +2320,6 @@ Q.scene('HUD2',function(stage) {
     }
   });
 
-  Q.state.set("lives", 3);
-
   container.fit(5,200);
   stage.show= function(state){
           this.hidden=state;
