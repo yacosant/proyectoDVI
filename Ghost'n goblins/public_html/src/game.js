@@ -616,6 +616,9 @@ Q.Sprite.extend("Player",{
         }      
     },
     step:function(dt){
+        var xA = this.p.x;
+        var yA = this.p.y;
+
         this.p.shoot+=dt; //Aumentamos el tiempo sin disparar
         this.Timer.step(dt);
         //Comprobamos el tiempo
@@ -2372,8 +2375,6 @@ Q.scene('HUD2',function(stage) {
     }
   });
 
-  Q.state.set("lives", 3);
-
   container.fit(5,200);
   stage.show= function(state){
           this.hidden=state;
@@ -2542,7 +2543,10 @@ Q.scene("L1",function(stage) {
 // Satge 2
 Q.scene("L3",function(stage) {
   Q.state.set("enJuego",true);
-  var levelAssets = [];
+  var levelAssets = [
+    ["Zombie",{x:(258*32)+16,y:(86*32)+16}]
+
+  ];
   Q.stageTMX("stage3.tmx",stage);
   stage.add("viewport").follow(Q("Player").first(),{x:true,y:true});
   stage.viewport.offset(0,120);
